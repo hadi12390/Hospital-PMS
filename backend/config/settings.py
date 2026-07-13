@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
     'django.contrib.sites',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -47,6 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+AUTH_USER_MODEL = "accounts.User"
+ROOT_URLCONF = 'config.urls'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -177,3 +183,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+AUTH_USER_MODEL = 'accounts.User'

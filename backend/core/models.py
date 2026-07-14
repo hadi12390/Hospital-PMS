@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-class Doctor(models.Model):  # Changed to singular
+class Doctor(models.Model):  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -17,13 +17,18 @@ class Doctor(models.Model):  # Changed to singular
         return f"Dr. {self.user.get_full_name() or self.user.username}"
 
 
-class Patient(models.Model):  # Changed to singular
+class Patient(models.Model):  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
+        on_delete=models.SET_NULL, # if the user got deleted this field will be Null
+        # making this field optinal in case he's just a visitor
+        null = True,
+        blank = True,
         limit_choices_to={'role': 'patient'}, 
-        related_name='patient'  # Fixed plural naming style
+        related_name='patient'  
     )
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     birth_date = models.DateField()
     
     # Renamed the inner class to Gender to avoid confusing it with 'User.Role'
@@ -36,12 +41,12 @@ class Patient(models.Model):  # Changed to singular
     phone_number = models.CharField(max_length=15, blank=True)
 
     def __str__(self):
-        return self.user.get_full_name() or self.user.username
+        return f"{self.first_name} {self.last_name}"
 
 
-class Appointment(models.Model):  # Changed to singular
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
+class Appointment(models.Model):  
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='appointments')
+    patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, related_name='appointments')
     
     # This single field handles day AND hour/minute perfectly
     scheduled_time = models.DateTimeField() 

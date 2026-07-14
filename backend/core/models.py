@@ -63,3 +63,12 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Appointment: {self.patient} with {self.doctor} on {self.scheduled_time}"
+
+
+class Manager(models.Model):
+    user = models.OneToOneField(
+        setings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'manager'},
+        related_name='manager'
+    )

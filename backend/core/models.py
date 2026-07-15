@@ -12,7 +12,7 @@ class Doctor(models.Model):
     phone_number = models.CharField(max_length=15, blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
-
+    created_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Dr. {self.user.get_full_name() or self.user.username}"
 
@@ -40,6 +40,7 @@ class Patient(models.Model):
         
     gender = models.CharField(max_length=10, choices=Gender.choices, default=Gender.UNKNOWN)
     phone_number = models.CharField(max_length=15, blank=True)
+    email = models.EmailField()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

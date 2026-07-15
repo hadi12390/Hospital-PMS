@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'allauth.socialaccount',
     'accounts',
     'django.contrib.sites',
     'rest_framework',
@@ -49,10 +50,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 AUTH_USER_MODEL = "accounts.User"
 ROOT_URLCONF = 'config.urls'
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -141,9 +144,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # --- allauth ---
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
@@ -151,6 +153,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",  # add this
+
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",

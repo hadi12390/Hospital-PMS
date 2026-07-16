@@ -148,7 +148,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # --- DRF ---
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -160,6 +160,8 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ),
 }
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # --- simplejwt ---
 from datetime import timedelta

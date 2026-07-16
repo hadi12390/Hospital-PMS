@@ -28,6 +28,7 @@ class Patient(models.Model):
         limit_choices_to={'role': 'patient'}, 
         related_name='patient'  
     )
+    personal_id = models.CharField(max_length=100, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField()
@@ -41,7 +42,19 @@ class Patient(models.Model):
     gender = models.CharField(max_length=10, choices=Gender.choices, default=Gender.UNKNOWN)
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField()
-
+    class BloodType(models.TextChoices):
+        OP = 'O+', 'O+'
+        OM = 'O-', 'O-'
+        AP = 'A+', 'A+'
+        AM = 'A-', 'A-'
+        BP = 'B+', 'B+'
+        BM = 'B-', 'B-'
+        ABP = 'AB+', 'AB+'
+        ABM = 'AB-', 'AB-'
+        UNKNOWN = 'unknown', 'Unknown'
+    
+    blood_type = models.CharField(max_length=4, choices=BloodType.choices, default=BloodType.UNKNOWN)
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 

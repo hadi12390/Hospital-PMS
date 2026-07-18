@@ -1,3 +1,6 @@
+import "./Dashboard.css";
+
+
 function AdminDashboard(){
 
   return (

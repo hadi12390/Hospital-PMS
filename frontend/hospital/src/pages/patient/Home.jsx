@@ -1,3 +1,7 @@
+import "./Home.css";
+
+
+
 function PatientHome(){
 
   return (

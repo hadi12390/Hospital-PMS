@@ -1,3 +1,7 @@
+import "./Dashboard.css";
+
+
+
 function DoctorDashboard(){
 
   return (

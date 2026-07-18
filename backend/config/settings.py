@@ -174,7 +174,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# --- dj-rest-auth ---
+# --- dj-rest-a uth ---
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_HTTPONLY": True,
@@ -183,6 +183,8 @@ REST_AUTH = {
     "JWT_AUTH_SAMESITE": "Lax",
     "TOKEN_MODEL": None,
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    "PASSWORD_RESET_USE_SITES_DOMAIN": False,
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
 }
 
 

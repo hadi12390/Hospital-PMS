@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from .models import User
 from allauth.account.models import EmailAddress
+from dj_rest_auth.registration.serializers import RegisterSerializer 
+from logs.models import ActivityLog
 
 class StaffCreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -30,4 +32,16 @@ class StaffCreateUserSerializer(serializers.ModelSerializer):
             verified=True,
             primary=True,
         )
+        return user
+
+class CustomRegisterSerializer(RegisterSerializer): # edit the dj-rest-register
+    def save(self, request): 
+        user = super().save(request)
+        
+        ActivityLog.objects.create( 
+            user=user,
+            action=ActivityLog.Action.REGISTER,
+            description=f"{user.email} registered."
+        )
+        # now we saved the object but we added the log
         return user

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'logs',
     'allauth.socialaccount',
     'accounts',
     'django.contrib.sites',
@@ -181,7 +182,10 @@ REST_AUTH = {
     "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
     "JWT_AUTH_SAMESITE": "Lax",
     "TOKEN_MODEL": None,
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
 }
+
+
 
 # --- CORS: talk to a Vite dev server ---
 CORS_ALLOWED_ORIGINS = [

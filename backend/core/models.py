@@ -10,8 +10,8 @@ class Doctor(models.Model):
     )
     specialty = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15, blank=True)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(blank=True)
+    end_time = models.TimeField(blank=True)
     created_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Dr. {self.user.get_full_name() or self.user.username}"
@@ -21,12 +21,11 @@ class Doctor(models.Model):
 class Patient(models.Model):  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
-        on_delete=models.SET_NULL, # if the user got deleted this field will be Null
+        on_delete=models.CASCADE,
         # making this field optinal in case he's just a visitor
         null = True,
         blank = True,
-        limit_choices_to={'role': 'patient'}, 
-        related_name='patient'  
+        related_name='patient'
     )
     personal_id = models.CharField(max_length=100, blank=True)
     first_name = models.CharField(max_length=100)
@@ -41,7 +40,6 @@ class Patient(models.Model):
         
     gender = models.CharField(max_length=10, choices=Gender.choices, default=Gender.UNKNOWN)
     phone_number = models.CharField(max_length=15, blank=True)
-    email = models.EmailField()
     class BloodType(models.TextChoices):
         OP = 'O+', 'O+'
         OM = 'O-', 'O-'
@@ -53,7 +51,7 @@ class Patient(models.Model):
         ABM = 'AB-', 'AB-'
         UNKNOWN = 'unknown', 'Unknown'
     
-    blood_type = models.CharField(max_length=4, choices=BloodType.choices, default=BloodType.UNKNOWN)
+    blood_type = models.CharField(max_length=10, choices=BloodType.choices, default=BloodType.UNKNOWN)
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -72,7 +70,6 @@ class Appointment(models.Model):
         CONFIRMED = 'confirmed', 'Confirmed'
         COMPLETED = 'completed', 'Completed'
         CANCELLED = 'cancelled', 'Cancelled'
-    
     reason_for_visit = models.CharField(max_length=255, blank=True, help_text="The patient's primary symptoms or reason for booking.")
     # Bumped max_length up to 20 to safely hold 'confirmed' and 'cancelled'
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

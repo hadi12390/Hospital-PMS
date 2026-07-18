@@ -15,7 +15,7 @@ class Command(BaseCommand):
         now = timezone.now()
 
         # Delete users who have been expired for 14 days
-        delete_users = User.objects.filter(
+        delete_users = User.objects.filter( 
             status=User.Status.EXPIRED,
             expired_at__lt=now - timedelta(days=14),
             emailaddress__verified=False,

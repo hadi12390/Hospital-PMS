@@ -16,7 +16,7 @@ class User(AbstractUser):
         DISABLED = 'disabled', 'Disabled'
 
     status = models.CharField(
-        max_length=20,
+        max_length=50,
         choices=Status.choices,
         default=Status.ACTIVE
     )

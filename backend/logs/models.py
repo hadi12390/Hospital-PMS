@@ -13,7 +13,8 @@ class ActivityLog(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name="activities"
     )   
 
     action = models.CharField(max_length=50, choices=Action.choices)

@@ -2,7 +2,6 @@ from rest_framework .generics import CreateAPIView
 from .serializers import StaffCreateUserSerializer
 from .permissions import IsManager
 from logs.models import ActivityLog
-from core.models import Doctor, Patient, Manager
 
 class StaffCreateUserView(CreateAPIView):
     serializer_class = StaffCreateUserSerializer

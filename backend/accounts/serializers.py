@@ -48,11 +48,10 @@ class StaffCreateUserSerializer(serializers.ModelSerializer):
 class CustomRegisterSerializer(RegisterSerializer): # edit the dj-rest-register
     def save(self, request): 
         user = super().save(request)
-        
         ActivityLog.objects.create( 
             user=user,
             action=ActivityLog.Action.REGISTER,
-            description=f"{user.email} registered."
+            description=f"{user.email} registered (unverified yet)."
         )
         # now we saved the object but we added the log
         return user

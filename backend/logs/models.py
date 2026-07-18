@@ -4,6 +4,7 @@ from django.conf import settings
 class ActivityLog(models.Model):
     class Action(models.TextChoices):
         REGISTER = "register", "Register"
+        EMAIL_VERIFIED = "email_verified", "Email Verified"
         APPOINTMENT_CREATED = "appointment_created", "Appointment Created"
         APPOINTMENT_UPDATED = "appointment_updated", "Appointment Updated"
         APPOINTMENT_DELETED = "appointment_deleted", "Appointment Deleted"

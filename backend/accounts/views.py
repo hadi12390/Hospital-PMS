@@ -13,6 +13,6 @@ class StaffCreateUserView(CreateAPIView):
         ActivityLog.objects.create(
             user=self.request.user,
             action=ActivityLog.Action.REGISTER,
-            description=f"Manager {self.request.user.username} ({self.request.user.email}) created a {role} account for {user.username} ({user.email})."
+            description=f"Manager {self.request.user.username} ({self.request.user.email}) created a {role} account for {user.username} ({user.email}), (verifid)."
         )
         

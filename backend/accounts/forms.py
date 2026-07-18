@@ -4,7 +4,6 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 
-
 class CustomAllAuthPasswordResetForm(AllAuthPasswordResetForm):
     def save(self, request, **kwargs):
         email = self.cleaned_data["email"]

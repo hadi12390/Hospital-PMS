@@ -225,3 +225,5 @@ TEMPLATES = [
         },
     },
 ]
+
+ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"

@@ -4,6 +4,8 @@ from .models import User
 from allauth.account.models import EmailAddress
 from dj_rest_auth.registration.serializers import RegisterSerializer 
 from logs.models import ActivityLog
+from dj_rest_auth.serializers import PasswordResetSerializer
+from .forms import CustomAllAuthPasswordResetForm
 
 class StaffCreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -55,3 +57,11 @@ class CustomRegisterSerializer(RegisterSerializer): # edit the dj-rest-register
         )
         # now we saved the object but we added the log
         return user
+
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    def validate_email(self, value):
+        self.reset_form = CustomAllAuthPasswordResetForm(data=self.initial_data)
+        if not self.reset_form.is_valid():
+            raise serializers.ValidationError(self.reset_form.errors)
+        return value

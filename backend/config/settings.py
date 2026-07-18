@@ -174,7 +174,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# --- dj-rest-a uth ---
+# --- dj-rest-auth ---
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_HTTPONLY": True,
@@ -184,7 +184,9 @@ REST_AUTH = {
     "TOKEN_MODEL": None,
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     "PASSWORD_RESET_USE_SITES_DOMAIN": False,
-    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "http://localhost:5173/reset-password/{uid}/{token}",
+    "PASSWORD_RESET_SERIALIZER": "accounts.serializers.CustomPasswordResetSerializer",
+
 }
 
 
@@ -194,6 +196,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -204,3 +207,21 @@ MEDIA_URL = '/media/'
 
 # The absolute filesystem path to the directory where uploaded files will be saved
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+FRONTEND_URL = "http://localhost:5173"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]

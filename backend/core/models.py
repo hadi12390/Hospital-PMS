@@ -70,6 +70,8 @@ class Appointment(models.Model):
         CONFIRMED = 'confirmed', 'Confirmed'
         COMPLETED = 'completed', 'Completed'
         CANCELLED = 'cancelled', 'Cancelled'
+        NO_SHOW = "no_show", "No Show"
+        
     reason_for_visit = models.CharField(max_length=255, blank=True, help_text="The patient's primary symptoms or reason for booking.")
     # Bumped max_length up to 20 to safely hold 'confirmed' and 'cancelled'
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
@@ -151,7 +153,7 @@ class MedicalDocument(models.Model):
 
 class Manager(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,  # Typo fixed here!
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         limit_choices_to={'role': 'manager'},
         related_name='manager'

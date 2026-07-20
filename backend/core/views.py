@@ -1,7 +1,7 @@
-from rest_framework .generics import CreateAPIView
+from rest_framework .generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from core.serializers import AddUserToDoctor, AddUserToPatient, AddUserToManager
 from accounts.permissions import IsManager, IsPatient, IsDoctor
-
+from .models import Appointment
 
 class AddDoctor(CreateAPIView):
     serializer_class = AddUserToDoctor
@@ -14,3 +14,6 @@ class AddPatient(CreateAPIView):
 class AddManager(CreateAPIView):
     serializer_class = AddUserToManager
     permission_classes = [IsManager]
+
+class CreateAppointment(CreateAPIView):
+    

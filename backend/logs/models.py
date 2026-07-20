@@ -15,7 +15,7 @@ class ActivityLog(models.Model):
         null=True,
         blank=True,
         related_name="activities"
-    )   
+    )
 
     action = models.CharField(max_length=50, choices=Action.choices)
     description = models.TextField()

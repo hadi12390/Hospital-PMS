@@ -2,7 +2,7 @@ from django.db import models
 from doctor.models import Doctor
 from patient.models import Patient
 
-class Appointment(models.Model):  
+class Appointment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='appointments')
     patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, related_name='appointments')
     

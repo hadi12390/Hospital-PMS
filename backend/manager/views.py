@@ -1,7 +1,7 @@
 from accounts.permissions import IsManager
 from .serializers import ManagerSerializer
 from doctor.serializers import DoctorSerializer
-from appointments.serializers import AppointmentSerializer
+from appointments.serializers import ManagerAppointmentSerializer
 from rest_framework .generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 
 
@@ -14,5 +14,5 @@ class AddManager(CreateAPIView):
     permission_classes = [IsManager]
 
 class ManagerAddAppointment(CreateAPIView):
-    serializer_class = AppointmentSerializer
+    serializer_class = ManagerAppointmentSerializer
     permission_classes = [IsManager]

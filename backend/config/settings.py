@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "appointments",
     "medical_records",
     "notifications",
-    "activity_logs",
     'logs',
     'allauth.socialaccount',
     'accounts',

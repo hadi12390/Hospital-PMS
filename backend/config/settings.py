@@ -31,6 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "doctor",
+    "patient",
+    "manager",
+    "appointments",
+    "medical_records",
+    "notifications",
+    "activity_logs",
     'logs',
     'allauth.socialaccount',
     'accounts',

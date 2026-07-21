@@ -21,7 +21,10 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
             "scheduled_time",
             "reason_for_visit",
             "notes",
+            "status",
         ]
+        
+        read_only_fields = ["status"]
     
     def create(self, validated_data):
         request = self.context["request"]
@@ -38,7 +41,10 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
             "scheduled_time",
             "reason_for_visit",
             "notes",
+            "status",
         ]
+
+        read_only_fields = ["status"]
 
     def create(self, validated_data):
         request = self.context["request"]

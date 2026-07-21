@@ -1,0 +1,405 @@
+@font-face {
+    font-family: "RegularGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GeologicaBold";
+    src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
+}
+
+
+* {
+    font-family: "RegularGEO";
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Main Layout */
+
+.DoctorDashboard {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    background: #F1EFE8;
+}
+
+
+/* Sidebar */
+
+.sideBar {
+
+    width: 250px;
+    height: 100vh;
+
+    flex-shrink: 0;
+
+    padding: 1.5em 0;
+
+    background: linear-gradient(
+        to bottom,
+        #185FA5,
+        #378ADD
+    );
+
+    border-top-right-radius: 2em;
+    border-bottom-right-radius: 2em;
+
+    overflow-y: auto;
+}
+
+
+/* Right side */
+
+.dashboardContent {
+
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+/* Navbar */
+
+.nav {
+
+    width: 100%;
+    height: 80px;
+
+    background-color: white;
+
+    padding: 1em;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+
+.navContent {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 1em;
+}
+
+
+/* Add appointment button */
+
+.buttonAddAppoi button {
+
+    cursor: pointer;
+
+    font-family: "GeologicaBold";
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 1em;
+
+    border: none;
+    border-radius: 5px;
+
+    color: white;
+
+    background: linear-gradient(
+        90deg,
+        #378ADD 0%,
+        #185FA5 100%
+    );
+}
+
+
+/* Profile */
+
+.profileSec {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: .7em;
+}
+
+
+.profilePic {
+
+    width: 43.66px;
+    height: 43.66px;
+
+    border-radius: 50%;
+
+    background-color: #185FA5;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+
+    font-size: 1.5rem;
+
+    font-family: "GeologicaBold";
+}
+
+
+.profBut {
+
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+
+/* Sidebar text */
+
+.optName {
+    text-align: start;
+
+    color: #D0D0D0;
+
+    font-size: 1rem;
+
+    margin: 1.5em 0 2em 15px;
+
+    font-family: "ExtraLightGEO";
+}
+
+
+/* Sidebar buttons */
+
+.optionsContainer {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.options {
+
+    position: relative;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    border: none;
+
+    width: 100%;
+
+
+    display: flex;
+
+    justify-content: flex-start;
+    align-items: center;
+
+
+    gap: 10px;
+
+
+    padding: 12px 20px;
+
+
+    color: #E4E4E4;
+
+    font-size: 1.1rem;
+
+
+    background: transparent;
+
+
+    border-left: 3px solid transparent;
+
+
+    transition: border-color .3s ease;
+}
+
+
+
+.options::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+
+    background: linear-gradient(
+        90deg,
+        #378ADD,
+        #185FA5
+    );
+
+
+    transform: translateX(-100%);
+
+
+    transition: transform .4s ease;
+
+
+    z-index: 0;
+}
+
+
+
+.options img,
+.options span {
+
+    position: relative;
+
+    z-index: 1;
+}
+
+
+
+.options:hover {
+
+    border-left-color: white;
+
+}
+
+
+
+.options:hover::before {
+
+    transform: translateX(0);
+
+}
+
+
+
+.otherMenu {
+
+    margin-bottom: 1em;
+
+}
+
+
+
+/* Main Content */
+.sideBar{
+
+    position: absolute;
+
+ 
+}
+
+.back{
+    width: 250px;
+    height: 50px;
+    background-color: white;
+    position: relative;
+}
+
+
+.cards {
+
+    flex: 1;
+
+    padding: 1em 1.5em;
+
+    background: #F1EFE8;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.box1 {
+        grid-area: one;
+        background-color: #378ADD;
+    }
+
+.box2 {
+    grid-area: two;
+    background-color: #378ADD;
+
+}
+
+.box3 {
+    grid-area: three;
+    background-color: #378ADD;
+
+}
+
+.box4 {
+    grid-area: four;
+    background-color: #378ADD;
+
+}
+
+.box5 {
+    grid-area: five;
+    background-color: #378ADD;
+
+}
+
+.box6 {
+    grid-area: six;
+    background-color: #378ADD;
+
+}
+
+
+.containerCards {
+    display: grid;
+    width: 100%;
+
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 100%);
+
+    grid-template-areas:
+        "one two three"
+        "four four four"
+        "five five six";
+
+    gap: 20px;
+}
+.heroName{
+
+    text-align: left;
+    background: #185FA5;
+    background: linear-gradient(90deg, #378ADD, #185FA5);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+.heroNameP{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    gap: 10px;
+
+}
+.fullNameBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}

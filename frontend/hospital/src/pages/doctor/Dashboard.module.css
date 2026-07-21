@@ -9,6 +9,11 @@
 }
 
 @font-face {
+    font-family: "SoExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Cursive-Thin.ttf") format("truetype");
+}
+
+@font-face {
     font-family: "GeologicaBold";
     src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
 }
@@ -39,7 +44,7 @@
 .sideBar {
 
     width: 250px;
-    height: 100vh;
+    min-height: 100vh;
 
     flex-shrink: 0;
 
@@ -68,23 +73,37 @@
     flex-direction: column;
 
     min-width: 0;
+
+    height: 100vh;
+
+    overflow-y: auto;
+    position: relative;
+
+
 }
 
 
 /* Navbar */
 
 .nav {
-
-    width: 100%;
-    height: 80px;
-
-    background-color: white;
-
-    padding: 1em;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    padding: 1em 2em;
+
+    background: rgba(255,255,255,.65);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid rgba(0,0,0,.06);
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.04);
 }
 
 
@@ -125,6 +144,12 @@
         #378ADD 0%,
         #185FA5 100%
     );
+    transition: all 0.3s ease;
+}
+
+.buttonAddAppoi button:hover{
+    filter: brightness(1.2);
+    transform: scale(1.03);
 }
 
 
@@ -310,7 +335,14 @@
 .back{
     width: 250px;
     height: 50px;
-    background-color: white;
+    background: rgba(255,255,255,.65);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid rgba(0,0,0,.06);
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.04);
     position: relative;
 }
 
@@ -325,41 +357,68 @@
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+
+
 }
 
 .box1 {
-        grid-area: one;
-        background-color: #378ADD;
-    }
+    grid-area: one;
+    background:linear-gradient(to right ,#185FA5, #378ADD) ;
+    border-radius: .5em;
+    height: 11em;
+    color: white;
+
+}
 
 .box2 {
     grid-area: two;
-    background-color: #378ADD;
-
+    background-color: white;
+    border-radius: .5em;
+    height: 11em;
+    color: #4d4d4d !important;
+    
 }
 
 .box3 {
     grid-area: three;
-    background-color: #378ADD;
+    background-color: white;
+    border-radius: .5em;
+    height: 11em;
+    color: #4d4d4d !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
 }
 
 .box4 {
     grid-area: four;
-    background-color: #378ADD;
+    background-color: white;
+    border-radius: .5em;
+
 
 }
 
 .box5 {
     grid-area: five;
-    background-color: #378ADD;
+    border-radius: .5em;
+    background-color: white;
+    height: 11em;
+    color: #4d4d4d;
+    display: flex;
+    
+    justify-content: space-between;
+    padding-right: 1em;
 
 }
 
 .box6 {
     grid-area: six;
-    background-color: #378ADD;
-
+    background:linear-gradient(to right ,#185FA5, #378ADD) ;
+    border-radius: .5em;
+    height: 11em;
+    color: #E4E4E4 !important;
+    transition: all 0.3s ease;
 }
 
 
@@ -368,7 +427,6 @@
     width: 100%;
 
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 100%);
 
     grid-template-areas:
         "one two three"
@@ -388,6 +446,7 @@
 
     -webkit-text-fill-color: transparent;
     color: transparent;
+    display: flex;
 }
 .heroNameP{
     display: flex;
@@ -400,6 +459,369 @@
 .fullNameBox{
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: flex-start;
+}
+.heroPar{
+    font-family: "ExtraLightGEO";
+    color: #4d4d4d;
+    margin-bottom: 2em;
+}
+
+/* BOX 1 */
+
+.boxJustiUper{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 1em;
+    font-family: "GeologicaBold";
+    font-size: 1.5rem;
+    padding-bottom: 0em;
+
+}
+.boxJustiDown{
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    padding: 1em;
+    padding-top: 0em;
+
+}
+.boxJustiDown h1{
+    font-size: 4rem;
+    margin-left: 1em;
+}
+
+/* BOX 2 */
+
+.box2 h1{
+    background: #185FA5;
+    background: linear-gradient(0deg, #378ADD, #185FA5);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+.precentGreen{
+    color: #639922;
+}
+.precentRed{
+    color: #c23535;
+}
+
+/* BOX 3 */
+
+.box3 h1{
+    font-size: 2rem;
+    margin-bottom: .5em;
+    background: #185FA5;
+    background: linear-gradient(90deg, #378ADD, #185FA5);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.dateRealDay{
+
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    border: 1.5px #4d4d4d solid;
+    padding: 10px;
+    border-radius: 5px;
+
+    font-size: 1.5rem;
+    color: #4d4d4d;
+}
+.dateRealDay p span ,.dateRealDay p {
+    font-family: "SoExtraLightGEO" !important;
+}
+
+.heroSec{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weekAppointment {
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2rem;
+    margin-bottom: .5em;
+    background: #185FA5;
+    background: linear-gradient(90deg, #378ADD, #185FA5);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+
+}
+
+.date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+}
+
+/* ---------- Schedule ---------- */
+
+.schedule {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Time Row */
+
+.timeHeader {
+    display: grid;
+    grid-template-columns: 60px repeat(11, 1fr);
+    align-items: center;
+    color: #777;
+    font-size: .9rem;
+}
+
+.timeHeader span {
+    text-align: center;
+}
+
+/* Each Day */
+
+.dayRow {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    align-items: center;
+
+    min-height: 50px;
+
+    border-bottom: 1px solid #ECECEC;
+}
+.dayRow:last-child {
+    border-bottom: none;
+}
+
+/* Day Name */
+
+.day {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Timeline */
+
+.timeline {
+    position: relative;
+    height: 22px;
+}
+
+/* Appointment */
+
+.appointment {
+    position: absolute;
+
+    top: 0;
+    height: 22px;
+
+    border-radius: 6px;
+
+    background: #2F73B9;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: .75rem;
+    padding: 0 10px;
+
+    white-space: nowrap;
+}
+
+/* Demo only */
+
+.mon1 {
+    left: 3%;
+    width: 14%;
+}
+
+.tue1 {
+    left: 15%;
+    width: 16%;
+}
+
+.wed1 {
+    left: 5%;
+    width: 12%;
+}
+
+.thu1 {
+    left: 28%;
+    width: 40%;
+}
+
+.sat1 {
+    left: 5%;
+    width: 25%;
+}
+
+.sat2 {
+    left: 77%;
+    width: 22%;
+}
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.box6 h1{
+    color: white;
+    font-size: 2rem;
+    text-align: start;
+    margin-bottom: 7%;
+    margin-left: 15%;
+}
+.boxJustiDownForSix{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding:0 1em;
+}
+.boxJustiDownForSix div{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.box6:hover{
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+
+.box5 h1{
+    background: #185FA5;
+    background: linear-gradient(90deg, #378ADD, #185FA5);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-size: 3rem;
+}
+.mainBack{
+    background:linear-gradient(to left ,#185FA5, #378ADD) ;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    border-radius: 10px;
+}
+.mainClock{
+    background:linear-gradient(to left ,#185FA5, #378ADD) ;
+}
+.mainArrowA{
+    background:linear-gradient(5deg ,#185FA5, #378ADD) ;
+}
+.fullMain{
+    display: flex;
+    padding: 1em;
+    gap: 10px;
+    height: 100%;
+}
+.mainSecTwo{
+    display: flex;
+    gap: 10px;    
+}
+.whiteBack{
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding:5px 10px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+
+}
+.stateBack{
+    background-color: #bbec80;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+.mainClock{
+    width: 100%;
+    font-family:"GeologicaBold" ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.3rem;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    padding-top:15px ;
+    padding-bottom:15px ;
+
+}
+.mainArrowA{
+    padding: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+}
+.mainArrowA:hover{
+    filter: brightness(1.2);
+}
+.mainSecOne{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+}
+.date span{
+    border-bottom:2px #21599F solid ;
+}
+.date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.hiddenDate {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
 }

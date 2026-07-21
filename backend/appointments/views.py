@@ -1,17 +1,19 @@
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from .models import Appointment
 from .serializers import (
     ManagerAppointmentSerializer,
     DoctorAppointmentSerializer,
     PatientAppointmentSerializer,
+    DoctorAppointmentUpdateSerializer,
 )
 from accounts.permissions import IsManager, IsDoctor, IsPatient
 from logs.models import ActivityLog
 from django.db import transaction
+from rest_framework.permissions import IsAuthenticated
 
 class ManagerListCreateAppointment(ListCreateAPIView):
     serializer_class = ManagerAppointmentSerializer
-    permission_classes = [IsManager]
+    permission_classes = [IsManager, IsAuthenticated]
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -31,7 +33,7 @@ class ManagerListCreateAppointment(ListCreateAPIView):
 
 class DoctorListCreateAppointment(ListCreateAPIView):
     serializer_class = DoctorAppointmentSerializer
-    permission_classes = [IsDoctor]
+    permission_classes = [IsDoctor, IsAuthenticated]
     
     def get_queryset(self):
         doctor_profile = getattr(self.request.user, "doctor", None)
@@ -73,3 +75,30 @@ class PatientListCreateAppointment(ListCreateAPIView):
                 f"with doctor {appointment.doctor.user.username}."
             )
         )
+
+class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
+    serializer_class = DoctorAppointmentUpdateSerializer
+    permission_classes = [IsDoctor, IsAuthenticated]
+
+    def get_queryset(self):
+        doctor_profile = getattr(self.request.user, "doctor", None)
+        if not doctor_profile:
+            return Appointment.objects.none()
+        return Appointment.objects.filter(doctor=doctor_profile).select_related("patient__user")
+        
+    @transaction.atomic
+    def perform_update(self, serializer):
+        old_status = self.get_object().status
+        appointment = serializer.save()
+        new_status = appointment.status
+
+        # Create activity log if status changed
+        if old_status != new_status:
+            ActivityLog.objects.create(
+                user=self.request.user,
+                action=ActivityLog.Action.APPOINTMENT_UPDATED,
+                description=(
+                    f"Doctor {self.request.user.username} updated appointment status "
+                    f"from '{old_status}' to '{new_status}' for patient {appointment.patient.user.username}."
+                )
+            )

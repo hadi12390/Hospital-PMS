@@ -53,3 +53,13 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
+
+class DoctorAppointmentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['status', 'notes']
+        
+    def validate_status(self, value):
+        if self.instance.status == Appointment.Status.COMPLETED:
+            raise serializers.ValidationError("Cannot change the status of a completed appointment.")
+        return value

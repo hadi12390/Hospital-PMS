@@ -8,7 +8,8 @@ class Patient(models.Model):
         # making this field optinal in case he's just a visitor
         null = True,
         blank = True,
-        related_name='patient'
+        related_name='patient',
+        unique=True
     )
     personal_id = models.CharField(max_length=100, blank=True)
     first_name = models.CharField(max_length=100)

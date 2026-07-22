@@ -14,7 +14,6 @@ from .serializers import (
     PatientAppointmentSerializer,
 )
 
-
 class ManagerListCreateAppointment(ListCreateAPIView):
     queryset = Appointment.objects.select_related("patient__user", "doctor__user").all()
     serializer_class = ManagerAppointmentSerializer
@@ -42,7 +41,11 @@ class DoctorListCreateAppointment(ListCreateAPIView):
         doctor_profile = getattr(self.request.user, "doctor", None)
         if not doctor_profile:
             return Appointment.objects.none()
-        return Appointment.objects.filter(doctor=doctor_profile).select_related("patient__user")
+        return (
+            Appointment.objects.filter(doctor=doctor_profile)
+            .select_related("patient__user")
+            .order_by("-appointment_date")
+        )
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -117,3 +120,4 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     f"from '{old_status}' to '{new_status}' for patient {appointment.patient.user.username}."
                 ),
             )
+

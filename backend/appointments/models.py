@@ -1,13 +1,15 @@
 from django.db import models
 from doctor.models import Doctor
 from patient.models import Patient
+from django.utils import timezone
 
 class Appointment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='appointments')
     patient = models.ForeignKey(Patient, on_delete=models.SET_NULL, null=True, related_name='appointments')
     
     # This single field handles day AND hour/minute perfectly
-    scheduled_time = models.DateTimeField() 
+    scheduled_time = models.DateTimeField()
+    created_at = models.DateTimeField(default=timezone.now)
     
     class Status(models.TextChoices):
         PENDING = 'pending', 'Pending'

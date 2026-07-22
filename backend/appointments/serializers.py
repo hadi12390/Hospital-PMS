@@ -14,6 +14,12 @@ class ManagerAppointmentSerializer(serializers.ModelSerializer):
         ]
 
 class DoctorAppointmentSerializer(serializers.ModelSerializer):
+
+    patient_no_show_count = serializers.IntegerField(
+        source="patient.no_show_count", 
+        read_only=True
+    )
+
     class Meta:
         model = Appointment
         fields = [
@@ -22,6 +28,7 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
             "reason_for_visit",
             "notes",
             "status",
+            "patient_no_show_count",
         ]
         
         read_only_fields = ["status"]

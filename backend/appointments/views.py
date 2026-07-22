@@ -95,23 +95,30 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
 
     @transaction.atomic
     def perform_update(self, serializer):
-        old_status = self.get_object().status
-        appointment = serializer.save()
-        new_status = appointment.status
+        # 1. Grab old_status BEFORE saving
+        instance = self.get_object()
+        old_status = instance.status
 
-        # Handle status-specific timestamps safely on the specific instance
+        # 2. Save directly via serializer (pass extra kwargs to update_fields safely)
+        now = timezone.now()
+        extra_kwargs = {}
+        
+        # Check updated validated data from serializer
+        new_status = serializer.validated_data.get("status", old_status)
+
         if old_status != new_status:
-            now = timezone.now()
             if new_status == "confirmed":
-                appointment.confirmed_at = now
+                extra_kwargs["confirmed_at"] = now
             elif new_status == "completed":
-                appointment.completed_at = now
+                extra_kwargs["completed_at"] = now
             elif new_status == "cancelled":
-                appointment.cancelled_at = now
-            
-            # Save the updated timestamp field(s)
-            appointment.save()
+                extra_kwargs["cancelled_at"] = now
 
+        # Save once with timestamps included — avoids calling appointment.save() twice!
+        appointment = serializer.save(**extra_kwargs)
+
+        # 3. Log activity
+        if old_status != new_status:
             ActivityLog.objects.create(
                 user=self.request.user,
                 action=ActivityLog.Action.APPOINTMENT_UPDATED,

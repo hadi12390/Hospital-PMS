@@ -20,6 +20,8 @@ class Appointment(models.Model):
     # Bumped max_length up to 20 to safely hold 'confirmed' and 'cancelled'
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     notes = models.TextField(max_length=1000, blank=True) # Added blank=True so notes are optional
-
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"Appointment: {self.patient} with {self.doctor} on {self.scheduled_time}"

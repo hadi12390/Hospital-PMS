@@ -36,7 +36,11 @@ class Patient(models.Model):
         UNKNOWN = 'unknown', 'Unknown'
     
     blood_type = models.CharField(max_length=10, choices=BloodType.choices, default=BloodType.UNKNOWN)
-    
+    @property
+    def no_show_count(self) -> int:
+        """Returns the total number of NO_SHOW appointments for this patient."""
+        # 'appointments' assumes related_name='appointments' on Appointment.patient
+        return self.appointments.filter(status="no_show").count()    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 

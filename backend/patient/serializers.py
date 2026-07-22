@@ -10,10 +10,10 @@ class PatientSelfRegistrationSerializer(serializers.ModelSerializer):
             'personal_id', 
             'first_name', 
             'last_name', 
-            'birth_date', 
-            'gender', 
-            'phone_number', 
-            'blood_type'
+            'birth_date',
+            'gender',
+            'phone_number',
+            'blood_type',
         ]
 
 

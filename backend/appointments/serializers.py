@@ -4,14 +4,7 @@ from .models import Appointment
 class ManagerAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = [
-            "patient",
-            "doctor",
-            "scheduled_time",
-            "reason_for_visit",
-            "status",
-            "notes",
-        ]
+        fields = "__all__"
 
 class DoctorAppointmentSerializer(serializers.ModelSerializer):
 
@@ -29,6 +22,10 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
             "notes",
             "status",
             "patient_no_show_count",
+            "end_time",
+            "appointment_type",
+            "confirmed_at",
+            "created_at",
         ]
         
         read_only_fields = ["status"]
@@ -64,7 +61,7 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
 class DoctorAppointmentUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ['status', 'notes']
+        fields = ['duration_minutes', 'status', 'notes']
         
     def validate_status(self, value):
         if self.instance.status == Appointment.Status.COMPLETED:

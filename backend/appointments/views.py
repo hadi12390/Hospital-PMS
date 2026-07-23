@@ -44,7 +44,7 @@ class DoctorListCreateAppointment(ListCreateAPIView):
         return (
             Appointment.objects.filter(doctor=doctor_profile)
             .select_related("patient__user")
-            .order_by("-appointment_date")
+            .order_by("-scheduled_time")
         )
 
     @transaction.atomic

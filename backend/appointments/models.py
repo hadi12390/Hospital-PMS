@@ -51,20 +51,33 @@ class Appointment(models.Model):
     )
 
     scheduled_time = models.DateTimeField()
+    duration_minutes = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
 
     @property
     def end_time(self):
-        if not self.doctor:
-            return None
- 
-        durations = {
-            self.AppointmentType.CONSULTATION: self.doctor.consultation_duration,
-            self.AppointmentType.FOLLOW_UP: self.doctor.follow_up_duration,
-            self.AppointmentType.CHECKUP: self.doctor.checkup_duration,
-        }
+
+        if self.duration_minutes:
+            duration = self.duration_minutes
+
+        else:
+            durations = {
+                self.AppointmentType.CONSULTATION:
+                    self.doctor.consultation_duration,
+
+                self.AppointmentType.FOLLOW_UP:
+                    self.doctor.follow_up_duration,
+
+                self.AppointmentType.CHECKUP:
+                    self.doctor.checkup_duration,
+            }
+
+            duration = durations[self.appointment_type]
 
         return self.scheduled_time + timedelta(
-            minutes=durations[self.appointment_type]
+            minutes=duration
         )
 
     notes = models.TextField(

@@ -170,7 +170,10 @@ class DoctorDashboard(APIView):
         week_appointments = (
             appointments
             .exclude(
-                status=Appointment.Status.CANCELLED
+                status__in=[
+                    Appointment.Status.CANCELLED,
+                    Appointment.Status.PENDING,
+                ]
             )
             .filter(
                 scheduled_time__date__range=(
@@ -197,5 +200,6 @@ class DoctorDashboard(APIView):
             for appointment in week_appointments
         ]
 
+        stats["week_appointments_count"] = len(stats["week_appointments"])
 
         return Response(stats)

@@ -13,7 +13,7 @@ class Command(BaseCommand):
         # .update() returns the exact count of rows modified in a single query
         updated_count = Appointment.objects.filter(
             status=Appointment.Status.CONFIRMED,
-            appointment_date__lt=cutoff_time,
+            scheduled_time__lt=cutoff_time,
         ).update(status=Appointment.Status.NO_SHOW)
 
         self.stdout.write(

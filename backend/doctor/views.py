@@ -108,6 +108,13 @@ class DoctorDashboard(APIView):
                     status=Appointment.Status.CANCELLED
                 ),
             ),
+            
+            pending_appointments=Count(
+                "id",
+                filter=Q(
+                    status=Appointment.Status.PENDING
+                ),
+            ),
 
             no_show_appointments=Count(
                 "id",
@@ -136,7 +143,7 @@ class DoctorDashboard(APIView):
             .filter(
                 status=Appointment.Status.CONFIRMED,
                 scheduled_time__lte=now,
-            )
+            )   
             .order_by("-scheduled_time")
             .first()
         )

@@ -9,14 +9,15 @@ class Doctor(models.Model):
         related_name='doctor'
     )
     specialty = models.CharField(max_length=100)
-        consultation_duration = models.PositiveIntegerField(
-        default=30,
-        help_text="Duration in minutes"
-    )
+    
+    consultation_duration = models.PositiveIntegerField(
+    default=30,
+    help_text="Duration in minutes"
+)
 
     follow_up_duration = models.PositiveIntegerField(
         default=15,
-        help_text="Duration in minutes"
+        help_text="Duration in minutes",
     )
 
     checkup_duration = models.PositiveIntegerField(

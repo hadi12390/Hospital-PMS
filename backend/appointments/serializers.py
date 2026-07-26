@@ -59,9 +59,44 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
 class DoctorAppointmentUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ['duration_minutes', 'status', 'notes']
+        fields = [
+            "patient",
+            "scheduled_time",
+            "duration_minutes",
+            "reason_for_visit",
+            "appointment_type",
+            "created_at",
+            "status",
+            "notes",
+        ]
+        read_only_fields = [
+            "patient", 
+            "scheduled_time",
+            "reason_for_visit",
+            "created_at",
+        ]
         
     def validate_status(self, value):
         if self.instance.status == Appointment.Status.COMPLETED:
             raise serializers.ValidationError("Cannot change the status of a completed appointment.")
         return value
+
+class DoctorPendingAppointmentSerializer(serializers.ModelSerializer):
+
+    patient_name = serializers.SerializerMethodField()
+
+    def get_patient_name(self, obj):
+        if obj.patient.user:
+            return obj.patient.user.get_full_name()
+        return obj.patient.name
+
+    class Meta:
+        model = Appointment
+        fields = [
+            "id",
+            "patient_name",
+            "scheduled_time",
+            "reason_for_visit",
+            "appointment_type",
+            "created_at",
+        ]

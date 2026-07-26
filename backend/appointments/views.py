@@ -1,7 +1,11 @@
 from datetime import timedelta
 from django.db import transaction
 from django.utils import timezone
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import( 
+    ListCreateAPIView, 
+    RetrieveUpdateAPIView,
+    ListAPIView,
+    )
 from rest_framework.permissions import IsAuthenticated
 
 from accounts.permissions import IsDoctor, IsManager, IsPatient
@@ -12,6 +16,7 @@ from .serializers import (
     DoctorAppointmentUpdateSerializer,
     ManagerAppointmentSerializer,
     PatientAppointmentSerializer,
+    DoctorPendingAppointmentSerializer,
 )
 
 class ManagerListCreateAppointment(ListCreateAPIView):
@@ -128,3 +133,20 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                 ),
             )
 
+class PendingAppointmentsView(ListAPIView):
+    serializer_class = DoctorPendingAppointmentSerializer
+    permission_classes = [IsAuthenticated, IsDoctor]
+
+    def get_queryset(self):
+        doctor_profile = getattr(self.request.user, "doctor", None)
+        if not doctor_profile:
+            return Appointment.objects.none()
+        return(
+            Appointment.objects.filter(
+                doctor=doctor_profile, 
+                status=Appointment.Status.PENDING
+                )
+                .select_related("patient__user")
+                .order_by("scheduled_time")
+        )
+    

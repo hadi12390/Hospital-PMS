@@ -4,11 +4,13 @@ from .views import (
     DoctorListCreateAppointment, 
     PatientListCreateAppointment,
     DoctorAppointmentDetailView,
+    PendingAppointmentsView,
 )
 
 urlpatterns = [
     path('manager/', ManagerListCreateAppointment.as_view()),
     path('doctor/', DoctorListCreateAppointment.as_view()),
     path('patient/', PatientListCreateAppointment.as_view()),
-    path('doctor/<int:pk>/', DoctorAppointmentDetailView.as_view())
+    path('doctor/<int:pk>/', DoctorAppointmentDetailView.as_view()),
+    path('doctor/pending/', PendingAppointmentsView.as_view()),
 ]

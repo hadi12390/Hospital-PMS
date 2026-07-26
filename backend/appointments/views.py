@@ -55,14 +55,24 @@ class DoctorListCreateAppointment(ListCreateAPIView):
     @transaction.atomic
     def perform_create(self, serializer):
         appointment = serializer.save()
-        ActivityLog.objects.create(
-            user=self.request.user,
-            action=ActivityLog.Action.APPOINTMENT_CREATED,
-            description=(
-                f"Doctor {self.request.user.username} created appointment "
-                f"for patient {appointment.patient.user.username}."
-            ),
-        )
+        if (appointment.patient.user):
+            ActivityLog.objects.create(
+                user=self.request.user,
+                action=ActivityLog.Action.APPOINTMENT_CREATED,
+                description=(
+                    f"Doctor {self.request.user.username} created appointment "
+                    f"for patient {appointment.patient.user.username}."
+                ),
+            )
+        else:
+            ActivityLog.objects.create(
+                user=self.request.user,
+                action=ActivityLog.Action.APPOINTMENT_CREATED,
+                description=(
+                    f"Doctor {self.request.user.username} created appointment"
+                    f"for guest patient {appointment.patient.first_name} {appointment.patient.last_name}."
+                ),
+            )
 
 
 class PatientListCreateAppointment(ListCreateAPIView):

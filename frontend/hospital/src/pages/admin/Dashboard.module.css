@@ -23,6 +23,7 @@
 }
 
 
+
 /* ==========================================================================
    RESET / BASE
    ========================================================================== */
@@ -32,6 +33,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    
 }
 
 body {
@@ -69,8 +71,8 @@ body {
 
     background: linear-gradient(
         to bottom,
-        #185FA5,
-        #378ADD
+        #0F172A,
+        #3F3F3F
     );
 
     border-top-right-radius: 2em;
@@ -175,8 +177,8 @@ body {
 
     background: linear-gradient(
         90deg,
-        #378ADD,
-        #185FA5
+        #0F172A,
+        #3F3F3F
     );
 
 
@@ -271,9 +273,7 @@ body {
 
     display: flex;
 
-    width: 100%;
-
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 
     gap: 1em;
@@ -302,14 +302,14 @@ body {
 
     background: linear-gradient(
         90deg,
-        #378ADD 0%,
-        #185FA5 100%
+        #0F172A,
+        #3F3F3F
     );
     transition: all 0.3s ease;
 }
 
 .buttonAddAppoi button:hover{
-    filter: brightness(1.2);
+    filter: brightness(1.5);
     transform: scale(1.03);
 }
 
@@ -338,8 +338,9 @@ body {
     position: absolute;
     width: 1px;
     height: 1px;
-    opacity: 0;
+    opacity: 1;
     pointer-events: none;
+    z-index: 9999;
 }
 
 
@@ -374,7 +375,7 @@ body {
 
     border-radius: 50%;
 
-    background-color: #185FA5;
+    background:linear-gradient(#0F172A,#6e6c6c);
 
     display: flex;
     justify-content: center;
@@ -444,7 +445,7 @@ body {
 }
 
 .dropdownMenu button:hover {
-    background: rgba(55,138,221,.1);
+    background: #0f172a0b;
 }
 
 
@@ -462,8 +463,8 @@ body {
 .heroName{
 
     text-align: left;
-    background: #185FA5;
-    background: linear-gradient(90deg, #378ADD, #185FA5);
+    background: #0F172A;
+    background: linear-gradient(90deg, #0F172A, #4d4d4dcf);
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -532,10 +533,14 @@ body {
 
 .box1 {
     grid-area: one;
-    background:linear-gradient(to right ,#185FA5, #378ADD) ;
+  
+    background:linear-gradient(to right ,#0F172A, #3F3F3F) ;
     border-radius: .5em;
     height: 11em;
     color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
 }
 
@@ -552,7 +557,7 @@ body {
 
 .boxJustiDown{
     display: flex;
-    align-items: end;
+    align-items: center;
     justify-content: space-between;
     padding: 1em;
     padding-top: 0em;
@@ -572,12 +577,15 @@ body {
     border-radius: .5em;
     height: 11em;
     color: #4d4d4d !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     
 }
 
 .box2 h1{
-    background: #185FA5;
-    background: linear-gradient(0deg, #378ADD, #185FA5);
+    background: #0F172A;
+    background: linear-gradient(180deg, #0F172A, #3f3f3f9e);
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -608,11 +616,11 @@ body {
 
 }
 
-.box3 h1{
+.box3 h1{  
     font-size: 2rem;
     margin-bottom: .5em;
-    background: #185FA5;
-    background: linear-gradient(90deg, #378ADD, #185FA5);
+    background: #3F3F3F;
+    background: linear-gradient(90deg, #0F172A, #878585);
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -644,7 +652,7 @@ body {
     grid-area: four;
     background-color: white;
     border-radius: .5em;
-
+    width: 100%;
 
 }
 
@@ -664,11 +672,12 @@ body {
 }
 
 .header h1 {
+    
     margin: 0;
     font-size: 2rem;
     margin-bottom: .5em;
-    background: #185FA5;
-    background: linear-gradient(90deg, #378ADD, #185FA5);
+    background: #0F172A;
+    background: linear-gradient(90deg,#0F172A, #858585);
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -778,13 +787,11 @@ body {
     grid-area: five;
     border-radius: .5em;
     background-color: white;
-    height: 11em;
     color: #4d4d4d;
     display: flex;
-    
-    justify-content: space-between;
-    padding-right: 1em;
+    flex-direction: column;
 
+    height: 16em;
 }
 
 .box5 h1{
@@ -802,12 +809,20 @@ body {
 /* ---- Box 6 ---- */
 
 .box6 {
+    
     grid-area: six;
-    background:linear-gradient(to right ,#185FA5, #378ADD) ;
+    background:linear-gradient(to left ,#4D4D4D, #0F172A) ;
     border-radius: .5em;
-    height: 11em;
     color: #E4E4E4 !important;
     transition: all 0.3s ease;
+    min-height: 16em;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding-bottom: 20px;
+
 }
 
 .box6 h1{
@@ -820,9 +835,18 @@ body {
 
 .boxJustiDownForSix{
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding:0 1em;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+    padding:1em;
+    background-color: #F1EFE8;
+    height: 80%;
+    width: 90%;
+    margin-top: 10px;
+    border-radius: 10px;
+
+    gap: 10px;
+    
 }
 
 .boxJustiDownForSix div{
@@ -929,73 +953,234 @@ body {
     justify-content: space-between;
 }
 
-.co{
+.mainNumBoxOne{
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 8px;
+    font-size: 3rem;
+    border-radius: 10px;
+}
+.mainNumBoxTwo{
+    background-color: #0f172aba;
+    padding: 8px;
+    font-size: 3rem;
+    border-radius: 10px;
+    color: white;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
 }
-
-.icon {
-    animation: wiggle 2s infinite;
-    transition: all 0.3s ease;
-    filter: brightness(10);
-}
-
-.stopped {
-    animation: none;
-    filter: brightness(10);
-}
-
-@keyframes wiggle {
-    0%, 50%, 100% {
-        transform: rotate(0deg);
-    }
-
-    5% {
-        transform: rotate(10deg);
-    }
-
-    10% {
-        transform: rotate(-10deg);
-    }
-
-    15% {
-        transform: rotate(8deg);
-    }
-
-    20% {
-        transform: rotate(-8deg);
-    }
-
-    25% {
-        transform: rotate(5deg);
-    }
-
-    30% {
-        transform: rotate(0deg);
-    }
-}
-
-.pinding{
+.arrowBoxOne{
+    background-color: rgba(255, 255, 255, 0.23);
+    height: 100%;
+    padding: 10px;
     display: flex;
-    background:linear-gradient(to right,#185FA5,#378ADD);
-    padding: 10px 12px;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
     border-radius: 10px;
-    color: white;
-    width: 310px;
-    cursor: pointer;   
-    border: none; 
 }
-.pindingNum{
+.appBoxOne{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.45);
+    border-radius: 10px;
+    padding: 5px;
+}
+.appBoxTwo{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    padding: 6px;
+    background:linear-gradient(to right , #0F172A ,#4D4D4D);
+    gap: 10px;
+}
+.tableElement{
+    background-color: #0F172A;
+    border-radius: 10px;
+    width: 100%;
+    font-size: .6rem;
+    padding: 2px;
+}
+.tableElementTwo{
     background-color: white;
-
-    padding: 0 5px;
-    border-radius: 5px;
-    color:#b97230;
+    border-radius: 10px;
+    width: 100%;
+    font-size: .6rem;
+    padding: 2px;
 }
-.stoppedN{
-    color: #185FA5;
+.tableNamesBoxOne{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px;
+    width: 30%;
+}
+.tablePaNamesBoxOne{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px;
+    width: 40%;
+}
+.tablePaCostBoxOne{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px;
+    width: 30%;
+}
+.boxJustiDownBoxOne{
+    display: flex;
+    gap: 5px;
+}
+.boxJustiDownBoxTwo{
+    display: flex;
+    gap: 5px;
+    height: 52.5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tableNamesBoxTwo{
+    height: 100%;
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.tablePaNamesBoxTwo{
+    height: 100%;
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.tablePaCostBoxTwo{
+    height: 100%;
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.notiCard{
+    background-color: #0F172A;
+    color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-radius: 15px;
+
+}
+.notiTime{
+    background: #d9d9d971;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 15px;
+    margin-bottom: 0px;
+    
+    
+}
+.notiDisc{
+    background: #d9d9d971;
+    height: 100%;
+    padding: 1em;
+
+    margin: 10px;
+    margin-top: 0px;
+
+    border-radius: 15px;
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    font-size: 0.8rem;
+}
+.notiDisc p{
+    margin-top:20px ;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+.noti{
+    display: flex;
+    padding: 1em;
+    gap: 10px;
+}
+.arrowBoxSix{
+    display: flex;
+    background-color: #0F172A;
+    justify-content: center;
+    align-items: center;
+    padding: 1px;
+    border-radius: 15px;
+}
+.arrowBoxSix img{
+    width: 50%;
+}
+.notiTime p{
+    font-size: 10px;
+}
+.staPi{
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.staPiIn{
+    background-color: #0F172A;
+    font-size: 4rem;
+
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px;
+
+    border-radius: 10px;
+}
+.staPi{
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.staPiIn{
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #0F172A;
+
+    padding: 10px 0;
+}
+
+.staPiIn > *{
+    margin: 0;
+    line-height: 1;
+}
+.staPi .staPiIn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    padding: 10px 0;
+
+    background: #0F172A;
 }

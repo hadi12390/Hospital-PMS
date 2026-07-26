@@ -1,13 +1,35 @@
 from rest_framework import serializers
 from .models import Appointment
+from datetime import timedelta
 
-class ManagerAppointmentSerializer(serializers.ModelSerializer):
+class BaseAppointmentSerializer(serializers.ModelSerializer):
+
+    def has_conflict(self):
+        new_end = self.end_time
+
+        appointments = Appointment.objects.filter(
+            doctor=self.doctor,
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+        ).exclude(id=self.id)
+
+        for appointment in appointments:
+            if (
+                self.scheduled_time < appointment.end_time
+                and new_end > appointment.scheduled_time
+            ):
+                return True
+
+        return False
+
+class ManagerAppointmentSerializer(BaseAppointmentSerializer):
     class Meta:
         model = Appointment
         fields = "__all__"
 
-class DoctorAppointmentSerializer(serializers.ModelSerializer):
-
+class DoctorAppointmentSerializer(BaseAppointmentSerializer):
     patient_no_show_count = serializers.IntegerField(
         source="patient.no_show_count", 
         read_only=True
@@ -16,6 +38,7 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = [
+            "id",
             "patient",
             "scheduled_time",
             "reason_for_visit",
@@ -28,14 +51,16 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
         
         read_only_fields = ["status"]
     
-    def create(self, validated_data):
+    def validate(self, attrs):
         request = self.context["request"]
-        validated_data["doctor"] = request.user.doctor
-        validated_data["status"] = "confirmed"
-        
-        return super().create(validated_data)
 
-class PatientAppointmentSerializer(serializers.ModelSerializer):
+        attrs["doctor"] = request.user.doctor
+        attrs["status"] = Appointment.Status.CONFIRMED
+
+        return super().validate(attrs)
+
+
+class PatientAppointmentSerializer(BaseAppointmentSerializer):
     class Meta:
         model = Appointment
         fields = [
@@ -56,7 +81,7 @@ class PatientAppointmentSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class DoctorAppointmentUpdateSerializer(serializers.ModelSerializer):
+class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
     class Meta:
         model = Appointment
         fields = [
@@ -81,7 +106,7 @@ class DoctorAppointmentUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot change the status of a completed appointment.")
         return value
 
-class DoctorPendingAppointmentSerializer(serializers.ModelSerializer):
+class DoctorPendingAppointmentSerializer(BaseAppointmentSerializer):
 
     patient_name = serializers.SerializerMethodField()
 

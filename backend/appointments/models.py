@@ -106,7 +106,19 @@ class Appointment(models.Model):
         blank=True
     )
 
-
+    def has_conflict(self):
+        return Appointment.objects.filter(
+            doctor=self.doctor,
+            scheduled_time__lt=self.end_time,
+            end_time__gt=self.scheduled_time,
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+        ).exclude(
+            id=self.id
+        ).exists()
+    
     class Meta:
         ordering = ["scheduled_time"]
 

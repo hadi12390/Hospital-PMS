@@ -24,8 +24,6 @@ class DoctorAppointmentSerializer(serializers.ModelSerializer):
             "patient_no_show_count",
             "end_time",
             "appointment_type",
-            "confirmed_at",
-            "created_at",
         ]
         
         read_only_fields = ["status"]

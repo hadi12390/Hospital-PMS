@@ -191,7 +191,14 @@ class DoctorDashboard(APIView):
             .order_by("scheduled_time")
         )
 
-
+        last_patient = (
+            appointments
+            .filter(
+                status=Appointment.Status.COMPLETED,
+            )
+            .order_by("-completed_at")
+            .first()
+        )
 
         # Add extra dashboard data
         stats["current_appointment"] = self.appointment_summary(
@@ -208,5 +215,7 @@ class DoctorDashboard(APIView):
         ]
 
         stats["week_appointments_count"] = len(stats["week_appointments"])
+
+        stats["last_patient"] = self.appointment_summary(last_patient)
 
         return Response(stats)

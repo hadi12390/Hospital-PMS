@@ -1099,14 +1099,13 @@ body {
     text-align: start;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 
     font-size: 0.8rem;
 }
 .notiDisc p{
-    margin-top:20px ;
+    margin-top: 10px ;
     font-weight: 800;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 .noti{
     display: flex;

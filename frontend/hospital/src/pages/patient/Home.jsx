@@ -1,19 +1,75 @@
-import "./Home.css";
-
+import styles from "./Home.module.css";
+import HomeLogo from "../../assets/patient/home.svg?react";
+import AppLogo from "../../assets/patient/app.svg?react";
+import DocLogo from "../../assets/patient/doc.svg?react";
+import PillLogo from "../../assets/patient/pill.svg?react";
+import DocuLogo from "../../assets/patient/docu.svg?react";
+import HelpLogo from "../../assets/patient/help.svg?react";
+import SettLogo from "../../assets/patient/setting.svg?react";
+import LogOutLogo from "../../assets/patient/logout.svg?react";
 
 
 function PatientHome(){
 
   return (
-    <div>
+    <div className={styles.PatientDashboard}>
 
-      <h1>
-        Patient Home
-      </h1>
+      <aside className={styles.sideBar}>
+              <img src="/assest/patient/logo.svg" alt="Logo" />
+      
+      
+              <div className={styles.optionsContainer}>
+                <button className={`${styles.options} ${styles.homeLogoButton}`}>
+                 <HomeLogo className={styles.homelogoicon} />
+                </button>
+      
+                <button className={`${styles.options} ${styles.appLogoButton}`}>
+                 <AppLogo className={styles.applogoicon} />
+                </button>
+      
+                <button className={`${styles.options} ${styles.docLogoButton}`}>
+                 <DocLogo className={styles.doclogoicon} />
+                </button>
+      
+                <button className={`${styles.options} ${styles.pillLogoButton}`}>
+                 <PillLogo className={styles.pilllogoicon} />
+                </button>
 
-      <p>
-        View appointments and medical history
-      </p>
+                <button className={`${styles.options} ${styles.docuLogoButton}`}>
+                 <DocuLogo className={styles.doculogoicon} />
+                </button>
+      
+              </div>
+      
+      
+              <div className={styles.optionsContainer}>
+                <button className={`${styles.options} ${styles.helpLogoButton}`}>
+                 <HelpLogo className={styles.helplogoicon} />
+                </button>
+      
+                <button className={`${styles.options} ${styles.settLogoButton}`}>
+                  <SettLogo className={styles.settlogoicon} />
+                </button>
+              </div>
+
+              <div className={styles.logoutsec}>
+                <div className={styles.optionsContainer}>
+                  <button className={`${styles.options} ${styles.logoutLogoButton}`}>
+                  <LogOutLogo className={styles.logoutlogoicon} />
+                  </button>
+        
+                  <button className={`${styles.options} ${styles.settLogoButton}`}>
+                    <SettLogo className={styles.Asettlogoicon} />
+                  </button>
+                </div>
+
+                <div className={styles.profPicLogOut}>
+                  <img src="/assest/patient/profPic.png" alt="as" />
+                </div>
+              </div> 
+            </aside>
+
+     
 
     </div>
   );

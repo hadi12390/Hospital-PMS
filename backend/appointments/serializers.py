@@ -1,39 +1,69 @@
 from rest_framework import serializers
 from .models import Appointment
-from datetime import timedelta
+
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 
-    def has_conflict(self):
-        new_end = self.end_time
+    def has_conflict(self, doctor, scheduled_time, appointment_type=None,
+                      duration_minutes=None, exclude_id=None):
+        # Build an unsaved instance so we can reuse the model's own
+        # end_time logic (handles the duration_minutes / doctor-default fallback)
+        temp = Appointment(
+            doctor=doctor,
+            scheduled_time=scheduled_time,
+            appointment_type=appointment_type or Appointment.AppointmentType.CONSULTATION,
+            duration_minutes=duration_minutes,
+        )
+        new_end = temp.end_time
 
         appointments = Appointment.objects.filter(
-            doctor=self.doctor,
+            doctor=doctor,
             status__in=[
                 Appointment.Status.PENDING,
                 Appointment.Status.CONFIRMED,
             ],
-        ).exclude(id=self.id)
+        )
+        if exclude_id:
+            appointments = appointments.exclude(id=exclude_id)
 
         for appointment in appointments:
-            if (
-                self.scheduled_time < appointment.end_time
-                and new_end > appointment.scheduled_time
-            ):
+            if scheduled_time < appointment.end_time and new_end > appointment.scheduled_time:
                 return True
 
         return False
 
+
 class ManagerAppointmentSerializer(BaseAppointmentSerializer):
+    end_time = serializers.ReadOnlyField()
+
     class Meta:
         model = Appointment
         fields = "__all__"
 
+    def validate(self, attrs):
+        doctor = attrs.get("doctor", getattr(self.instance, "doctor", None))
+        scheduled_time = attrs.get("scheduled_time", getattr(self.instance, "scheduled_time", None))
+        appointment_type = attrs.get("appointment_type", getattr(self.instance, "appointment_type", None))
+        duration_minutes = attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None))
+
+        if self.has_conflict(
+            doctor=doctor,
+            scheduled_time=scheduled_time,
+            appointment_type=appointment_type,
+            duration_minutes=duration_minutes,
+            exclude_id=self.instance.id if self.instance else None,
+        ):
+            raise serializers.ValidationError("This time slot conflicts with another appointment for this doctor.")
+
+        return attrs
+
+
 class DoctorAppointmentSerializer(BaseAppointmentSerializer):
     patient_no_show_count = serializers.IntegerField(
-        source="patient.no_show_count", 
+        source="patient.no_show_count",
         read_only=True
     )
+    end_time = serializers.ReadOnlyField()
 
     class Meta:
         model = Appointment
@@ -48,14 +78,23 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
             "end_time",
             "appointment_type",
         ]
-        
+
         read_only_fields = ["status"]
-    
+
     def validate(self, attrs):
         request = self.context["request"]
 
         attrs["doctor"] = request.user.doctor
         attrs["status"] = Appointment.Status.CONFIRMED
+
+        if self.has_conflict(
+            doctor=attrs["doctor"],
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type", getattr(self.instance, "appointment_type", None)),
+            duration_minutes=attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None)),
+            exclude_id=self.instance.id if self.instance else None,
+        ):
+            raise serializers.ValidationError("This time slot conflicts with another appointment.")
 
         return super().validate(attrs)
 
@@ -72,6 +111,18 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         ]
 
         read_only_fields = ["status"]
+
+    def validate(self, attrs):
+        if self.has_conflict(
+            doctor=attrs["doctor"],
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type", getattr(self.instance, "appointment_type", None)),
+            duration_minutes=attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None)),
+            exclude_id=self.instance.id if self.instance else None,
+        ):
+            raise serializers.ValidationError("This time slot conflicts with another appointment.")
+
+        return attrs
 
     def create(self, validated_data):
         request = self.context["request"]
@@ -95,16 +146,32 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
             "notes",
         ]
         read_only_fields = [
-            "patient", 
+            "patient",
             "scheduled_time",
             "reason_for_visit",
             "created_at",
         ]
-        
+
     def validate_status(self, value):
         if self.instance.status == Appointment.Status.COMPLETED:
             raise serializers.ValidationError("Cannot change the status of a completed appointment.")
         return value
+
+    def validate(self, attrs):
+        duration_minutes = attrs.get("duration_minutes", self.instance.duration_minutes)
+        appointment_type = attrs.get("appointment_type", self.instance.appointment_type)
+
+        if self.has_conflict(
+            doctor=self.instance.doctor,
+            scheduled_time=self.instance.scheduled_time,
+            appointment_type=appointment_type,
+            duration_minutes=duration_minutes,
+            exclude_id=self.instance.id,
+        ):
+            raise serializers.ValidationError("This time slot conflicts with another appointment.")
+
+        return attrs
+
 
 class DoctorPendingAppointmentSerializer(BaseAppointmentSerializer):
 

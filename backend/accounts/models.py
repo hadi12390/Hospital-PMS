@@ -6,6 +6,7 @@ class User(AbstractUser):
     # inherit TextChoices and 
     class Role(models.TextChoices):
         # make the choices
+        PLATFORM_ADMIN = 'platform_admin', 'Platform Admin'
         MANAGER = 'manager', 'Manager'
         DOCTOR = 'doctor', 'Doctor'
         PATIENT = 'patient', 'Patient'

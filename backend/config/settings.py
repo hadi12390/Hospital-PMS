@@ -30,32 +30,37 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-SHARED_APPS = (
-    "django_tenants",
-    "tenants",
-    "accounts",
+SHARED_APPS = [
+    'django_tenants',
+    'tenants',
+    'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
+]
 
-    "django.contrib.contenttypes",
-    "django.contrib.auth",
-    "django.contrib.sessions",
-    "django.contrib.sites",
-    "django.contrib.admin",
-)
-TENANT_APPS = (
-    "accounts",
-
-    "doctor",
-    "patient",
-    "manager",
-
-    "appointments",
-    "medical_records",
-
-    "notifications",
-    "logs",
-
-    "core",
-)
+TENANT_APPS = [
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',      # moved here — needs auth/accounts in same schema
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'accounts',                  # removed from SHARED_APPS, appears once only
+    'doctor',
+    'patient',
+    'manager',
+    'appointments',
+    'medical_records',
+    'notifications',
+    'logs',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'django.contrib.sites',
+    'core',
+]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS
@@ -67,7 +72,6 @@ TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
-AUTH_USER_MODEL = "accounts.User"
 ROOT_URLCONF = 'config.urls'
 
 
@@ -109,7 +113,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        'ENGINE': 'django_tenants.postgresql_backend',
         "NAME": "hospital_pms",
         "USER": "hadi",
         "PASSWORD": "hadi",
@@ -118,9 +122,7 @@ DATABASES = {
     }
 }
 
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+DATABASE_ROUTERS = ('django_tenants.routers.TenantSyncRouter',)
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

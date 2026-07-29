@@ -30,33 +30,40 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+SHARED_APPS = (
+    "django_tenants",
+    "tenants",
+    "accounts",
+
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    "django.contrib.sessions",
+    "django.contrib.sites",
+    "django.contrib.admin",
+)
+TENANT_APPS = (
+    "accounts",
+
     "doctor",
     "patient",
     "manager",
+
     "appointments",
     "medical_records",
+
     "notifications",
-    'logs',
-    'allauth.socialaccount',
-    'accounts',
-    'django.contrib.sites',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'corsheaders',
-    'allauth',
-    'allauth.account',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'core',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "logs",
+
+    "core",
+)
+
+INSTALLED_APPS = list(SHARED_APPS) + [
+    app for app in TENANT_APPS
+    if app not in SHARED_APPS
 ]
 
+TENANT_MODEL = "tenants.Hospital"
+TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
@@ -65,6 +72,7 @@ ROOT_URLCONF = 'config.urls'
 
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware', # ⚠️ must be at the top !!
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -109,6 +117,10 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

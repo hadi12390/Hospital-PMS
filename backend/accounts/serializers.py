@@ -7,6 +7,9 @@ from logs.models import ActivityLog
 from dj_rest_auth.serializers import PasswordResetSerializer
 from .forms import CustomAllAuthPasswordResetForm
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.db import connection
+
 class StaffCreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
@@ -65,3 +68,12 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
         if not self.reset_form.is_valid():
             raise serializers.ValidationError(self.reset_form.errors)
         return value
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Stamp the current database schema name into the JWT
+        token['tenant_schema'] = connection.schema_name
+        return token

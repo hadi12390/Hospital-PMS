@@ -1,12 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+import uuid
 
 class User(AbstractUser):
+    id = models.BigAutoField(primary_key=True)
+
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
     # inherit TextChoices and 
     class Role(models.TextChoices):
         # make the choices
-        PLATFORM_ADMIN = 'platform_admin', 'Platform Admin'
         MANAGER = 'manager', 'Manager'
         DOCTOR = 'doctor', 'Doctor'
         PATIENT = 'patient', 'Patient'

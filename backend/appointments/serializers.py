@@ -280,6 +280,8 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
 
         read_only_fields = [
             "status",
+            "appointment_type",
+            "duration_minutes",
         ]
 
 

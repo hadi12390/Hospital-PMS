@@ -22,4 +22,13 @@ class StaffPatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         # Staff explicitly specify which user account this profile belongs to
-        fields = "__all__"
+        fields = [
+            'user',
+            'personal_id', 
+            'first_name', 
+            'last_name', 
+            'birth_date',
+            'gender',
+            'phone_number',
+            'blood_type',
+        ]

@@ -26,8 +26,14 @@ class DoctorDashboard(APIView):
             patient = f"Guest: {appointment.patient.first_name} {appointment.patient.last_name}"
         
         return {
-            "id": appointment.id,
-            "patient": patient,
+            "patient": {
+                "public_id": (
+                    str(appointment.patient.user.public_id)
+                    if appointment.patient.user
+                    else None
+                ),
+                "name": patient,
+            },
             "scheduled_time": appointment.scheduled_time,
             "day": appointment.scheduled_time.strftime("%A"),
             "date": appointment.scheduled_time.strftime("%Y-%m-%d"),
@@ -35,7 +41,7 @@ class DoctorDashboard(APIView):
             "appointment_type": appointment.appointment_type,
             "status": appointment.status,
         }
-
+    
     def get(self, request):
 
         doctor_profile = getattr(request.user, "doctor", None)

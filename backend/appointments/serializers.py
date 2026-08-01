@@ -1,17 +1,33 @@
 from rest_framework import serializers
-from .models import Appointment
 from django.db.models import Q
 
+from .models import Appointment
+from doctor.models import Doctor
+from patient.models import Patient
+
+
 class BaseAppointmentSerializer(serializers.ModelSerializer):
-    def has_conflict(self, doctor, patient, scheduled_time, appointment_type=None,
-                    duration_minutes=None, exclude_id=None):
+
+    def has_conflict(
+        self,
+        doctor,
+        patient,
+        scheduled_time,
+        appointment_type=None,
+        duration_minutes=None,
+        exclude_id=None,
+    ):
         temp = Appointment(
             patient=patient,
             doctor=doctor,
             scheduled_time=scheduled_time,
-            appointment_type=appointment_type or Appointment.AppointmentType.CONSULTATION,
+            appointment_type=(
+                appointment_type
+                or Appointment.AppointmentType.CONSULTATION
+            ),
             duration_minutes=duration_minutes,
         )
+
         new_end = temp.end_time
 
         appointments = Appointment.objects.filter(
@@ -21,54 +37,161 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 Appointment.Status.CONFIRMED,
             ],
         )
+
         if exclude_id:
             appointments = appointments.exclude(id=exclude_id)
 
         for appointment in appointments:
-            if scheduled_time < appointment.end_time and new_end > appointment.scheduled_time:
+            if (
+                scheduled_time < appointment.end_time
+                and new_end > appointment.scheduled_time
+            ):
                 return True
 
         return False
 
 
-class ManagerAppointmentSerializer(BaseAppointmentSerializer):
-    end_time = serializers.ReadOnlyField()
+    def get_full_name(self, person):
+        if person is None:
+            return None
 
-    class Meta:
-        model = Appointment
-        fields = "__all__"
+        if getattr(person, "user", None):
+            return person.user.get_full_name()
 
-    def validate(self, attrs):
-        patient = attrs.get("patient", getattr(self.instance, "patient", None))
-        doctor = attrs.get("doctor", getattr(self.instance, "doctor", None))
-        scheduled_time = attrs.get("scheduled_time", getattr(self.instance, "scheduled_time", None))
-        appointment_type = attrs.get("appointment_type", getattr(self.instance, "appointment_type", None))
-        duration_minutes = attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None))
-
-        if self.has_conflict(
-            doctor=doctor,
-            patient=patient,
-            scheduled_time=scheduled_time,
-            appointment_type=appointment_type,
-            duration_minutes=duration_minutes,
-            exclude_id=self.instance.id if self.instance else None,
-        ):
-            raise serializers.ValidationError("This time slot conflicts with another appointment for this doctor.")
-
-        return attrs
+        return getattr(person, "name", None)
 
 
-class DoctorAppointmentSerializer(BaseAppointmentSerializer):
-    patient_no_show_count = serializers.IntegerField(
-        source="patient.no_show_count",
-        read_only=True
+    def get_person_repr(self, person):
+        if person is None:
+            return None
+
+        return {
+            "public_id": (
+                person.user.public_id
+                if getattr(person, "user", None)
+                else None
+            ),
+            "name": self.get_full_name(person),
+        }
+
+
+# =========================
+# Manager Create Serializer
+# =========================
+
+class ManagerAppointmentCreateSerializer(BaseAppointmentSerializer):
+
+    doctor = serializers.SlugRelatedField(
+        slug_field="user__public_id",
+        queryset=Doctor.objects.all(),
+        write_only=True,
     )
-    end_time = serializers.ReadOnlyField()
+
+    patient = serializers.SlugRelatedField(
+        slug_field="user__public_id",
+        queryset=Patient.objects.all(),
+        write_only=True,
+    )
+
 
     class Meta:
         model = Appointment
         fields = [
-            "id",
+            "doctor",
+            "patient",
+            "scheduled_time",
+            "reason_for_visit",
+            "notes",
+            "status",
+            "appointment_type",
+            "duration_minutes",
+        ]
+
+
+    def validate(self, attrs):
+
+        if self.has_conflict(
+            doctor=attrs["doctor"],
+            patient=attrs["patient"],
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type"),
+            duration_minutes=attrs.get("duration_minutes"),
+            exclude_id=(
+                self.instance.id
+                if self.instance
+                else None
+            ),
+        ):
+            raise serializers.ValidationError(
+                "This time slot conflicts with another appointment."
+            )
+
+        return attrs
+
+
+
+# =========================
+# Manager Read Serializer
+# =========================
+
+class ManagerAppointmentSerializer(BaseAppointmentSerializer):
+
+    end_time = serializers.ReadOnlyField()
+
+    doctor = serializers.SerializerMethodField()
+    patient = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = Appointment
+
+        fields = [
+            "public_id",
+            "doctor",
+            "patient",
+            "scheduled_time",
+            "reason_for_visit",
+            "notes",
+            "status",
+            "appointment_type",
+            "created_at",
+            "end_time",
+        ]
+
+
+    def get_doctor(self, obj):
+        return self.get_person_repr(obj.doctor)
+
+
+    def get_patient(self, obj):
+        return self.get_person_repr(obj.patient)
+
+
+
+# =========================
+# Doctor Create Appointment
+# =========================
+
+class DoctorAppointmentSerializer(BaseAppointmentSerializer):
+
+    patient = serializers.SlugRelatedField(
+        slug_field="user__public_id",
+        queryset=Patient.objects.all(),
+    )
+
+    patient_no_show_count = serializers.IntegerField(
+        source="patient.no_show_count",
+        read_only=True,
+    )
+
+    end_time = serializers.ReadOnlyField()
+
+
+    class Meta:
+        model = Appointment
+
+        fields = [
+            "public_id",
             "patient",
             "scheduled_time",
             "reason_for_visit",
@@ -77,69 +200,157 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
             "patient_no_show_count",
             "end_time",
             "appointment_type",
+            "duration_minutes",
         ]
 
-        read_only_fields = ["status"]
+        read_only_fields = [
+            "status",
+        ]
+
+
+    def to_representation(self, instance):
+
+        data = super().to_representation(instance)
+
+        data["patient"] = self.get_person_repr(
+            instance.patient
+        )
+
+        return data
+
 
     def validate(self, attrs):
+
         request = self.context["request"]
 
         attrs["doctor"] = request.user.doctor
         attrs["status"] = Appointment.Status.CONFIRMED
 
+
         if self.has_conflict(
             doctor=attrs["doctor"],
+            patient=attrs["patient"],
             scheduled_time=attrs["scheduled_time"],
-            patient=attrs.get("patient", getattr(self.instance, "patient", None)),
-            appointment_type=attrs.get("appointment_type", getattr(self.instance, "appointment_type", None)),
-            duration_minutes=attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None)),
-            exclude_id=self.instance.id if self.instance else None,
+            appointment_type=attrs.get(
+                "appointment_type"
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes"
+            ),
+            exclude_id=(
+                self.instance.id
+                if self.instance
+                else None
+            ),
         ):
-            raise serializers.ValidationError("This time slot conflicts with another appointment.")
+            raise serializers.ValidationError(
+                "This time slot conflicts with another appointment."
+            )
 
-        return super().validate(attrs)
 
+        return attrs
+
+
+
+# =========================
+# Patient Create Appointment
+# =========================
 
 class PatientAppointmentSerializer(BaseAppointmentSerializer):
+
+    doctor = serializers.SlugRelatedField(
+        slug_field="user__public_id",
+        queryset=Doctor.objects.all(),
+        write_only=True,
+    )
+
+
     class Meta:
         model = Appointment
+
         fields = [
             "doctor",
             "scheduled_time",
             "reason_for_visit",
             "notes",
             "status",
+            "appointment_type",
+            "duration_minutes",
         ]
 
-        read_only_fields = ["status"]
+        read_only_fields = [
+            "status",
+        ]
+
+
+    def to_representation(self, instance):
+
+        data = super().to_representation(instance)
+
+        data["doctor"] = self.get_person_repr(
+            instance.doctor
+        )
+
+        return data
+
 
     def validate(self, attrs):
-        request = self.context["request"]
-        patient = request.user.patient
+
+        patient = self.context["request"].user.patient
+
 
         if self.has_conflict(
-            doctor = attrs.get("doctor", getattr(self.instance, "doctor", None)),
+            doctor=attrs["doctor"],
             patient=patient,
             scheduled_time=attrs["scheduled_time"],
-            appointment_type=attrs.get("appointment_type", getattr(self.instance, "appointment_type", None)),
-            duration_minutes=attrs.get("duration_minutes", getattr(self.instance, "duration_minutes", None)),
-            exclude_id=self.instance.id if self.instance else None,
+            appointment_type=attrs.get(
+                "appointment_type"
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes"
+            ),
+            exclude_id=(
+                self.instance.id
+                if self.instance
+                else None
+            ),
         ):
-            raise serializers.ValidationError("This time slot conflicts with another appointment.")
+            raise serializers.ValidationError(
+                "This time slot conflicts with another appointment."
+            )
+
 
         return attrs
 
+
     def create(self, validated_data):
-        request = self.context["request"]
-        validated_data["patient"] = request.user.patient
-        validated_data["status"] = "pending"
+
+        validated_data["patient"] = (
+            self.context["request"]
+            .user
+            .patient
+        )
+
+        validated_data["status"] = (
+            Appointment.Status.PENDING
+        )
 
         return super().create(validated_data)
 
 
+
+# =========================
+# Doctor Update Appointment
+# =========================
+
 class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
+
+    patient = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Appointment
+
         fields = [
             "patient",
             "scheduled_time",
@@ -150,6 +361,7 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
             "status",
             "notes",
         ]
+
         read_only_fields = [
             "patient",
             "scheduled_time",
@@ -157,44 +369,71 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
             "created_at",
         ]
 
+
+    def get_patient(self, obj):
+        return self.get_person_repr(
+            obj.patient
+        )
+
+
     def validate_status(self, value):
+
         if self.instance.status == Appointment.Status.COMPLETED:
-            raise serializers.ValidationError("Cannot change the status of a completed appointment.")
+            raise serializers.ValidationError(
+                "Cannot change the status of a completed appointment."
+            )
+
         return value
 
+
+
     def validate(self, attrs):
-        duration_minutes = attrs.get("duration_minutes", self.instance.duration_minutes)
-        appointment_type = attrs.get("appointment_type", self.instance.appointment_type)
 
         if self.has_conflict(
-            patient=self.instance.patient,
             doctor=self.instance.doctor,
+            patient=self.instance.patient,
             scheduled_time=self.instance.scheduled_time,
-            appointment_type=appointment_type,
-            duration_minutes=duration_minutes,
+            appointment_type=attrs.get(
+                "appointment_type",
+                self.instance.appointment_type,
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes",
+                self.instance.duration_minutes,
+            ),
             exclude_id=self.instance.id,
         ):
-            raise serializers.ValidationError("This time slot conflicts with another appointment.")
+            raise serializers.ValidationError(
+                "This time slot conflicts with another appointment."
+            )
 
         return attrs
 
 
+
+# =========================
+# Doctor Pending List
+# =========================
+
 class DoctorPendingAppointmentSerializer(BaseAppointmentSerializer):
 
-    patient_name = serializers.SerializerMethodField()
+    patient = serializers.SerializerMethodField()
 
-    def get_patient_name(self, obj):
-        if obj.patient.user:
-            return obj.patient.user.get_full_name()
-        return obj.patient.name
 
     class Meta:
         model = Appointment
+
         fields = [
-            "id",
-            "patient_name",
+            "public_id",
+            "patient",
             "scheduled_time",
             "reason_for_visit",
             "appointment_type",
             "created_at",
         ]
+
+
+    def get_patient(self, obj):
+        return self.get_person_repr(
+            obj.patient
+        )

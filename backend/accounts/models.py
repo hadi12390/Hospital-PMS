@@ -12,7 +12,7 @@ class User(AbstractUser):
         editable=False,
         db_index=True,
     )
-    # inherit TextChoices and 
+    # inherit TextChoices
     class Role(models.TextChoices):
         # make the choices
         MANAGER = 'manager', 'Manager'

@@ -187,8 +187,12 @@ REST_AUTH = {
 }
 
 
-SESSION_COOKIE_DOMAIN = ".localhost"
-CSRF_COOKIE_DOMAIN = ".localhost"
+
+# ⚠️⚠️⚠️⚠️set these two lines when finish devolpment⚠️⚠️⚠️⚠️
+
+# SESSION_COOKIE_SECURE = True 
+# CSRF_COOKIE_SECURE = True
+
 
 # --- CORS: talk to a Vite dev server ---
 CORS_ALLOWED_ORIGIN_REGEXES = [

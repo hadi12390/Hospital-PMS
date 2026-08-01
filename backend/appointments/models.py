@@ -3,6 +3,7 @@ from django.utils import timezone
 from doctor.models import Doctor
 from patient.models import Patient
 from datetime import timedelta
+import uuid
 
 class Appointment(models.Model):
 
@@ -17,6 +18,13 @@ class Appointment(models.Model):
         CONSULTATION = "consultation", "Consultation"
         FOLLOW_UP = "follow_up", "Follow-up"
         CHECKUP = "checkup", "Checkup"
+
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
 
     doctor = models.ForeignKey(
         Doctor,

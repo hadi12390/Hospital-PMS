@@ -188,10 +188,10 @@ REST_AUTH = {
 
 
 
-# ⚠️⚠️⚠️⚠️set these two lines when finish devolpment⚠️⚠️⚠️⚠️
+# ⚠️⚠️⚠️⚠️set these two lines⚠️⚠️⚠️⚠️
 
-# SESSION_COOKIE_SECURE = True 
-# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True ⚠️
+# CSRF_COOKIE_SECURE = True ⚠️
 
 
 # --- CORS: talk to a Vite dev server ---

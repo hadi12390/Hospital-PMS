@@ -11,9 +11,10 @@ class Patient(models.Model):
         related_name='patient',
         unique=True
     )
+    first_name = models.CharField(max_length=50, blank=True, default='')
+    last_name = models.CharField(max_length=50, blank=True, default='')
+
     personal_id = models.CharField(max_length=100, blank=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
     birth_date = models.DateField()
     
     # Renamed the inner class to Gender to avoid confusing it with 'User.Role'
@@ -43,4 +44,14 @@ class Patient(models.Model):
         return self.appointments.filter(status="no_show").count()    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def save(self, *args, **kwargs):
+        # If linked to a User, sync names from User if not manually specified
+        if self.user:
+            if not self.first_name:
+                self.first_name = self.user.first_name
+            if not self.last_name:
+                self.last_name = self.user.last_name
+                
+        super().save(*args, **kwargs)
 

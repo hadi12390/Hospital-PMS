@@ -29,7 +29,8 @@ class User(AbstractUser):
         choices=Status.choices,
         default=Status.ACTIVE
     )
-    
+    first_name = models.CharField(max_length=50, blank=False, null=True)
+    last_name = models.CharField(max_length=50, blank=False, null=True)
     expired_at = models.DateTimeField(
         null=True,
         blank=True

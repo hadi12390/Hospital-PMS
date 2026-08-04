@@ -101,6 +101,7 @@ class PatientListCreateAppointment(ListCreateAPIView):
 class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
     serializer_class = DoctorAppointmentUpdateSerializer
     permission_classes = [IsAuthenticated, IsDoctor]
+    lookup_field = 'public_id'
 
     def get_queryset(self):
         doctor_profile = getattr(self.request.user, "doctor", None)

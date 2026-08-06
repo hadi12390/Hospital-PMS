@@ -7,6 +7,8 @@ import PatientHome from "../pages/patient/Home";
 import Register from "../pages/auth/Register";
 import RestPassword from "../pages/auth/RestPassword";
 import RestPasswordDone from "../pages/auth/RestPasswordDone";
+import AppointmentPatient from "../pages/patient/Appointmet";
+
 
 
 
@@ -21,6 +23,7 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/resetpassword" element={<RestPassword />} />
       <Route path="/resetpasswordDone" element={<RestPasswordDone />} />
+      <Route path="/patient/appointment" element={<AppointmentPatient />} />
 
     </Routes>
   );

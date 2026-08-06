@@ -242,7 +242,7 @@ function AdminDashboard() {
             <span>Help & Center</span>
           </button>
 
-          <button className={`${styles.options} ${styles.otherMenu}`}>
+          <button className ={`${styles.options} ${styles.otherMenu}`}>
             <img src="/assest/doctor/sidebar/SVGRepo_iconCarrier.svg" alt="" />
             <span>Settings</span>
           </button>

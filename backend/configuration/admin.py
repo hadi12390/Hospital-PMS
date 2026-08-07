@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import ClinicConfiguration
 
-# Register your models here.
+@admin.register(ClinicConfiguration)
+class ConfigAdmin(admin.ModelAdmin):
+    pass

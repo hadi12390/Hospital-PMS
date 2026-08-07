@@ -113,6 +113,10 @@ class Appointment(models.Model):
         null=True,
         blank=True
     )
+    
+    cancellation_reason = models.TextField(
+        blank=True
+    )
 
     def has_conflict(self):
         return Appointment.objects.filter(

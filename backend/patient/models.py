@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from configuration.models import ClinicConfiguration
+from django.db.models import Count, Q, F
+from datetime import timedelta
 
 class Patient(models.Model):  
     user = models.OneToOneField(
@@ -41,9 +44,72 @@ class Patient(models.Model):
     def no_show_count(self) -> int:
         """Returns the total number of NO_SHOW appointments for this patient."""
         # 'appointments' assumes related_name='appointments' on Appointment.patient
-        return self.appointments.filter(status="no_show").count()    
+        return self.appointments.filter(status="no_show").count()  
+    @property
+    def reliability(self):
+
+        config = ClinicConfiguration.get_solo()
+
+        stats = self.appointments.aggregate(
+            completed=Count(
+                "id",
+                filter=Q(status="completed")
+            ),
+            no_show=Count(
+                "id",
+                filter=Q(status="no_show")
+            ),
+            early_cancelled=Count(
+                "id",
+                filter=Q(
+                    status="cancelled",
+                    cancelled_at__lte=F("scheduled_time") - timedelta(hours=24)
+                )
+            ),
+            late_cancelled=Count(
+                "id",
+                filter=Q(
+                    status="cancelled",
+                    cancelled_at__gt=F("scheduled_time") - timedelta(hours=24)
+                )
+            ),
+        )
+
+        positive_points = (
+            stats["completed"] *
+            config.completed_weight
+        )
+
+        negative_points = (
+            stats["early_cancelled"] *
+            config.cancelled_early_weight
+            +
+            stats["late_cancelled"] *
+            config.cancelled_late_weight
+            +
+            stats["no_show"] *
+            config.no_show_weight
+        )
+
+        if positive_points == 0 and negative_points == 0:
+            return 100
+        
+        print(stats)
+        print("positive:", positive_points)
+        print("negative:", negative_points)
+        print(
+            (positive_points / (positive_points + negative_points)) * 100
+        )
+        return round(
+            (
+                positive_points /
+                (positive_points + negative_points)
+            ) * 100,
+            2
+        )
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.reliability}"
     
     def save(self, *args, **kwargs):
         # If linked to a User, sync names from User if not manually specified

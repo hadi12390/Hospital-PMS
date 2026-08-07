@@ -49,6 +49,7 @@ TENANT_APPS = [
     'rest_framework_simplejwt',
     'django.contrib.sites',
     'core',
+    'configuration',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [

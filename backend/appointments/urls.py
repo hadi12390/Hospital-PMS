@@ -12,5 +12,5 @@ urlpatterns = [
     path('doctor/', DoctorListCreateAppointment.as_view()),
     path('', PatientListCreateAppointment.as_view()),
     path('doctor/<uuid:public_id>/', DoctorAppointmentDetailView.as_view()),
-    path('pending/', PendingAppointmentsView.as_view()),
+    path('doctor/pending/', PendingAppointmentsView.as_view()),
 ]

@@ -49,8 +49,37 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 return True
 
         return False
+    
+    
+    def suitable_for_dr(
+        self,
+        doctor,
+        patient,
+        scheduled_time,
+        appointment_type=None,
+        duration_minutes=None,
+    ):
+        temp = Appointment(
+            patient=patient,
+            doctor=doctor,
+            scheduled_time=scheduled_time,
+            appointment_type=(
+                appointment_type
+                or Appointment.AppointmentType.CONSULTATION
+            ),
+            duration_minutes=duration_minutes,
+        )
 
+        start = scheduled_time.time()
+        end = temp.end_time.time()
 
+        return (
+            start >= doctor.start_time
+            and start < doctor.end_time
+            and end <= doctor.end_time
+        )
+
+    
     def get_full_name(self, person):
         if person is None:
             return None
@@ -125,6 +154,17 @@ class ManagerAppointmentCreateSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError(
                 "This time slot conflicts with another appointment."
             )
+        
+        if not self.suitable_for_dr(
+            doctor=attrs["doctor"],
+            patient=attrs["patient"],
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type"),
+            duration_minutes=attrs.get("duration_minutes"),
+        ):
+            raise serializers.ValidationError({
+                "scheduled_time": "This appointment may fall outside the doctor's working hours."
+            })
 
         return attrs
 
@@ -246,9 +286,20 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError(
                 "This time slot conflicts with another appointment."
             )
-
+        
+        if not self.suitable_for_dr(
+            doctor=attrs["doctor"],
+            patient=attrs["patient"],
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type"),
+            duration_minutes=attrs.get("duration_minutes"),
+        ):
+            raise serializers.ValidationError({
+                "scheduled_time": "This appointment may fall outside the doctor's working hours."
+            })
 
         return attrs
+
 
 
 
@@ -321,6 +372,17 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
                 "This time slot conflicts with another appointment."
             )
 
+
+        if not self.suitable_for_dr(
+            doctor=attrs["doctor"],
+            patient=patient,
+            scheduled_time=attrs["scheduled_time"],
+            appointment_type=attrs.get("appointment_type"),
+            duration_minutes=attrs.get("duration_minutes"),
+        ):
+            raise serializers.ValidationError({
+                "scheduled_time": "This appointment may fall outside the doctor's working hours."
+            })
 
         return attrs
 
@@ -408,6 +470,23 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError(
                 "This time slot conflicts with another appointment."
             )
+        
+        if not self.suitable_for_dr(
+            doctor=self.instance.doctor,
+            patient=self.instance.patient,
+            scheduled_time=self.instance.scheduled_time,
+            appointment_type=attrs.get(
+                "appointment_type",
+                self.instance.appointment_type,
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes",
+                self.instance.duration_minutes,
+            ),
+        ):
+            raise serializers.ValidationError({
+                "scheduled_time": "This appointment may fall outside the doctor's working hours."
+            })
 
         return attrs
 

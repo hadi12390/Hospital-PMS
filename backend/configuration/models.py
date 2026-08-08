@@ -32,6 +32,10 @@ class ClinicConfiguration(models.Model):
     )
 
     max_pending_appointments = models.PositiveSmallIntegerField(default=3)
+    max_advance_booking_days = models.PositiveIntegerField(
+        default=30,
+        help_text="Maximum number of days in advance that a patient can book an appointment."
+    )
     reliability_enabled = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

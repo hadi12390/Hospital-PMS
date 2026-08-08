@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db.models import Q
 from django.utils import timezone
+from datetime import timedelta
 
 from .models import Appointment
 from doctor.models import Doctor
@@ -93,7 +94,11 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
     def is_in_the_past(self, scheduled_time):
         return scheduled_time < timezone.now()
 
-        
+    def exceeds_booking_window(self, scheduled_time):
+        config = ClinicConfiguration.objects.first()
+
+        return scheduled_time > timezone.now() + timedelta(days=config.max_advance_booking_days)
+    
     def get_full_name(self, person):
         if person is None:
             return None
@@ -378,6 +383,12 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         if self.is_in_the_past(attrs["scheduled_time"]):
             raise serializers.ValidationError(
                 "You cannot create an appointment for a date or time in the past."
+            )
+
+        if self.exceeds_booking_window(attrs["scheduled_time"]):
+            config = ClinicConfiguration.objects.first()
+            raise serializers.ValidationError(
+                f"You cannot book an appointment more than {config.max_advance_booking_days} days in advance."
             )
         
         if self.has_conflict(

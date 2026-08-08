@@ -96,13 +96,10 @@ class Patient(models.Model):
         if positive_points == 0 and negative_points == 0:
             return 100
         
-        return round(
-            (
-                positive_points /
-                (positive_points + negative_points)
-            ) * 100,
-            2
-        )
+        return (
+            positive_points /
+            (positive_points + negative_points)
+        ) * 100
 
     def __str__(self):
         return f"{self.reliability}"

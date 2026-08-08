@@ -80,24 +80,47 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
             and start < doctor.end_time
             and end <= doctor.end_time
         )
+    
+    def get_reliability_policy(self, patient):
+
+        policy = (
+            ReliabilityPolicy.objects
+            .filter(min_reliability__lte=patient.reliability)
+            .order_by("-min_reliability")
+            .first()
+        )
+
+        if policy is None:
+            raise serializers.ValidationError(
+                "No reliability policy has been configured. Please contact the clinic administrator."
+            )
+
+        return policy
 
     def at_pending_limit(self, patient):
-        configuration = ClinicConfiguration.objects.first()
-
         appointments = Appointment.objects.filter(
-            patient=patient, 
+            patient=patient,
             status=Appointment.Status.PENDING
         ).count()
+        
+        policy = self.get_reliability_policy(patient)
 
-        return appointments >= configuration.max_pending_appointments
+        return appointments >= policy.max_pending_appointments
 
     def is_in_the_past(self, scheduled_time):
         return scheduled_time < timezone.now()
 
-    def exceeds_booking_window(self, scheduled_time):
-        config = ClinicConfiguration.objects.first()
+    def exceeds_booking_window(self, scheduled_time, patient):
 
-        return scheduled_time > timezone.now() + timedelta(days=config.max_advance_booking_days)
+        policy = self.get_reliability_policy(patient)
+
+        return scheduled_time > timezone.now() + timedelta(days=policy.max_advance_booking_days)
+
+    def online_booking_blocked(self, patient):
+
+        policy = self.get_reliability_policy(patient)
+
+        return policy.block_online_booking
     
     def get_full_name(self, person):
         if person is None:
@@ -379,13 +402,20 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
     def validate(self, attrs):
 
         patient = self.context["request"].user.patient
+        
+        if self.online_booking_blocked(patient):
 
+            raise serializers.ValidationError(
+                "Online appointment booking is currently unavailable for your account. "
+                "Please contact the clinic for assistance."
+            )
+        
         if self.is_in_the_past(attrs["scheduled_time"]):
             raise serializers.ValidationError(
                 "You cannot create an appointment for a date or time in the past."
             )
 
-        if self.exceeds_booking_window(attrs["scheduled_time"]):
+        if self.exceeds_booking_window(attrs["scheduled_time"], patient):
             config = ClinicConfiguration.objects.first()
             raise serializers.ValidationError(
                 f"You cannot book an appointment more than {config.max_advance_booking_days} days in advance."

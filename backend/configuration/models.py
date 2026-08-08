@@ -31,11 +31,7 @@ class ClinicConfiguration(models.Model):
         validators=[MinValueValidator(0)]
     )
 
-    max_pending_appointments = models.PositiveSmallIntegerField(default=3)
-    max_advance_booking_days = models.PositiveIntegerField(
-        default=30,
-        help_text="Maximum number of days in advance that a patient can book an appointment."
-    )
+
     reliability_enabled = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -46,3 +42,17 @@ class ClinicConfiguration(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
     
+
+class ReliabilityPolicy(models.Model):
+    min_reliability = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+
+    max_pending_appointments = models.PositiveIntegerField()
+    max_advance_booking_days = models.PositiveIntegerField()
+
+    block_online_booking = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["min_reliability"]
+
+    def __str__(self):
+        return f"{self.min_reliability}"

@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from django.db.models import Q
+from django.utils import timezone
 
 from .models import Appointment
 from doctor.models import Doctor
 from patient.models import Patient
-
+from configuration.models import ClinicConfiguration
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 
@@ -79,7 +80,20 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
             and end <= doctor.end_time
         )
 
-    
+    def at_pending_limit(self, patient):
+        configuration = ClinicConfiguration.objects.first()
+
+        appointments = Appointment.objects.filter(
+            patient=patient, 
+            status=Appointment.Status.PENDING
+        ).count()
+
+        return appointments >= configuration.max_pending_appointments
+
+    def is_in_the_past(self, scheduled_time):
+        return scheduled_time < timezone.now()
+
+        
     def get_full_name(self, person):
         if person is None:
             return None
@@ -138,7 +152,12 @@ class ManagerAppointmentCreateSerializer(BaseAppointmentSerializer):
 
 
     def validate(self, attrs):
-
+        
+        if self.is_in_the_past(attrs["scheduled_time"]):
+            raise serializers.ValidationError(
+                "You cannot create an appointment for a date or time in the past."
+            )
+        
         if self.has_conflict(
             doctor=attrs["doctor"],
             patient=attrs["patient"],
@@ -165,6 +184,7 @@ class ManagerAppointmentCreateSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError({
                 "scheduled_time": "This appointment may fall outside the doctor's working hours."
             })
+
 
         return attrs
 
@@ -266,7 +286,11 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
         attrs["doctor"] = request.user.doctor
         attrs["status"] = Appointment.Status.CONFIRMED
 
-
+        if self.is_in_the_past(attrs["scheduled_time"]):
+            raise serializers.ValidationError(
+                "You cannot create an appointment for a date or time in the past."
+            )
+        
         if self.has_conflict(
             doctor=attrs["doctor"],
             patient=attrs["patient"],
@@ -351,7 +375,11 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
 
         patient = self.context["request"].user.patient
 
-
+        if self.is_in_the_past(attrs["scheduled_time"]):
+            raise serializers.ValidationError(
+                "You cannot create an appointment for a date or time in the past."
+            )
+        
         if self.has_conflict(
             doctor=attrs["doctor"],
             patient=patient,
@@ -383,6 +411,12 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError({
                 "scheduled_time": "This appointment may fall outside the doctor's working hours."
             })
+
+        if self.at_pending_limit(patient=patient):
+            configuration = ClinicConfiguration.objects.first()
+            raise serializers.ValidationError(
+                f"Unfortunately, you have reached the maximum of {configuration.max_pending_appointments} pending appointments. Please complete or cancel an existing appointment before booking another."
+            )
 
         return attrs
 
@@ -453,6 +487,10 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
 
     def validate(self, attrs):
 
+        if self.is_in_the_past(attrs["scheduled_time"]):
+            raise serializers.ValidationError(
+                "You cannot create an appointment for a date or time in the past."
+            )
         if self.has_conflict(
             doctor=self.instance.doctor,
             patient=self.instance.patient,

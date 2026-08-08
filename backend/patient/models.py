@@ -14,6 +14,7 @@ class Patient(models.Model):
         related_name='patient',
         unique=True
     )
+    
     first_name = models.CharField(max_length=50, blank=True, default='')
     last_name = models.CharField(max_length=50, blank=True, default='')
 
@@ -45,6 +46,7 @@ class Patient(models.Model):
         """Returns the total number of NO_SHOW appointments for this patient."""
         # 'appointments' assumes related_name='appointments' on Appointment.patient
         return self.appointments.filter(status="no_show").count()  
+    
     @property
     def reliability(self):
 
@@ -94,12 +96,6 @@ class Patient(models.Model):
         if positive_points == 0 and negative_points == 0:
             return 100
         
-        print(stats)
-        print("positive:", positive_points)
-        print("negative:", negative_points)
-        print(
-            (positive_points / (positive_points + negative_points)) * 100
-        )
         return round(
             (
                 positive_points /

@@ -11,7 +11,7 @@ class IsValidTenantUser(BasePermission):
             return False
         
         # Get the tenant_schema embedded in the JWT payload
-        token_schema = request.auth.get('tenants_schema') if request.auth else None
+        token_schema = request.auth.get('tenant_schema') if request.auth else None
         
         # Verify it matches the active PostgreSQL schema
         return token_schema == connection.schema_name

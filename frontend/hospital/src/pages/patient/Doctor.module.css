@@ -163,25 +163,33 @@
 .homelogoicon polygon {
   stroke: #4D4D4D;
 }
+
 .homeLogoButton:hover .homelogoicon path,
 .homelogoicon circle,
 .homelogoicon rect,
 .homelogoicon polygon {
   stroke: #2986DC;
 }
-.appLogoButton .applogoicon path,
+.appLogoButton:hover .applogoicon path,
 .applogoicon circle,
 .applogoicon rect,
 .applogoicon polygon{
   stroke: #2986DC;
 }
-.appLogoButton{
+
+.docLogoButton{
     background-color: #0F172A;
     width: 100%;
     border-radius: 999px;
 }
-.appLogoButton svg{
+.docLogoButton svg{
     width: 80%;
+}
+.docLogoButton .doclogoicon path,
+.doclogoicon circle,
+.doclogoicon rect,
+.doclogoicon polygon{
+  fill: #2986DC;
 }
 
 .docLogoButton:hover .doclogoicon path,
@@ -243,6 +251,9 @@
 .logoutlogoicon rect,
 .logoutlogoicon polygon{
   stroke: #2986DC;
+}
+.appLogoButton svg{
+  stroke: #4d4d4d;
 }
 
 .Asettlogoicon{
@@ -632,270 +643,164 @@ body {
 .searchInput::placeholder{
     color: #4d4d4d; 
 }
-
-
-/* STOP HERE */
-
-
-
-
-/* Card One */
-.nextAppointment{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-
-    background:linear-gradient(to right , #2986DC ,#7FC1FF,#2986DC);
-
-    padding: 2em;
-    border-radius: 1rem;
-}
-.upperNextAppointment{
-    display: flex;
-    justify-content: space-between;
-
-    margin-bottom: 3em;
-}
-.downNextAppointment{
-    display: flex;
+.cardsDCont{
+    display: grid;
     gap: 1em;
-}
-.heroNextApp{
-    color: white;
-    font-size: 3rem;
-    font-family: "GeologicaBold";
-}
-.timingNextApp{
-    color: white;
-    font-size: 2rem;
-    font-family: "ExtraLightGEO";
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.docName{
-    padding: 7px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    gap: 10px;
-    border-radius: .5rem;
-    background-color: rgba(255, 255, 255, 0.244);
 
-    font-size: 1.5rem;
-
-    margin-bottom: .5em;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     width: 100%;
+
 }
-.docName svg path{
+.Dcards{
+    background:linear-gradient(60deg,#0080ffae,#6da8e7c8,#4A91FF);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+
+    padding-bottom: 0em ;
+    width: 100%;
+
+}
+.timeICON svg path{
     fill: white;
 }
-.surtype{
-     padding: 5px;
+.photoCont{
+    height: fit-content;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5px;
+    border-radius: .5rem;
+
+
+}
+.secOneBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: fit-content;
+
+    padding: 1.5em;
+}
+
+.heroCardInfo{
     color: white;
+    font-size: 1.2rem;
+    text-align: start;
+}
+.infoDEV{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+
+    color: white;
+
     gap: 10px;
-    border-radius: .5rem;
-    background-color: rgba(255, 255, 255, 0.244);
+    height: fit-content;
 
-    font-size: 1.5rem;
-
-    margin-bottom: .5em;
-
-    width: 100%;
+    position: relative;
+    transform: translateY(2em);
 }
-.docPho{
-    width: fit-content;
+ 
+.makeAppBut{
+    display: flex;
     padding: 5px;
-    border-radius: .5rem;
+    border-radius: 999px;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+    gap: .3em;
+
+    transition: all 0.3s ease;
+}
+.thingsCards{
     display: flex;
     justify-content: center;
     align-items: center;
+
+
+    gap: .3em;
+
+    font-family: "SoExtraLightGEO";
 }
-.naCardOne{
+
+.buttAddDiv{
+    align-self: flex-end;
+    margin: 1em;
+    /*here please*/    
+}
+.infoANDb{
     display: flex;
     flex-direction: column;
-    align-items: center;
-
-    width: 50em;
     justify-content: space-between;
-}
-.naCardTwo{
-    background-color: rgba(255, 255, 255, 0.244);
-    padding: 1em;
-    font-family: "SoExtraLightGEO";
-    border-radius: .5rem;
-    color: white;
-
     width: 100%;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-}
-.naCardTwo svg path{
-    stroke: white;
-}
-.namaintext{
-    color: white;
-    font-family: "GeologicaBold";
-    font-size: 3rem;
-}
-.upperNaTwo{
-    border-radius: .5rem;
-    padding: 5px;
-
-    display: flex;
-    align-items: center;
-}
-
-.upperNaTwo {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* left spacer, content, right spacer */
-  align-items: center;
-  padding: 5px 10px;
-  font-size: 2rem;
-  background-color: #00000000;
-}
-
-.logonaCardTwo {
-  grid-column: 1;
-  justify-self: start;
-}
-
-.upperNaTwo span {
-  grid-column: 2;
-  justify-self: center;
-}
-.clocknatwo{
-    font-size: 1.5rem;
-    align-self: end;              
-}
-.naCardFour{
-    display: flex;
-    flex-direction: column;
-    padding: 1em;
-    color: white;
-
-    justify-content: flex-start;
-
-    border-radius: .5em;
-
-    width: 50em;
-}
-.statusA{
-    font-size: 2rem;
-    margin-top: .3em;
-}
-.iconstatusA{
     height: 100%;
+    position: relative;   /* ADD THIS */
+
+}   
+.thePLusIcon{
+    padding: 1em;
+    background-color: white;
+    padding: .5em;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 999px;
+    flex-shrink: 0;
 }
-.uppernacardone{
-    width: 100%;
-}
-.heroSecName{
-    margin-top: 2em;
-    margin-bottom: 1em;
-
-    color: #4d4d4d;
-    font-family: "SoExtraLightGEO";
-    font-size: 2.5rem;
-}
-.expcard {
-    width: 100%;
-    padding: 2em;
-    border-radius: 20px;
-    background: linear-gradient(90deg,#75A0E3,#6da8e7b4,#75A0E3);
-
+.infoshehe{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-
-    padding-bottom: 1em;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 10px;
+    gap: .5em;
 }
-
-.expcontent {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows .4s ease;
+.makeAppBut:hover{
+    transform: scale(1.05);
+    cursor: pointer;
 }
-
-.expinner {
+@media (max-width:1479px) {
+    .infoDEV{
+        font-size: .8rem;
+    }
+}
+.makeAppBut {
+    position: relative;
     overflow: hidden;
+    isolation: isolate;
 }
 
-.expexpanded .expcontent {
-    grid-template-rows: 1fr;
-}
-.expheader{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.expheader h3{
-    font-family: "SoExtraLightGEO";
-    color: white;
-    font-size: 2rem;
-}
-.expStatusLogo{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    color: white;
-}
-.approved{
-    width: 80%;
-}
-.downerEXP{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-.expStatusLogomain{
-    display: flex;
-}
-.toggleBtn{
-    background-color: transparent;
-    border: none;
-}
-.toggleBtn .arrow {
-    transition: transform 0.35s ease;
+.shineLayer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle 120px at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.35),
+        rgba(255, 255, 255, 0) 70%
+    );
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.open .arrow {
-    transform: rotate(180deg);
+.makeAppBut:hover .shineLayer {
+    opacity: 1;
 }
-.expcardsin{
-    padding: 2em 0;
-    display: flex;
-    gap: 1em;
-}
-.expAllCards{
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-}
-.wid100{
-    width: 100%;
-    gap: 1em;
-    display: flex;
-    flex-direction: column;
-}
-.expcardH{
-    width: 100%;
-    padding:1em 2em;
-    border-radius: 20px;
-    background: linear-gradient(270deg,#215a9fcb,#0099ff9c);
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.thePLusIcon {
+    position: relative;
+    z-index: 2;
+}
+
+.btnLabel {
+    position: relative;
+    z-index: 2;
 }

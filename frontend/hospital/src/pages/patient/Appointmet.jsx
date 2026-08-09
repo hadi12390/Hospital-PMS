@@ -21,7 +21,7 @@ import ExpArrow from "../../assets/patient/expArrwo.svg?react";
 
 
 import { useRef, useState } from 'react';
-
+import { NavLink } from "react-router-dom";
 
 function PatientAppointment(){
   const [searchValue, setSearchValue] = useState('');
@@ -47,57 +47,110 @@ function PatientAppointment(){
       <aside className={styles.sideBar}>
         <img src="/assest/patient/logo.svg" alt="Logo" />
 
-            <div className={styles.contSide}>
-      
-              <div className={styles.optionsContainer}>
-                <button className={`${styles.options} ${styles.homeLogoButton}`}>
-                 <HomeLogo className={styles.homelogoicon} />
-                </button>
-      
-                <button className={`${styles.options} ${styles.appLogoButton}`}>
-                 <AppLogo className={styles.applogoicon} />
-                </button>
-      
-                <button className={`${styles.options} ${styles.docLogoButton}`}>
-                 <DocLogo className={styles.doclogoicon} />
-                </button>
-      
-                <button className={`${styles.options} ${styles.pillLogoButton}`}>
-                 <PillLogo className={styles.pilllogoicon} />
-                </button>
+        <div className={styles.contSide}>
+          <div className={styles.optionsContainer}>
+            <NavLink
+              to="/patient/home"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.homeLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <HomeLogo className={styles.homelogoicon} />
+            </NavLink>
 
-                <button className={`${styles.options} ${styles.docuLogoButton}`}>
-                 <DocuLogo className={styles.doculogoicon} />
-                </button>
-      
-              </div>
-      
-      
-              <div className={styles.optionsContainer}>
-                <button className={`${styles.options} ${styles.helpLogoButton}`}>
-                 <HelpLogo className={styles.helplogoicon} />
-                </button>
-      
-                <button className={`${styles.options} ${styles.settLogoButton}`}>
-                  <SettLogo className={styles.settlogoicon} />
-                </button>
-              </div>
+            <NavLink
+              to="/patient/appointment"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.appLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <AppLogo className={styles.applogoicon} />
+            </NavLink>
 
-              <div className={styles.logoutsec}>
-                <div className={styles.optionsContainer}>
-                  <button className={`${styles.options} ${styles.logoutLogoButton}`}>
-                  <LogOutLogo className={styles.logoutlogoicon} />
-                  </button>
-        
-                  <button className={`${styles.options} ${styles.settLogoButton}`}>
-                    <SettLogo className={styles.Asettlogoicon} />
-                  </button>
-                </div>
+            <NavLink
+              to="/patient/doctor"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.docLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <DocLogo className={styles.doclogoicon} />
+            </NavLink>
 
-                <div className={styles.profPicLogOut}>
-                  <img src="/assest/patient/pp.png" alt="Profile" />
-                </div>
-              </div> 
+            <NavLink
+              to="/patient/medication"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.pillLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <PillLogo className={styles.pilllogoicon} />
+            </NavLink>
+
+            <NavLink
+              to="/patient/report"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.docuLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <DocuLogo className={styles.doculogoicon} />
+            </NavLink>
+          </div>
+
+          <div className={styles.optionsContainer}>
+            <NavLink
+              to="/patient/help"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.helpLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <HelpLogo className={styles.helplogoicon} />
+            </NavLink>
+
+            <NavLink
+              to="/patient/settings"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.settLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <SettLogo className={styles.settlogoicon} />
+            </NavLink>
+          </div>
+
+          <div className={styles.logoutsec}>
+            <div className={styles.optionsContainer}>
+              <button className={`${styles.options} ${styles.logoutLogoButton}`}>
+                <LogOutLogo className={styles.logoutlogoicon} />
+              </button>
+
+              <NavLink
+                to="/patient/account"
+                className={({ isActive }) =>
+                  `${styles.options} ${styles.settLogoButton} ${
+                    isActive ? styles.active : ""
+                  }`
+                }
+              >
+                <SettLogo className={styles.Asettlogoicon} />
+              </NavLink>
+            </div>
+
+            <div className={styles.profPicLogOut}>
+              <img src="/assest/patient/pp.png" alt="Profile" />
+            </div>
+          </div>
         </div>
       </aside>
 

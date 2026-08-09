@@ -6,7 +6,7 @@ from datetime import timedelta
 from .models import Appointment
 from doctor.models import Doctor
 from patient.models import Patient
-from configuration.models import ClinicConfiguration
+from configuration.models import ClinicConfiguration, ReliabilityPolicy
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 

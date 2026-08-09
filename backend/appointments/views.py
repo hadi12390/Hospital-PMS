@@ -160,4 +160,3 @@ class PendingAppointmentsView(ListAPIView):
                 .select_related("patient__user")
                 .order_by("scheduled_time")
         )
-    

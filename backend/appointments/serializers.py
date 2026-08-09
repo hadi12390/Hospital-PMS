@@ -366,7 +366,12 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         queryset=Doctor.objects.all(),
         write_only=True,
     )
-
+    appointment_type = serializers.ChoiceField(
+        choices=[
+            (Appointment.AppointmentType.CONSULTATION, Appointment.AppointmentType.CONSULTATION.label),
+            (Appointment.AppointmentType.CHECKUP, Appointment.AppointmentType.CHECKUP.label),
+        ]
+    )
 
     class Meta:
         model = Appointment
@@ -383,7 +388,6 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
 
         read_only_fields = [
             "status",
-            "appointment_type",
             "duration_minutes",
         ]
 
@@ -469,7 +473,7 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
             .user
             .patient
         )
-
+        
         validated_data["status"] = (
             Appointment.Status.PENDING
         )

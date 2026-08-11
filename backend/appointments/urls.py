@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from .views import (
     ManagerListCreateAppointment, 
     DoctorListCreateAppointment, 
@@ -13,4 +13,5 @@ urlpatterns = [
     path('', PatientListCreateAppointment.as_view()),
     path('doctor/<uuid:public_id>/', DoctorAppointmentDetailView.as_view()),
     path('doctor/pending/', PendingAppointmentsView.as_view()),
+    path('available-times/', ),
 ]

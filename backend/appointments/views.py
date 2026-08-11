@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.utils.dateparse import parse_date
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.generics import( 
@@ -6,7 +7,10 @@ from rest_framework.generics import(
     RetrieveUpdateAPIView,
     ListAPIView,
     )
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+import uuid
 
 from accounts.permissions import IsDoctor, IsManager, IsPatient
 from logs.models import ActivityLog
@@ -160,3 +164,32 @@ class PendingAppointmentsView(ListAPIView):
                 .select_related("patient__user")
                 .order_by("scheduled_time")
         )
+
+class AvailableTimesView(APIView):
+    permission_classes = [IsAuthenticated, (IsPatient | IsDoctor | IsManager)]
+
+    def get(self, request):
+        date_str = request.query_params.get("date")
+        doctor_public_id = request.query_params.get("doctor")
+        appointment_type = request.query_params.get("type")
+
+        if date_str:
+            selected_date = parse_date(date_str)
+
+            if selected_date is None:
+                return Response(
+                    {
+                        "detail": "Invalid date format. Use YYYY-MM-DD."
+                    },
+                    status=400,
+                )
+        else:
+            return Response(
+                {
+                    "detail": "There is no date. Use YYYY-MM-DD."
+                },
+                status=400,
+            )
+
+        
+        

@@ -6,6 +6,7 @@ from .views import (
     DoctorAppointmentDetailView,
     PendingAppointmentsView,
     AvailableTimesView,
+    AppointmentCancelView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('doctor/<uuid:public_id>/', DoctorAppointmentDetailView.as_view()),
     path('doctor/pending/', PendingAppointmentsView.as_view()),
     path('available-times/', AvailableTimesView.as_view()),
+    path('<uuid:public_id>/cancel/', AppointmentCancelView.as_view(), name="appointment-cancel")
 ]

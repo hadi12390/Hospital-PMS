@@ -8,6 +8,7 @@ from rest_framework.generics import(
     ListCreateAPIView, 
     RetrieveUpdateAPIView,
     ListAPIView,
+    UpdateAPIView
     )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,6 +26,7 @@ from .serializers import (
     ManagerAppointmentSerializer,
     PatientAppointmentSerializer,
     DoctorPendingAppointmentSerializer,
+    PatientCancelAppointment,
 )
 
 class ManagerListCreateAppointment(ListCreateAPIView):
@@ -294,3 +296,14 @@ class AvailableTimesView(APIView):
 
         # 9) Return the free times
         return Response(final_available_times)
+
+class AppointmentCancelView(UpdateAPIView):
+    serializer_class = PatientCancelAppointment
+    permission_classes = [IsAuthenticated, IsPatient]
+    lookup_field = "public_id"
+
+    def get_queryset(self):
+        return Appointment.objects.filter(
+            patient=self.request.user.patient
+        )
+    

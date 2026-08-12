@@ -7,6 +7,7 @@ from .models import Appointment
 from doctor.models import Doctor
 from patient.models import Patient
 from configuration.models import ClinicConfiguration, ReliabilityPolicy
+from logs.models import ActivityLog
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 
@@ -377,6 +378,7 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         model = Appointment
 
         fields = [
+            "public_id",
             "doctor",
             "scheduled_time",
             "reason_for_visit",
@@ -601,3 +603,53 @@ class DoctorPendingAppointmentSerializer(BaseAppointmentSerializer):
         return self.get_person_repr(
             obj.patient
         )
+
+class PatientCancelAppointment(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ["status"]
+
+    def validate_status(self, value):
+        if value != Appointment.Status.CANCELLED:
+            raise serializers.ValidationError(
+                "Patients may only cancel appointments."
+            )
+
+        if self.instance.status in [
+            Appointment.Status.CANCELLED,
+            Appointment.Status.COMPLETED,
+            Appointment.Status.NO_SHOW,
+        ]:
+            raise serializers.ValidationError(
+                "This appointment cannot be cancelled."
+            )
+
+        return value
+
+    def update(self, instance, validated_data):
+        old_status = instance.status
+        new_status = Appointment.Status.CANCELLED
+
+        instance.status = new_status
+        instance.cancelled_at = timezone.now()
+
+        instance.save(
+            update_fields=[
+                "status",
+                "cancelled_at",
+            ]
+        )
+
+        request = self.context["request"]
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action=ActivityLog.Action.APPOINTMENT_UPDATED,
+            description=(
+                f"Patient {request.user.username} updated appointment status "
+                f"from '{old_status}' to '{new_status}' "
+                f"for patient {instance.patient.user.username}."
+            ),
+        )
+
+        return instance

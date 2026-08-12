@@ -2,6 +2,8 @@ from datetime import timedelta
 from django.utils.dateparse import parse_date
 from django.db import transaction
 from django.utils import timezone
+from datetime import date, datetime
+from django.db.models import Q
 from rest_framework.generics import( 
     ListCreateAPIView, 
     RetrieveUpdateAPIView,
@@ -15,7 +17,9 @@ import uuid
 from accounts.permissions import IsDoctor, IsManager, IsPatient
 from logs.models import ActivityLog
 from .models import Appointment
+from doctor.models import Doctor
 from .serializers import (
+    BaseAppointmentSerializer,
     DoctorAppointmentSerializer,
     DoctorAppointmentUpdateSerializer,
     ManagerAppointmentSerializer,
@@ -166,13 +170,15 @@ class PendingAppointmentsView(ListAPIView):
         )
 
 class AvailableTimesView(APIView):
-    permission_classes = [IsAuthenticated, (IsPatient | IsDoctor | IsManager)]
+    permission_classes = [IsAuthenticated, IsPatient]
 
     def get(self, request):
+        # 1) Get the info from the request
         date_str = request.query_params.get("date")
         doctor_public_id = request.query_params.get("doctor")
         appointment_type = request.query_params.get("type")
-        # check the date
+        
+        #  1.1) check the date
         if date_str:
             selected_date = parse_date(date_str)
 
@@ -186,24 +192,105 @@ class AvailableTimesView(APIView):
         else:
             return Response(
                 {
-                    "detail": "There is no date. Use YYYY-MM-DD."
+                    "detail": "Date is required. Use YYYY-MM-DD."
                 },
                 status=400,
             )
-            # check the doctor
-            if not doctor_public_id:
-                return Response({"detail": "Doctor is required."}, status=400)
+        # 1.2) check the doctor
+        if not doctor_public_id:
+            return Response({"detail": "Doctor is required."}, status=400)
 
-            try:
-                uuid.UUID(doctor_public_id)
-            
-            except (ValueError, TypeError):
-                return Response({"detail": "Invalid doctor id."}, status=400)
-            
-            doctor = Doctor.objects.filter(user__public_id=doctor_public_id).first()
+        try:
+            uuid.UUID(doctor_public_id)
+        
+        except (ValueError, TypeError):
+            return Response({"detail": "Invalid doctor id."}, status=400)
+        
+        doctor = Doctor.objects.filter(user__public_id=doctor_public_id).first()
 
-            if doctor is None:
-                return Response({"detail": "Doctor not found."}, status=404)
-            
+        if doctor is None:
+            return Response({"detail": "Doctor not found."}, status=404)
+        # 1.3) check the type
+        if appointment_type:
+            if appointment_type == "consultation":
+                appointment_type = Appointment.AppointmentType.CONSULTATION
+            elif appointment_type == "checkup":
+                appointment_type = Appointment.AppointmentType.CHECKUP
+            else:
+                return Response({"detail": "Invalid appointment type."}, status=400)
+        else:
+            return Response({"detail": "appointment type is required."}, status=400)
+
+        # 2) Find the duration
+        if appointment_type == Appointment.AppointmentType.CONSULTATION:
+            duration = doctor.consultation_duration
+        elif appointment_type == Appointment.AppointmentType.CHECKUP:
+            duration = doctor.checkup_duration
+        else:
+            return Response({"detail": "Unsupported appointment type."}, status=400)
         
+        # 3) Find the doctor's working hours for that day
+        if doctor.start_time and doctor.end_time:
+            day_start = timezone.make_aware(datetime.combine(selected_date, doctor.start_time))
+            day_end = timezone.make_aware(datetime.combine(selected_date, doctor.end_time))
+        else:
+            return Response({"detail": "The doctor hasn't set the available hours yet."}, status=409)
         
+        # 4) Get the doctor's existing appointments
+        appointments = Appointment.objects.filter(
+            doctor=doctor,
+            scheduled_time__gte=day_start,
+            scheduled_time__lte=day_end,
+        ).filter(
+            Q(status=Appointment.Status.PENDING) | Q(status=Appointment.Status.CONFIRMED)
+        )
+        # 5) Make a list of possible times
+        possible_times = []
+        step = timedelta(minutes=duration)
+        current = day_start
+
+        while current + step <= day_end:
+            possible_times.append(current)
+            current = current + step
+
+        # 6) Check each time for overlap
+        available_times = []
+        for candidate in possible_times:
+            candidate_end = candidate + step
+            conflict = False
+            for appt in appointments:
+                if candidate < appt.end_time and candidate_end > appt.scheduled_time:
+                    conflict = True
+                    break
+            if not conflict:
+                available_times.append(candidate)
+        
+        # 7) Remove past times
+        future_times = []
+        for time in available_times:
+            if time >= timezone.now():
+                future_times.append(time)
+        available_times = future_times
+
+        # 8) Mark the times that will conflict with the patient appointments
+        patient = request.user.patient
+        patient_appointments = Appointment.objects.filter(
+            patient=patient,
+            scheduled_time__gte=day_start,
+            scheduled_time__lte=day_end,
+        ).filter(
+            Q(status=Appointment.Status.PENDING) | Q(status=Appointment.Status.CONFIRMED)
+        )
+
+        final_available_times = []
+        for candidate in available_times:
+            candidate_end = candidate + step
+            conflict = False
+            for appt in patient_appointments:
+                if candidate < appt.end_time and candidate_end > appt.scheduled_time:
+                    conflict = True
+                    break
+            final_available_times.append({"time": candidate, "conflict_with_patient": conflict})
+
+        # 9) Return the free times
+        return Response(final_available_times)

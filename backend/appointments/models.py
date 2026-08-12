@@ -113,12 +113,12 @@ class Appointment(models.Model):
         null=True,
         blank=True
     )
-    
+   
     cancellation_reason = models.TextField(
         blank=True
     )
 
-    
+
     class Meta:
         ordering = ["scheduled_time"]
 

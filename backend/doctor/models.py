@@ -11,9 +11,9 @@ class Doctor(models.Model):
     specialty = models.CharField(max_length=100)
     
     consultation_duration = models.PositiveIntegerField(
-    default=30,
-    help_text="Duration in minutes"
-)
+        default=30,
+        help_text="Duration in minutes"
+    )
 
     follow_up_duration = models.PositiveIntegerField(
         default=15,
@@ -24,6 +24,7 @@ class Doctor(models.Model):
         default=45,
         help_text="Duration in minutes"
     )
+
     phone_number = models.CharField(max_length=15, blank=True)
     start_time = models.TimeField(blank=True)
     end_time = models.TimeField(blank=True)

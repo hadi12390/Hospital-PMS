@@ -5,6 +5,7 @@ from .views import (
     PatientListCreateAppointment,
     DoctorAppointmentDetailView,
     PendingAppointmentsView,
+    AvailableTimesView,
 )
 
 urlpatterns = [
@@ -13,5 +14,5 @@ urlpatterns = [
     path('', PatientListCreateAppointment.as_view()),
     path('doctor/<uuid:public_id>/', DoctorAppointmentDetailView.as_view()),
     path('doctor/pending/', PendingAppointmentsView.as_view()),
-    path('available-times/', ),
+    path('available-times/', AvailableTimesView.as_view()),
 ]

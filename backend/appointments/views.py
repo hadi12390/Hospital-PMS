@@ -172,7 +172,7 @@ class AvailableTimesView(APIView):
         date_str = request.query_params.get("date")
         doctor_public_id = request.query_params.get("doctor")
         appointment_type = request.query_params.get("type")
-
+        # check the date
         if date_str:
             selected_date = parse_date(date_str)
 
@@ -190,6 +190,20 @@ class AvailableTimesView(APIView):
                 },
                 status=400,
             )
+            # check the doctor
+            if not doctor_public_id:
+                return Response({"detail": "Doctor is required."}, status=400)
 
+            try:
+                uuid.UUID(doctor_public_id)
+            
+            except (ValueError, TypeError):
+                return Response({"detail": "Invalid doctor id."}, status=400)
+            
+            doctor = Doctor.objects.filter(user__public_id=doctor_public_id).first()
+
+            if doctor is None:
+                return Response({"detail": "Doctor not found."}, status=404)
+            
         
         

@@ -20,8 +20,10 @@ class DoctorDashboard(APIView):
         """Return a simplified representation of an appointment."""
         if not appointment:
             return None
-        if appointment.patient.user:
-            patient = f"{appointment.patient.first_name} {appointment.patient.last_name}"
+        if not appointment.patient:
+            return {"patient": "Deleted Patient"}
+        if appointment and appointment.patient and appointment.patient.user:
+            patient = f"{appointment.patient.user.first_name} {appointment.patient.user.last_name}"
         else:
             patient = f"Guest: {appointment.patient.first_name} {appointment.patient.last_name}"
         

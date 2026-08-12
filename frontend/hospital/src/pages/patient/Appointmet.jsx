@@ -83,7 +83,7 @@ function PatientAppointment(){
             </NavLink>
 
             <NavLink
-              to="/patient/medication"
+              to="/patient/reports"
               className={({ isActive }) =>
                 `${styles.options} ${styles.pillLogoButton} ${
                   isActive ? styles.active : ""

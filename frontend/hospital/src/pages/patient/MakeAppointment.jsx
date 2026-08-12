@@ -247,7 +247,7 @@ function MakeAppointment() {
 
 
                         <NavLink
-                            to="/patient/medication"
+                            to="/patient/reports"
                             className={({ isActive }) =>
                                 `${dashStyles.options}
                                 ${dashStyles.pillLogoButton}

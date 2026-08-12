@@ -10,6 +10,7 @@ import RestPasswordDone from "../pages/auth/RestPasswordDone";
 import AppointmentPatient from "../pages/patient/Appointmet";
 import AppointmentDoctor from "../pages/patient/Doctor";
 import MakeAppointment from "../pages/patient/MakeAppointment";
+import Reports from "../pages/patient/Reports";
 
 
 
@@ -27,7 +28,8 @@ function AppRoutes() {
       <Route path="/resetpasswordDone" element={<RestPasswordDone />} />
       <Route path="/patient/appointment" element={<AppointmentPatient />} />
       <Route path="/patient/doctor" element={<AppointmentDoctor />} />
-      <Route path="/patient/makeappointment" element={<MakeAppointment />} />
+      <Route path="/patient/make&appointment" element={<MakeAppointment />} />
+      <Route path="/patient/reports" element={<Reports />} />
     
     </Routes>
   );

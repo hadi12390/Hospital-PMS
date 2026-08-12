@@ -899,3 +899,9 @@ body {
     flex-direction: column;
     justify-content: space-between;
 }
+.pillLogoButton:hover .pilllogoicon path,
+.pillLogoButton circle,
+.pillLogoButton rect,
+.pillLogoButton polygon{
+  fill: #2986DC;
+}

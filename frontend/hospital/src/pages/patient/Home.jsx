@@ -253,7 +253,7 @@ function PatientHome(){
             </NavLink>
 
             <NavLink
-              to="/patient/medications"
+              to="/patient/reports"
               className={({ isActive }) =>
                 `${styles.options} ${styles.pillLogoButton} ${
                   isActive ? styles.active : ""

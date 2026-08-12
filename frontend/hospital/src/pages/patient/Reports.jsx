@@ -1,4 +1,4 @@
-import styles from "./Doctor.module.css";
+import styles from "./Reports.module.css";
 import HomeLogo from "../../assets/patient/home.svg?react";
 import AppLogo from "../../assets/patient/app.svg?react";
 import DocLogo from "../../assets/patient/doc.svg?react";
@@ -22,13 +22,17 @@ import Pill from "../../assets/patient/drugs.svg?react";
 import Star from "../../assets/patient/star.svg?react";
 import Locwhite from "../../assets/patient/locwhite.svg?react";
 import Plusvec from "../../assets/patient/plusvec.svg?react";
+import StatusB from "../../assets/patient/statusB.svg?react";
+import DownloadIcon from "../../assets/patient/download.svg?react";
+
+
 
 import { useRef, useState } from 'react';
 import { NavLink } from "react-router-dom";
 
 import AppointmentButton from "./AppointmentButton";
 
-function PatientDoctor(){
+function Reports(){
   const [searchValue, setSearchValue] = useState('');
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef(null);
@@ -197,135 +201,82 @@ function PatientDoctor(){
 
       {/* Main Content */}
       <main className={styles.cards}>
-        <div className={styles.cardsDCont}>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
+        <h1 className={styles.heroNameOB}>Latest Report</h1>
+        <div className={`${styles.lastReportCard}`}>
+            <div className={styles.heroSecLR}>
+                    <h3>Complete Blood Count</h3><p>11 day ago</p>
+            </div>
+                <div className={styles.containLR}>
+                    <div className={`${styles.secOneLR}`}>          
+                        <div className={`${styles.glass} ${styles.docNameLR}`}> <DocLogo/> Dr. Jassica</div>
+                            <div className={`${styles.glass} ${styles.cardOneLR}`}>
+                                <div className={`${styles.glass} ${styles.cardOneLRDate}`}>Date</div>
+                                    <h3>
+                                        Monday
+                                        <br />
+                                        31 July
+                                    </h3>
+                                <p className={styles.cardOneLRTime}>10:00 AM</p>
+                            </div>
                     </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
+
+                    <div className={`${styles.glass} ${styles.secTwoLRR}`}>
+                        <div className={`${styles.glass} ${styles.secStatus}`}>
+                            <StatusB/>status
+                        </div>
+                        <div className={styles.stutusT}>
+                            Normal
                         </div>
                     </div>
-                    <div className={styles.buttAddDiv}>
-                        <AppointmentButton/>
-                </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
+
+                    <div className={`${styles.glass} ${styles.secTwoLR}`}>
+                        <div className={`${styles.glass} ${styles.secStatusD}`}>
+                            Download
+                        </div>
+                        <div className={styles.stutusT}>
+                            <button><DownloadIcon/></button>
                         </div>
                     </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
+                </div>
+        </div>
+        <h1 className={styles.heroNameOB}>Recent Reports</h1>
+        <div className={`${styles.lastReportCard}`}>
+            <div className={styles.heroSecLR}>
+                    <h3>Complete Blood Count</h3><p>11 day ago</p>
+            </div>
+        <div className={styles.containLR}>
+            <div className={`${styles.secOneLR}`}>          
+                <div className={`${styles.glass} ${styles.docNameLR}`}> <DocLogo/> Dr. Jassica</div>
+                    <div className={`${styles.glass} ${styles.cardOneLR}`}>
+                        <div className={`${styles.glass} ${styles.cardOneLRDate}`}>Date</div>
+                            <h3>
+                                Monday
+                                <br />
+                                31 July
+                            </h3>
+                        <p className={styles.cardOneLRTime}>10:00 AM</p>
                     </div>
+            </div>
+
+            <div className={`${styles.glass} ${styles.secTwoLRR}`}>
+                <div className={`${styles.glass} ${styles.secStatus}`}>
+                    <StatusB/>status
+                </div>
+                <div className={styles.stutusT}>
+                    Normal
                 </div>
             </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
+
+            <div className={`${styles.glass} ${styles.secTwoLR}`}>
+                <div className={`${styles.glass} ${styles.secStatusD}`}>
+                    Download
                 </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
+                <div className={styles.stutusT}>
+                    <button><DownloadIcon/></button>
                 </div>
             </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div> 
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-       </div>
-       
+        </div>
+        </div>
       </main>
     </section>
     </div>
@@ -333,4 +284,4 @@ function PatientDoctor(){
 
 }
 
-export default PatientDoctor;
+export default Reports;

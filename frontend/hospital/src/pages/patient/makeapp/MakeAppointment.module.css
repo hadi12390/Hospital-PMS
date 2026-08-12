@@ -923,3 +923,9 @@ body {
     fill: rgb(13, 217, 67);
     stroke: rgb(255, 10, 10);
 }
+.pillLogoButton:hover .pilllogoicon path,
+.pillLogoButton circle,
+.pillLogoButton rect,
+.pillLogoButton polygon{
+  fill: #2986DC;
+}

@@ -1708,3 +1708,9 @@ main{
 .confirmTextCard p{
     font-size: 1.5rem;
 }
+.pillLogoButton:hover .pilllogoicon path,
+.pillLogoButton circle,
+.pillLogoButton rect,
+.pillLogoButton polygon{
+  fill: #2986DC;
+}

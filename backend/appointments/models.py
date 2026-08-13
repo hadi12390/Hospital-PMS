@@ -87,7 +87,8 @@ class Appointment(models.Model):
         return self.scheduled_time + timedelta(
             minutes=duration
         )
-
+    
+    reminder_sent = models.BooleanField(default=False)
     notes = models.TextField(
         max_length=1000,
         blank=True

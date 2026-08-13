@@ -6,7 +6,6 @@ class Notification(models.Model):
     class Type(models.TextChoices):
         APPOINTMENT = "appointment", "Appointment"
         REMINDER = "reminder", "Reminder"
-        PASSWORD_CHANGED = "password_changed", "password_changed"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

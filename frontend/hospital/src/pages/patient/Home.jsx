@@ -13,12 +13,13 @@ import Heart from "../../assets/patient/heart-pulse.svg?react";
 import Yourdoc from "../../assets/patient/doctoer.svg?react";
 import TimePast from "../../assets/patient/time-past.svg?react";
 import Arrow from "../../assets/patient/arrowoo.svg?react";
+import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 
 
 import { NavLink } from "react-router-dom";
 import { useRef, useState } from 'react';
-
+import { Link } from "react-router-dom";
 
 function PatientHome(){
 
@@ -214,115 +215,168 @@ function PatientHome(){
   return (
     <div className={`${styles.PatientDashboard}`}>
 
-      <aside className={`${styles.sideBar}`}>
-        <img src="/assest/patient/logo.svg" alt="Logo" />
+      <aside className={styles.sideBar}>
+
+        {/* Logo */}
+        <div className={styles.sidebarLogo}>
+            <img
+                src="/assest/patient/logo.svg"
+                alt="Logo"
+            />
+        </div>
+
 
         <div className={styles.contSide}>
-          <div className={styles.optionsContainer}>
-            <NavLink
-              to="/patient/home"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.homeLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <HomeLogo className={styles.homelogoicon} />
-            </NavLink>
 
-            <NavLink
-              to="/patient/appointment"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.appLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <AppLogo className={styles.applogoicon} />
-            </NavLink>
-
-            <NavLink
-              to="/patient/doctor"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.docLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <DocLogo className={styles.doclogoicon} />
-            </NavLink>
-
-            <NavLink
-              to="/patient/reports"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.pillLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <PillLogo className={styles.pilllogoicon} />
-            </NavLink>
-
-            <NavLink
-              to="/patient/payment"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.docuLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <DocuLogo className={styles.doculogoicon} />
-            </NavLink>
-          </div>
-
-          <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
-            <NavLink
-              to="/patient/flag"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.helpLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <HelpLogo className={styles.helplogoicon} />
-            </NavLink>
-
-            <NavLink
-              to="/patient/settings"
-              className={({ isActive }) =>
-                `${styles.options} ${styles.settLogoButton} ${
-                  isActive ? styles.active : ""
-                }`
-              }
-            >
-              <SettLogo className={styles.settlogoicon} />
-            </NavLink>
-          </div>
-
-          <div className={styles.logoutsec}>
+            {/* ================= MAIN MENU ================= */}
             <div className={styles.optionsContainer}>
-              <button className={`${styles.options} ${styles.logoutLogoButton}`}>
-                <LogOutLogo className={styles.logoutlogoicon} />
-              </button>
 
-              <NavLink
-                to="/patient/account"
-                className={({ isActive }) =>
-                  `${styles.options} ${styles.settLogoButton} ${
-                    isActive ? styles.active : ""
-                  }`
-                }
-              >
-                <SettLogo className={styles.Asettlogoicon} />
-              </NavLink>
+                {/* Home */}
+                <NavLink
+                    to="/patient/home"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.homeLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <HomeLogo className={styles.homelogoicon} />
+                </NavLink>
+
+
+                {/* Appointments */}
+                <NavLink
+                    to="/patient/appointment"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.appLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <AppLogo className={styles.applogoicon} />
+                </NavLink>
+
+
+                {/* Doctors */}
+                <NavLink
+                    to="/patient/doctor"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.docLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <DocLogo className={styles.doclogoicon} />
+                </NavLink>
+
+
+                {/* Reports */}
+                <NavLink
+                    to="/patient/reports"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.pillLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <PillLogo className={styles.pilllogoicon} />
+                </NavLink>
+
+
+                {/* Payments */}
+                <NavLink
+                    to="/patient/payment"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.docuLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <DocuLogo className={styles.doculogoicon} />
+                </NavLink>
+
             </div>
 
-            <div className={styles.profPicLogOut}>
-              <img src="/assest/patient/pp.png" alt="Profile" />
+
+            {/* ================= SECOND MENU ================= */}
+            <div
+                className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}
+            >
+
+                {/* Help */}
+                <NavLink
+                    to="/patient/flag"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.helpLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <HelpLogo className={styles.helplogoicon} />
+                </NavLink>
+
+
+                {/* Settings */}
+                <NavLink
+                    to="/patient/settings"
+                    className={({ isActive }) =>
+                        `${styles.options} ${styles.settLogoButton} ${
+                            isActive ? styles.active : ""
+                        }`
+                    }
+                >
+                    <SettLogo className={styles.settlogoicon} />
+                </NavLink>
+
             </div>
-          </div>
+
+
+            {/* ================= LOGOUT SECTION ================= */}
+            <div className={styles.logoutsec}>
+
+                <div className={`${styles.optionsContainer} ${styles.optionsContainerLL}`}>
+
+                    {/* Logout */}
+                    <button
+                        type="button"
+                        className={`${styles.options} ${styles.logoutLogoButton}`}
+                    >
+                        <LogOutLogo
+                            className={styles.logoutlogoicon}
+                        />
+                    </button>
+
+
+                    {/* Notifications */}
+                    <NavLink
+                        to="/patient/notifications"
+                        className={({ isActive }) =>
+                            `${styles.options} ${styles.notificationLogoButton} ${
+                                isActive ? styles.active : ""
+                            }`
+                        }
+                    >
+                        <NotificationLogo
+                            className={styles.notificationlogoicon}
+                        />
+                    </NavLink>
+
+                </div>
+
+
+                {/* Profile picture */}
+                <div className={styles.profPicLogOut}>
+                    <img
+                        src="/assest/patient/pp.png"
+                        alt="Profile"
+                    />
+                </div>
+
+            </div>
+
         </div>
-      </aside>
+
+    </aside>
 
 
       <section className={styles.dashboardContent}>
@@ -487,7 +541,9 @@ function PatientHome(){
                     Dr.Ahmad hasbeen confirmed</p>
                   <p className={styles.dataNoti}>10 min ago</p>
               </div>
-              <button className={`${styles.buttnotif} ${styles.glass}`}>View All Notifications <Arrow className={styles.Arrownoti}/></button>
+              <Link className={styles.linkbuttnotif} to="/patient/notifications">
+                <button className={`${styles.buttnotif} ${styles.glass}`}>View All Notifications <Arrow className={styles.Arrownoti}/></button>
+              </Link>
             </div>
         </div>
     

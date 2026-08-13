@@ -970,3 +970,13 @@ body {
     opacity: 1;
   }
 }
+.optionsContainerLL {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.notificationLogoButton:hover .notificationlogoicon path,
+.notificationlogoicon circle,
+.notificationlogoicon rect,
+.notificationlogoicon polygon {
+  stroke: #2986DC;
+}

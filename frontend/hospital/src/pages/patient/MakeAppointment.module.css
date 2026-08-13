@@ -1732,3 +1732,13 @@ main{
 .helpLogoButton{
     margin-top: 10px;
 }
+.optionsContainerLL {
+    display: flex;
+    flex-direction: column-reverse;
+}
+.notificationLogoButton:hover .notificationlogoicon path,
+.notificationlogoicon circle,
+.notificationlogoicon rect,
+.notificationlogoicon polygon {
+    stroke: #2986DC;
+}

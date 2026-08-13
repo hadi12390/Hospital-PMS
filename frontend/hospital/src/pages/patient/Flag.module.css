@@ -1244,3 +1244,14 @@ body {
 .helpLogoButton{
     padding: 10px 0px;
 }
+.optionsContainerLL {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.notificationLogoButton:hover .notificationlogoicon path,
+.notificationlogoicon circle,
+.notificationlogoicon rect,
+.notificationlogoicon polygon {
+  stroke: #2986DC;
+}

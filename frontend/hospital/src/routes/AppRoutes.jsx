@@ -14,6 +14,8 @@ import Reports from "../pages/patient/Reports";
 import Payment from "../pages/patient/Payment";
 import Flag from "../pages/patient/Flag";
 import Setting from "../pages/patient/Settings";
+import Notification from "../pages/patient/Notification";
+
 
 
 
@@ -36,6 +38,7 @@ function AppRoutes() {
       <Route path="/patient/payment" element={<Payment />} />
       <Route path="/patient/flag" element={<Flag />} />
       <Route path="/patient/settings" element={<Setting />} />
+      <Route path="/patient/notifications" element={<Notification />} />
     </Routes>
   );
 }

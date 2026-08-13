@@ -170,7 +170,7 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
                     title="Appointment confirmed",
-                    message=f"Your appointment with Dr. {doctor_name} has just been confirmed.",
+                    message=f"Your appointment with Dr. {self.request.user.get_full_name()} has just been confirmed.",
                     appointment=instance
                 )
             elif new_status == "completed":
@@ -178,7 +178,7 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
                     title="Appointment completed",
-                    message=f"You have completed an appointment with Dr. {doctor_name}.",
+                    message=f"You have completed an appointment with Dr. {self.request.user.get_full_name()}.",
                     appointment=instance,
                 )
             elif new_status == "cancelled":
@@ -186,7 +186,7 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
                     title="Appointment cancelled",
-                    message=f"Your appointment got canceled by Dr. {doctor_name}.",
+                    message=f"Your appointment got canceled by Dr. {self.request.user.get_full_name()}.",
                     appointment=instance,
                 )
 

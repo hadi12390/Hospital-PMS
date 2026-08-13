@@ -96,7 +96,6 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "No reliability policy has been configured. Please contact the clinic administrator."
             )
-
         return policy
 
     def at_pending_limit(self, patient):
@@ -535,7 +534,9 @@ class DoctorAppointmentUpdateSerializer(BaseAppointmentSerializer):
 
     def validate(self, attrs):
 
-        if self.is_in_the_past(attrs["scheduled_time"]):
+        scheduled_time = attrs.get("scheduled_time")
+
+        if scheduled_time and self.is_in_the_past(scheduled_time):
             raise serializers.ValidationError(
                 "You cannot create an appointment for a date or time in the past."
             )

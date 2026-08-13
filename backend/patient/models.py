@@ -49,18 +49,11 @@ class Patient(models.Model):
     
     @property
     def reliability(self):
-
         config = ClinicConfiguration.get_solo()
 
         stats = self.appointments.aggregate(
-            completed=Count(
-                "id",
-                filter=Q(status="completed")
-            ),
-            no_show=Count(
-                "id",
-                filter=Q(status="no_show")
-            ),
+            completed=Count("id", filter=Q(status="completed")),
+            no_show=Count("id", filter=Q(status="no_show")),
             early_cancelled=Count(
                 "id",
                 filter=Q(
@@ -77,29 +70,35 @@ class Patient(models.Model):
             ),
         )
 
-        positive_points = (
-            stats["completed"] *
-            config.completed_weight
-        )
+        positive_points = stats["completed"] * config.completed_weight
 
         negative_points = (
-            stats["early_cancelled"] *
-            config.cancelled_early_weight
-            +
-            stats["late_cancelled"] *
-            config.cancelled_late_weight
-            +
-            stats["no_show"] *
-            config.no_show_weight
+            stats["early_cancelled"] * config.cancelled_early_weight
+            + stats["late_cancelled"] * config.cancelled_late_weight
+            + stats["no_show"] * config.no_show_weight
         )
 
-        if positive_points == 0 and negative_points == 0:
-            return 100
-        
-        return (
-            positive_points /
-            (positive_points + negative_points)
-        ) * 100
+        # Step 1: how much real evidence do we have?
+        total = (
+            stats["completed"]
+            + stats["no_show"]
+            + stats["early_cancelled"]
+            + stats["late_cancelled"]
+        )
+
+        # Step 2: the raw ratio, safe against division by zero
+        total_points = positive_points + negative_points
+        raw_score = float(positive_points / total_points * 100) if total_points > 0 else 0
+
+        # Step 3: how much do we trust the raw score vs the prior?
+        PRIOR_SCORE = 100
+        PRIOR_WEIGHT = 3
+        weight = total / (total + PRIOR_WEIGHT)
+
+        # Step 4: blend real data with the prior
+        final_score = (weight * raw_score) + ((1 - weight) * PRIOR_SCORE)
+
+        return final_score
 
     def __str__(self):
         return f"{self.reliability}"

@@ -103,7 +103,7 @@ function Reports(){
             </NavLink>
 
             <NavLink
-              to="/patient/report"
+              to="/patient/payment"
               className={({ isActive }) =>
                 `${styles.options} ${styles.docuLogoButton} ${
                   isActive ? styles.active : ""
@@ -114,9 +114,9 @@ function Reports(){
             </NavLink>
           </div>
 
-          <div className={styles.optionsContainer}>
+          <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
             <NavLink
-              to="/patient/help"
+              to="/patient/flag"
               className={({ isActive }) =>
                 `${styles.options} ${styles.helpLogoButton} ${
                   isActive ? styles.active : ""

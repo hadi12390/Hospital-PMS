@@ -42,9 +42,9 @@ function PatientAppointment(){
     }
   };
   return (
-    <div className={styles.PatientDashboard}>
+    <div className={`${styles.PatientDashboard}`}>
 
-      <aside className={styles.sideBar}>
+      <aside className={`${styles.sideBar}`}>
         <img src="/assest/patient/logo.svg" alt="Logo" />
 
         <div className={styles.contSide}>
@@ -94,7 +94,7 @@ function PatientAppointment(){
             </NavLink>
 
             <NavLink
-              to="/patient/report"
+              to="/patient/payment"
               className={({ isActive }) =>
                 `${styles.options} ${styles.docuLogoButton} ${
                   isActive ? styles.active : ""
@@ -105,9 +105,9 @@ function PatientAppointment(){
             </NavLink>
           </div>
 
-          <div className={styles.optionsContainer}>
+          <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
             <NavLink
-              to="/patient/help"
+              to="/patient/flag"
               className={({ isActive }) =>
                 `${styles.options} ${styles.helpLogoButton} ${
                   isActive ? styles.active : ""
@@ -198,7 +198,7 @@ function PatientAppointment(){
             <div className={styles.timingNextApp}>1 day remaining</div>
           </div>
 
-          <div className={styles.downNextAppointment}>
+          <div className={`${styles.downNextAppointment} staggerList`}>
             <div className={styles.naCardOne}>
               <div className={styles.uppernacardone}>
                 <div className={`${styles.surtype} ${styles.glass}`}>Cardiologist</div>
@@ -259,7 +259,7 @@ function PatientAppointment(){
         </div>
 
         <div className={styles.heroSecName}>Upcoming Appointments</div>
-        <div className={styles.expAllCards}>
+        <div className={`${styles.expAllCards} staggerList`}>
           <div className={`${styles.expcard} ${expanded ? styles.expexpanded : ""}`}>
           <div className={styles.expheader}>
             <h3>15 Jul | Dr. Sarah</h3><h3>Dermatology</h3><h3>2:00 PM</h3>

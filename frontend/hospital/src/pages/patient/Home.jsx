@@ -212,9 +212,9 @@ function PatientHome(){
     }
 
   return (
-    <div className={styles.PatientDashboard}>
+    <div className={`${styles.PatientDashboard}`}>
 
-      <aside className={styles.sideBar}>
+      <aside className={`${styles.sideBar}`}>
         <img src="/assest/patient/logo.svg" alt="Logo" />
 
         <div className={styles.contSide}>
@@ -264,7 +264,7 @@ function PatientHome(){
             </NavLink>
 
             <NavLink
-              to="/patient/reports"
+              to="/patient/payment"
               className={({ isActive }) =>
                 `${styles.options} ${styles.docuLogoButton} ${
                   isActive ? styles.active : ""
@@ -275,9 +275,9 @@ function PatientHome(){
             </NavLink>
           </div>
 
-          <div className={styles.optionsContainer}>
+          <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
             <NavLink
-              to="/patient/help"
+              to="/patient/flag"
               className={({ isActive }) =>
                 `${styles.options} ${styles.helpLogoButton} ${
                   isActive ? styles.active : ""
@@ -428,7 +428,7 @@ function PatientHome(){
               <div className={styles.bTHseconeDiv}>
 
                 {/* Row 1 */}
-                <div className={styles.bTHsecone}>
+                <div className={`${styles.bTHsecone} staggerList`}>
                   <div className={`${styles.madicalBox} ${styles.glass}`}>
                     <h1>Amoxicillin</h1>
                     <div className={styles.madicalBoxDet}>
@@ -447,7 +447,7 @@ function PatientHome(){
                 </div>
 
                 {/* Row 2 */}
-                <div className={styles.bTHsecone}>
+                <div className={`${styles.bTHsecone} staggerList`}>
                   <div className={`${styles.madicalBox} ${styles.glass}`}>
                     <h1>Vitamin D</h1>
                     <div className={styles.madicalBoxDet}>

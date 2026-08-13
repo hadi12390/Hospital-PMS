@@ -1,0 +1,36 @@
+/* src/styles/animations.css */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Whole-page entrance */
+.pageEnter {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sidebar can ease in slightly before content for a nicer feel */
+.sidebarEnter {
+  animation: fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Staggered children (card grids/lists) */
+.staggerList > * {
+  opacity: 0;
+  animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.staggerList > *:nth-child(1)  { animation-delay: 0.05s; }
+.staggerList > *:nth-child(2)  { animation-delay: 0.10s; }
+.staggerList > *:nth-child(3)  { animation-delay: 0.15s; }
+.staggerList > *:nth-child(4)  { animation-delay: 0.20s; }
+.staggerList > *:nth-child(5)  { animation-delay: 0.25s; }
+.staggerList > *:nth-child(6)  { animation-delay: 0.30s; }
+.staggerList > *:nth-child(7)  { animation-delay: 0.35s; }
+.staggerList > *:nth-child(8)  { animation-delay: 0.40s; }

@@ -198,13 +198,6 @@
 .pillLogoButton:hover .pilllogoicon {
   color: #2986DC; 
 }
-
-.docuLogoButton:hover .doculogoicon path,
-.doculogoicon circle,
-.doculogoicon rect,
-.doculogoicon polygon{
-  stroke: #2986DC;
-}
 .settLogoButton{
     width: 100%;
     margin-top: 1em;
@@ -649,6 +642,7 @@ body {
 
     padding: 2em;
     border-radius: 1rem;
+    box-shadow: 0 12px 30px rgba(24, 95, 165, .25);
 }
 .upperNextAppointment{
     display: flex;
@@ -819,6 +813,7 @@ body {
     justify-content: space-between;
 
     padding-bottom: 1em;
+    box-shadow: 0 12px 30px rgba(24, 95, 165, .25);
 }
 
 .expcontent {
@@ -877,6 +872,7 @@ body {
     padding: 2em 0;
     display: flex;
     gap: 1em;
+    box-shadow: 0 12px 30px rgba(24, 95, 165, .25);
 }
 .expAllCards{
     display: flex;
@@ -904,4 +900,28 @@ body {
 .pillLogoButton rect,
 .pillLogoButton polygon{
   fill: #2986DC;
+}
+.doculogoicon .moneyPath {
+    color: #4D4D4D;
+}
+.doculogoicon path:first-of-type {
+    transition: fill 0.3s ease;
+}
+
+.doculogoicon:hover path:first-of-type {
+    fill: #2986DC;
+    fill: #2986DC;
+}
+.doculogoicon path:nth-of-type(2) {
+    transition: stroke 0.3s ease;
+}
+
+.doculogoicon:hover path:nth-of-type(2) {
+    stroke: #2986DC;
+}
+.optionsContainerNN{
+    height: 7em;
+}
+.helpLogoButton{
+    margin-top: 10px;
 }

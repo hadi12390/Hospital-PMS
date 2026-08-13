@@ -206,13 +206,6 @@
 .pillLogoButton:hover .pilllogoicon path {
   color: #2986DC; 
 }
-
-.docuLogoButton:hover .doculogoicon path,
-.doculogoicon circle,
-.doculogoicon rect,
-.doculogoicon polygon{
-  stroke: #2986DC;
-}
 .settLogoButton{
     width: 100%;
     margin-top: 1em;
@@ -698,6 +691,7 @@ body {
     flex-direction: column;
 
     margin-bottom: 2em;
+    box-shadow: 0 12px 30px rgba(24, 95, 165, .25);
 }
 .secOneLR{
     display: flex;
@@ -843,3 +837,28 @@ body {
   width: 80%;
 }
 
+.doculogoicon .moneyPath {
+    color: #4D4D4D;
+}
+.doculogoicon path:first-of-type {
+    transition: fill 0.3s ease;
+}
+
+.doculogoicon:hover path:first-of-type {
+    fill: #2986DC;
+    fill: #2986DC;
+}
+.doculogoicon path:nth-of-type(2) {
+    transition: stroke 0.3s ease;
+}
+
+.doculogoicon:hover path:nth-of-type(2) {
+    stroke: #2986DC;
+}
+
+.optionsContainerNN{
+    height: 7em;
+}
+.helpLogoButton{
+    margin-top: 10px;
+}

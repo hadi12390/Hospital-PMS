@@ -1,4 +1,5 @@
 import styles from "./Doctor.module.css";
+
 import HomeLogo from "../../assets/patient/home.svg?react";
 import AppLogo from "../../assets/patient/app.svg?react";
 import DocLogo from "../../assets/patient/doc.svg?react";
@@ -47,9 +48,9 @@ function PatientDoctor(){
     }
   };
   return (
-    <div className={styles.PatientDashboard}>
+    <div className={`${styles.PatientDashboard}`}>
 
-      <aside className={styles.sideBar}>
+      <aside className={`${styles.sideBar}`}>
         <img src="/assest/patient/logo.svg" alt="Logo" />
 
         <div className={styles.contSide}>
@@ -99,20 +100,21 @@ function PatientDoctor(){
             </NavLink>
 
             <NavLink
-              to="/patient/report"
+              to="/patient/payment"
               className={({ isActive }) =>
                 `${styles.options} ${styles.docuLogoButton} ${
                   isActive ? styles.active : ""
                 }`
               }
             >
-              <DocuLogo className={styles.doculogoicon} />
+              <DocuLogo className={styles.doculogoicon}>
+              </DocuLogo>
             </NavLink>
           </div>
 
-          <div className={styles.optionsContainer}>
+          <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
             <NavLink
-              to="/patient/help"
+              to="/patient/flag"
               className={({ isActive }) =>
                 `${styles.options} ${styles.helpLogoButton} ${
                   isActive ? styles.active : ""
@@ -197,7 +199,7 @@ function PatientDoctor(){
 
       {/* Main Content */}
       <main className={styles.cards}>
-        <div className={styles.cardsDCont}>
+        <div className={`${styles.cardsDCont} staggerList`}>
             <div className={styles.Dcards}>
                 <div className={styles.secOneBox}>
                     <div className={`${styles.photoCont} ${styles.glass}`}>

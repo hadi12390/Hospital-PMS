@@ -177,19 +177,20 @@
   stroke: #2986DC;
 }
 
-.docLogoButton{
+.settLogoButton{
     background-color: #0F172A;
     width: 100%;
     border-radius: 999px;
 }
-.docLogoButton svg{
-    width: 80%;
+.settLogoButton svg{
+    width: 100%;
+    height: 130%;
 }
 .docLogoButton .doclogoicon path,
 .doclogoicon circle,
 .doclogoicon rect,
 .doclogoicon polygon{
-  fill: #2986DC;
+  fill: #4d4d4d;
 }
 
 .docLogoButton:hover .doclogoicon path,
@@ -225,6 +226,9 @@
     stroke: #2986DC;
 }
 
+.helpLogoButton{
+    margin-top: 10px;
+}
 
 
 .helpLogoButton:hover .helplogoicon path,
@@ -234,7 +238,7 @@
   stroke: #2986DC;
 }
 
-.settLogoButton:hover .settlogoicon path,
+.settLogoButton .settlogoicon path,
 .settlogoicon circle,
 .settlogoicon rect,
 .settlogoicon polygon{
@@ -637,6 +641,7 @@ body {
     border-radius: 999px;
     gap: .7em;
     width: 40%;
+
 }
 
 .searchInput{
@@ -652,169 +657,6 @@ body {
 .searchInput::placeholder{
     color: #4d4d4d; 
 }
-.cardsDCont{
-    display: grid;
-    gap: 1em;
-
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    width: 100%;
-
-}
-.Dcards{
-    background:linear-gradient(60deg,#0080ffae,#6da8e7c8,#4A91FF);
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-
-    padding-bottom: 0em ;
-    width: 100%;
-
-    box-shadow: 0 12px 20px rgba(24, 95, 165, .3);
-
-}
-.timeICON svg path{
-    fill: white;
-}
-.photoCont{
-    height: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    border-radius: .5rem;
-
-
-}
-.secOneBox{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: fit-content;
-
-    padding: 1.5em;
-}
-
-.heroCardInfo{
-    color: white;
-    font-size: 1.2rem;
-    text-align: start;
-}
-.infoDEV{
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
-
-    color: white;
-
-    gap: 10px;
-    height: fit-content;
-
-    position: relative;
-    transform: translateY(2em);
-}
- 
-.makeAppBut{
-    display: flex;
-    padding: 5px;
-    border-radius: 999px;
-    justify-content: center;
-    align-items: center;
-
-    color: white;
-    gap: .3em;
-
-    transition: all 0.3s ease;
-}
-.thingsCards{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-
-    gap: .3em;
-
-    font-family: "SoExtraLightGEO";
-}
-
-.buttAddDiv{
-    align-self: flex-end;
-    margin: 1em;
-    /*here please*/    
-}
-.infoANDb{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-
-    height: 100%;
-    position: relative;   /* ADD THIS */
-
-}   
-.thePLusIcon{
-    padding: 1em;
-    background-color: white;
-    padding: .5em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 999px;
-    flex-shrink: 0;
-}
-.infoshehe{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    margin-left: 10px;
-    gap: .5em;
-}
-.makeAppBut:hover{
-    transform: scale(1.05);
-    cursor: pointer;
-}
-@media (max-width:1479px) {
-    .infoDEV{
-        font-size: .8rem;
-    }
-}
-.makeAppBut {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-}
-
-.shineLayer {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(
-        circle 120px at var(--x, 50%) var(--y, 50%),
-        rgba(255, 255, 255, 0.35),
-        rgba(255, 255, 255, 0) 70%
-    );
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.makeAppBut:hover .shineLayer {
-    opacity: 1;
-}
-
-.thePLusIcon {
-    position: relative;
-    z-index: 2;
-}
-
-.btnLabel {
-    position: relative;
-    z-index: 2;
-}
 .pillLogoButton:hover .pilllogoicon path,
 .pillLogoButton circle,
 .pillLogoButton rect,
@@ -826,8 +668,305 @@ body {
 }
 .settLogoButton{
     width: 100%;
-    margin-top: 1em;
+    margin-top: 7.6px;
 }
-.helpLogoButton{
-    margin-top: 10px;
+/* ==========================================================================
+   SETTINGS PAGE
+   ========================================================================== */
+
+.settingsPage {
+  width: 100%;
+  max-width: 700px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3em;
+}
+
+.settingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+
+.settingsTitle {
+  font-family: "SoExtraLightGEO";
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: #4d4d4d;
+
+  text-align: start;
+}
+
+/* ---- Avatar ---- */
+
+.avatarWrap {
+  width: fit-content;
+  background-color: #00000033;
+  padding: 5px;
+  padding-bottom: 2.5px;
+
+  border-radius: 1.5em;
+}
+
+.avatarButton {
+  position: relative;
+  overflow: hidden;
+
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  width: 7em;
+  height: 7em;
+  border-radius: 1.4em;
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .12);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarOverlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, .28);
+
+  opacity: 1;
+  transition: background .3s ease;
+}
+
+.avatarButton:hover .avatarOverlay {
+  background: rgba(0, 0, 0, .4);
+}
+
+.avatarEditIcon {
+  width: 1.8em;
+  height: 1.8em;
+  color: white;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+/* ---- Info pills (shared by personal info + password fields) ---- */
+
+.infoStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.infoPill {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  max-width: 560px;
+
+  padding: 1.1em 1.6em;
+  border-radius: 16px;
+  background: #00000031;
+  color: white;
+
+  font-family: "GeologicaBold";
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+}
+
+.pillIconButton {
+  flex-shrink: 0;
+
+  border: none;
+  cursor: pointer;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  margin-left: 1em;
+}
+
+.pillIcon {
+  width: 1.3em;
+  height: 1.3em;
+  color: white;
+}
+
+.nameInput {
+  flex: 1;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+}
+
+.nameInput::placeholder {
+  color: rgba(255, 255, 255, .7);
+}
+
+.passwordInput {
+  flex: 1;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+}
+
+.passwordInput::placeholder {
+  color: rgba(255, 255, 255, .85);
+}
+
+/* two icon buttons (eye / eye-off) sit together on password rows */
+.infoPill:has(.passwordInput) {
+  gap: .6em;
+}
+
+/* ---- Primary action buttons (Save Changes / Change Password) ---- */
+
+.primaryActionButton {
+  display: flex;
+  align-items: center;
+  gap: .8em;
+  align-self: flex-start;
+
+  border: none;
+  cursor: pointer;
+
+  padding: .5em .5em .5em 1.4em;
+  border-radius: 999px;
+
+  background: linear-gradient(60deg, #0080FF, #6DA7E7, #4A91FF);
+  box-shadow:
+    0 4px 8px rgba(24, 95, 165, .18),
+    0 10px 20px rgba(24, 95, 165, .16),
+    0 24px 40px rgba(24, 95, 165, .12);
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: 1.1rem;
+
+  transition:
+              transform .4s cubic-bezier(.4, 0, .2, 1),
+              box-shadow .4s cubic-bezier(.4, 0, .2, 1);
+}
+
+.primaryActionButton:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 6px 12px rgba(24, 95, 165, .2),
+    0 14px 28px rgba(24, 95, 165, .18),
+    0 32px 56px rgba(24, 95, 165, .14);
+
+}
+
+.actionIconCircle {
+  width: 2.2em;
+  height: 2.2em;
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+}
+
+.actionIcon {
+  width: 55%;
+  height: 55%;
+  color: white;
+}
+
+/* ---- Mobile ---- */
+
+@media (max-width: 640px) {
+  .infoPill {
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+   PAGE-OPEN ANIMATION
+   ========================================================================== */
+
+@keyframes settingsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes settingsPopIn {
+  from {
+    opacity: 0;
+    transform: scale(.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.settingsTitle {
+  opacity: 0;
+  animation: settingsFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+.avatarWrap {
+  opacity: 0;
+  animation: settingsPopIn .5s cubic-bezier(.34, 1.56, .64, 1) forwards;
+  animation-delay: .12s;
+}
+
+.infoStack .infoPill {
+  opacity: 0;
+  animation: settingsFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+.infoStack .infoPill:nth-child(1) { animation-delay: .22s; }
+.infoStack .infoPill:nth-child(2) { animation-delay: .29s; }
+.infoStack .infoPill:nth-child(3) { animation-delay: .36s; }
+.infoStack .infoPill:nth-child(4) { animation-delay: .43s; }
+
+.primaryActionButton {
+  opacity: 0;
+  animation: settingsFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+  animation-delay: .52s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settingsTitle,
+  .avatarWrap,
+  .infoStack .infoPill,
+  .primaryActionButton {
+    animation: none;
+    opacity: 1;
+  }
 }

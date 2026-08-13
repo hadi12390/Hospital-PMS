@@ -177,19 +177,19 @@
   stroke: #2986DC;
 }
 
-.docLogoButton{
+.docuLogoButton{
     background-color: #0F172A;
     width: 100%;
     border-radius: 999px;
 }
-.docLogoButton svg{
-    width: 80%;
+.docuLogoButton svg{
+    width: 90%;
 }
 .docLogoButton .doclogoicon path,
 .doclogoicon circle,
 .doclogoicon rect,
 .doclogoicon polygon{
-  fill: #2986DC;
+  fill: #4d4d4d;
 }
 
 .docLogoButton:hover .doclogoicon path,
@@ -213,7 +213,7 @@
     transition: fill 0.3s ease;
 }
 
-.doculogoicon:hover path:first-of-type {
+.doculogoicon path:first-of-type {
     fill: #2986DC;
     fill: #2986DC;
 }
@@ -221,7 +221,7 @@
     transition: stroke 0.3s ease;
 }
 
-.doculogoicon:hover path:nth-of-type(2) {
+.doculogoicon path:nth-of-type(2) {
     stroke: #2986DC;
 }
 
@@ -661,160 +661,6 @@ body {
     width: 100%;
 
 }
-.Dcards{
-    background:linear-gradient(60deg,#0080ffae,#6da8e7c8,#4A91FF);
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-
-    padding-bottom: 0em ;
-    width: 100%;
-
-    box-shadow: 0 12px 20px rgba(24, 95, 165, .3);
-
-}
-.timeICON svg path{
-    fill: white;
-}
-.photoCont{
-    height: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    border-radius: .5rem;
-
-
-}
-.secOneBox{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: fit-content;
-
-    padding: 1.5em;
-}
-
-.heroCardInfo{
-    color: white;
-    font-size: 1.2rem;
-    text-align: start;
-}
-.infoDEV{
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
-
-    color: white;
-
-    gap: 10px;
-    height: fit-content;
-
-    position: relative;
-    transform: translateY(2em);
-}
- 
-.makeAppBut{
-    display: flex;
-    padding: 5px;
-    border-radius: 999px;
-    justify-content: center;
-    align-items: center;
-
-    color: white;
-    gap: .3em;
-
-    transition: all 0.3s ease;
-}
-.thingsCards{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-
-    gap: .3em;
-
-    font-family: "SoExtraLightGEO";
-}
-
-.buttAddDiv{
-    align-self: flex-end;
-    margin: 1em;
-    /*here please*/    
-}
-.infoANDb{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-
-    height: 100%;
-    position: relative;   /* ADD THIS */
-
-}   
-.thePLusIcon{
-    padding: 1em;
-    background-color: white;
-    padding: .5em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 999px;
-    flex-shrink: 0;
-}
-.infoshehe{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    margin-left: 10px;
-    gap: .5em;
-}
-.makeAppBut:hover{
-    transform: scale(1.05);
-    cursor: pointer;
-}
-@media (max-width:1479px) {
-    .infoDEV{
-        font-size: .8rem;
-    }
-}
-.makeAppBut {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-}
-
-.shineLayer {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(
-        circle 120px at var(--x, 50%) var(--y, 50%),
-        rgba(255, 255, 255, 0.35),
-        rgba(255, 255, 255, 0) 70%
-    );
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.makeAppBut:hover .shineLayer {
-    opacity: 1;
-}
-
-.thePLusIcon {
-    position: relative;
-    z-index: 2;
-}
-
-.btnLabel {
-    position: relative;
-    z-index: 2;
-}
 .pillLogoButton:hover .pilllogoicon path,
 .pillLogoButton circle,
 .pillLogoButton rect,
@@ -824,9 +670,220 @@ body {
 .optionsContainerNN{
     height: 7em;
 }
+
 .settLogoButton{
     width: 100%;
     margin-top: 1em;
+}
+/* ==========================================================================
+   PAYMENT CARDS
+   ========================================================================== */
+
+.recentPaymentsCard,
+.statsSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.sectionTitle {
+  font-family: "SoExtraLightGEO";
+  font-size: clamp(1.2rem, 1.5vw, 1.6rem);
+  color: #4d4d4d;
+  margin: .2em 0;
+  text-align: start;
+  font-size: 2rem;
+}
+
+.paymentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+/* ---- Individual payment row ---- */
+
+.paymentRow {
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5em;
+
+  padding: clamp(1em, 2vw, 1.8em);
+  border-radius: 1.8em;
+
+  background: linear-gradient(60deg, #0080ffae, #6da8e7c8, #4A91FF);
+  box-shadow: 0 12px 30px rgba(24, 95, 165, .25);
+
+  color: white;
+}
+
+.paymentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: .8em;
+  min-width: 0;
+}
+
+.paymentTitle {
+  font-family: "GeologicaBold";
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  text-align: start;
+}
+
+.paymentMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7em;
+}
+
+.metaPill {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+
+  border: none;
+  cursor: pointer;
+
+  padding: .5em 1em;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: white;
+  font-family: "RegularGEO";
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+.metaIcon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  color: white;
+}
+.metaIcon path{
+  fill: white;
+}
+
+/* ---- Right-side status / amount boxes ---- */
+
+.paymentBoxes {
+  display: flex;
+  gap: .8em;
+  flex-shrink: 0;
+}
+
+.statusBox,
+.amountBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+
+  min-width: 7em;
+  padding: 1em 1.4em;
+  border-radius: 1.2em;
+
+  background: rgba(255, 255, 255, .16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .25);
+
+  font-family: "GeologicaBold";
+}
+
+.statusBox span {
+  font-size: .95rem;
+}
+
+.statusIcon {
+  width: 2.2em;
+  height: 2.2em;
+  color: white;
+}
+
+.amountBox span {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+}
+
+/* ---- Stats grid ---- */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1em;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: .8em;
+
+  padding: 1.2em;
+  border-radius: 1.5em;
+
+  background: linear-gradient(60deg, #0080ffae, #6da8e7c8, #4A91FF);
+  box-shadow: 0 10px 24px rgba(24, 95, 165, .2);
+
+  color: white;
+}
+
+.statLabel {
+  font-family: "GeologicaBold";
+  font-size: clamp(1rem, 1.4vw, 1.3rem);
+}
+
+.statValueBox {
+  padding: .9em;
+  border-radius: 1em;
+
+  background: rgba(255, 255, 255, .16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .25);
+
+  display: flex;
+  justify-content: center;
+
+  font-family: "GeologicaBold";
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+}
+
+.outstandingCard {
+  width: 100%;
+}
+
+/* ---- Mobile ---- */
+
+@media (max-width: 900px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .paymentRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .paymentBoxes {
+    justify-content: stretch;
+  }
+  .statusBox,
+  .amountBox {
+    flex: 1;
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 .helpLogoButton{
     margin-top: 10px;

@@ -259,7 +259,7 @@ function MakeAppointment() {
 
 
                         <NavLink
-                            to="/patient/report"
+                            to="/patient/payment"
                             className={({ isActive }) =>
                                 `${dashStyles.options}
                                 ${dashStyles.docuLogoButton}
@@ -272,10 +272,10 @@ function MakeAppointment() {
                     </div>
 
 
-                    <div className={dashStyles.optionsContainer}>
+                    <div className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}>
 
                         <NavLink
-                            to="/patient/help"
+                            to="/patient/flag"
                             className={({ isActive }) =>
                                 `${dashStyles.options}
                                 ${dashStyles.helpLogoButton}

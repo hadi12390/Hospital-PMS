@@ -8,6 +8,7 @@ from doctor.models import Doctor
 from patient.models import Patient
 from configuration.models import ClinicConfiguration, ReliabilityPolicy
 from logs.models import ActivityLog
+from notifications.models import Notification
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 
@@ -646,10 +647,17 @@ class PatientCancelAppointment(serializers.ModelSerializer):
             user=request.user,
             action=ActivityLog.Action.APPOINTMENT_UPDATED,
             description=(
-                f"Patient {request.user.username} updated appointment status "
+                f"Patient {request.user.username} canceled appointment "
                 f"from '{old_status}' to '{new_status}' "
-                f"for patient {instance.patient.user.username}."
             ),
+        )
+
+        Notification.create_notification(
+            user=instance.doctor.user,
+            notification_type=Notification.Type.APPOINTMENT,
+            title="Appointment Canceled",
+            message=f"Patient {request.user.username} canceled their appointment",
+            appointment=instance
         )
 
         return instance

@@ -17,6 +17,7 @@ import uuid
 
 from accounts.permissions import IsDoctor, IsManager, IsPatient
 from logs.models import ActivityLog
+from notifications.models import Notification
 from .models import Appointment
 from doctor.models import Doctor
 from .serializers import (
@@ -48,6 +49,7 @@ class ManagerListCreateAppointment(ListCreateAPIView):
         )
 
 
+
 class DoctorListCreateAppointment(ListCreateAPIView):
     serializer_class = DoctorAppointmentSerializer
     permission_classes = [IsAuthenticated, IsDoctor]
@@ -65,24 +67,31 @@ class DoctorListCreateAppointment(ListCreateAPIView):
     @transaction.atomic
     def perform_create(self, serializer):
         appointment = serializer.save()
-        if (appointment.patient.user):
-            ActivityLog.objects.create(
-                user=self.request.user,
-                action=ActivityLog.Action.APPOINTMENT_CREATED,
-                description=(
-                    f"Doctor {self.request.user.username} created appointment "
-                    f"for patient {appointment.patient.user.username}."
-                ),
+
+        if appointment.patient.user:
+            description = (
+                f"Doctor {self.request.user.username} created appointment "
+                f"for patient {appointment.patient.user.username}."
+            )
+            Notification.create_notification(
+                user=appointment.patient.user,
+                notification_type=Notification.Type.APPOINTMENT,
+                title="Appointment created",
+                message=f"Dr. {self.request.user.get_full_name()} booked an appointment with you at {appointment.scheduled_time}",
+                appointment=appointment,
             )
         else:
-            ActivityLog.objects.create(
-                user=self.request.user,
-                action=ActivityLog.Action.APPOINTMENT_CREATED,
-                description=(
-                    f"Doctor {self.request.user.username} created appointment"
-                    f"for guest patient {appointment.patient.first_name} {appointment.patient.last_name}."
-                ),
+            description = (
+                f"Doctor {self.request.user.username} created appointment "
+                f"for guest patient {appointment.patient.first_name} {appointment.patient.last_name}."
             )
+
+        ActivityLog.objects.create(
+            user=self.request.user,
+            action=ActivityLog.Action.APPOINTMENT_CREATED,
+            description=description,
+        )
+
 
 
 class PatientListCreateAppointment(ListCreateAPIView):
@@ -98,6 +107,7 @@ class PatientListCreateAppointment(ListCreateAPIView):
     @transaction.atomic
     def perform_create(self, serializer):
         appointment = serializer.save()
+
         ActivityLog.objects.create(
             user=self.request.user,
             action=ActivityLog.Action.APPOINTMENT_CREATED,
@@ -106,6 +116,15 @@ class PatientListCreateAppointment(ListCreateAPIView):
                 f"with doctor {appointment.doctor.user.username}."
             ),
         )
+
+        Notification.create_notification(
+            user=appointment.doctor.user,
+            notification_type=Notification.Type.APPOINTMENT,
+            title="Appointment created",
+            message=f"You have a pending appointment with {self.request.user.get_full_name()}",
+            appointment=appointment,
+        )
+    
 
 
 class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
@@ -135,16 +154,42 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
         if old_status != new_status:
             if new_status == "confirmed":
                 extra_kwargs["confirmed_at"] = now
+
             elif new_status == "completed":
                 extra_kwargs["completed_at"] = now
+
             elif new_status == "cancelled":
                 extra_kwargs["cancelled_at"] = now
 
         # Save once with timestamps included — avoids calling appointment.save() twice!
         appointment = serializer.save(**extra_kwargs)
 
-        # 3. Log activity
         if old_status != new_status:
+            if new_status == "confirmed":
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment confirmed",
+                    message=f"Your appointment with Dr. {doctor_name} has just been confirmed.",
+                    appointment=instance
+                )
+            elif new_status == "completed":
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment completed",
+                    message=f"You have completed an appointment with Dr. {doctor_name}.",
+                    appointment=instance,
+                )
+            elif new_status == "cancelled":
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment cancelled",
+                    message=f"Your appointment got canceled by Dr. {doctor_name}.",
+                    appointment=instance,
+                )
+
             ActivityLog.objects.create(
                 user=self.request.user,
                 action=ActivityLog.Action.APPOINTMENT_UPDATED,

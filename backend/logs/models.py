@@ -7,7 +7,6 @@ class ActivityLog(models.Model):
         EMAIL_VERIFIED = "email_verified", "Email Verified"
         APPOINTMENT_CREATED = "appointment_created", "Appointment Created"
         APPOINTMENT_UPDATED = "appointment_updated", "Appointment Updated"
-        APPOINTMENT_DELETED = "appointment_deleted", "Appointment Deleted"
     
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

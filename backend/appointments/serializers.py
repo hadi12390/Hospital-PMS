@@ -153,16 +153,6 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
 
 class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
-    doctor = serializers.SlugRelatedField(
-        slug_field="user__public_id",
-        queryset=Doctor.objects.all(),
-    )
-
-    patient = serializers.SlugRelatedField(
-        slug_field="user__public_id",
-        queryset=Patient.objects.all(),
-    )
-
     end_time = serializers.ReadOnlyField()
 
     class Meta:
@@ -176,7 +166,6 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
             "notes",
             "status",
             "appointment_type",
-            "created_at",
             "end_time",
         ]
 
@@ -188,46 +177,6 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
 
 
-# =========================
-# Manager Read Serializer
-# =========================
-
-class ManagerAppointmentSerializer(BaseAppointmentSerializer):
-    end_time = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Appointment
-        fields = [
-            "public_id",
-            "doctor",
-            "patient",
-            "scheduled_time",
-            "reason_for_visit",
-            "notes",
-            "status",
-            "appointment_type",
-            "created_at",
-            "end_time",
-        ]
-
-    def validate_doctor(self, value):
-        try:
-            return Doctor.objects.get(public_id=value)
-        except Doctor.DoesNotExist:
-            raise serializers.ValidationError("Doctor not found.")
-
-    def validate_patient(self, value):
-        try:
-            return Patient.objects.get(public_id=value)
-        except Patient.DoesNotExist:
-            raise serializers.ValidationError("Patient not found.")
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep["doctor"] = self.get_person_repr(instance.doctor)
-        rep["patient"] = self.get_person_repr(instance.patient)
-        return rep
-
 
 
 # =========================
@@ -236,10 +185,6 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
 class DoctorAppointmentSerializer(BaseAppointmentSerializer):
 
-    patient = serializers.SlugRelatedField(
-        slug_field="user__public_id",
-        queryset=Patient.objects.all(),
-    )
 
     patient_no_show_count = serializers.IntegerField(
         source="patient.no_show_count",

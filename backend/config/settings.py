@@ -32,7 +32,7 @@ TENANT_APPS = [
     'django.contrib.admin',      # moved here — needs auth/accounts in same schema
     'django.contrib.sessions',
     'django.contrib.messages',
-    'accounts',                  # removed from SHARED_APPS, appears once only
+    'accounts',                
     'doctor',
     'patient',
     'manager',

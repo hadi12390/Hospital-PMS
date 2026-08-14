@@ -1,9 +1,10 @@
 import styles from "./Dashboard.module.css";
 import { useRef, useState ,useMemo } from "react"
 import RevenueOverview from './RevenueOverview/RevenueOverview';
+import Sidebar from './Sidebar';
 
 
-function AdminDashboard() {
+function Dashboard() {
   // ---------- Date helpers ----------
   function getCurrentDate() {
     const date = new Date();
@@ -104,6 +105,7 @@ function AdminDashboard() {
   // ---------- State ----------
   const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [showMenu, setShowMenu] = useState(false);
+  const [activeNav, setActiveNav] = useState("dashboard");
   const dateInput = useRef();
 
   // ---------- Data ----------
@@ -200,54 +202,7 @@ function AdminDashboard() {
       <div className={styles.back}></div>
 
       {/* Sidebar */}
-      <aside className={styles.sideBar}>
-        <img src="/assest/doctor/sidebar/logo.svg" alt="Logo" />
-
-        <p className={styles.optName}>MENU</p>
-
-        <div className={styles.optionsContainer}>
-          <button className={styles.options}>
-            <img
-              src="/assest/doctor/sidebar/col-right-svgrepo-com 1.svg"
-              alt=""
-            />
-            <span>DashBoard</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/person.svg" alt="" />
-            <span>Manage Doctors</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/dwajdoies.svg" alt="" />
-            <span>Manage Patient</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/SVGRepo_iconCarriear.svg" alt="" />
-            <span>Appointments</span>
-          </button>
-
-        </div>
-
-        <p className={styles.optName}>OTHER MENU</p>
-
-        <div className={styles.optionsContainer}>
-          <button className={`${styles.options} ${styles.otherMenu}`}>
-            <img
-              src="/assest/doctor/sidebar/SVGRepo_iconCarrier (1).svg"
-              alt=""
-            />
-            <span>Help & Center</span>
-          </button>
-
-          <button className ={`${styles.options} ${styles.otherMenu}`}>
-            <img src="/assest/doctor/sidebar/SVGRepo_iconCarrier.svg" alt="" />
-            <span>Settings</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar activeId={activeNav} onSelect={setActiveNav} />
 
       {/* Right Side */}
       <section className={styles.dashboardContent}>
@@ -547,4 +502,4 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard;
+export default Dashboard;

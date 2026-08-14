@@ -16,6 +16,16 @@ import Flag from "../pages/patient/Flag";
 import Setting from "../pages/patient/Settings";
 import Notification from "../pages/patient/Notification";
 
+import ManageDoctors from "../pages/admin/ManageDoctors";
+import ManagePatient from "../pages/admin/ManagePatient";
+import AppointmentAdmin from "../pages/admin/Appointments";
+import SettingsAdmin from "../pages/admin/Settings";
+import HelpAdmin from "../pages/admin/Appointments";
+
+
+
+
+
 
 
 
@@ -39,6 +49,14 @@ function AppRoutes() {
       <Route path="/patient/flag" element={<Flag />} />
       <Route path="/patient/settings" element={<Setting />} />
       <Route path="/patient/notifications" element={<Notification />} />
+
+      <Route path="/admin/manage&doctors" element={<ManageDoctors />} />
+      <Route path="/admin/manage&patient" element={<ManagePatient />} />
+      <Route path="/admin/appointments" element={<AppointmentAdmin />} />
+      <Route path="/admin/settings" element={<SettingsAdmin />} />
+      <Route path="/admin/help" element={<HelpAdmin />} />
+
+
     </Routes>
   );
 }

@@ -1,4 +1,4 @@
-import "./RestPassword.css";
+import styles from "./RestPassword.module.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -19,22 +19,22 @@ function RestPassword() {
     };
 
   return (
-    <div>
-        <div id="background-img">
-            <img id="rightDNA" src="./assest/login/dna-svgrepo-com 1.svg" alt="" />
-            <img id="rightTopDNA" src="./assest/login/dna-svgrepo-com 2.svg" alt="" />
-            <img id="leftDNA" src="./assest/login/dna-svgrepo-com 4.svg" alt="" />
-            <img id="bigBottom" src="./assest/login/dna-svgrepo-com 3.svg" alt="" />
+    <div className={styles.loginpage}>
+        <div className={styles.backgroundImg}>
+            <img className={styles.rightDNA} src="./assest/login/dna-svgrepo-com 1.svg" alt="" />
+            <img className={styles.rightTopDNA} src="./assest/login/dna-svgrepo-com 2.svg" alt="" />
+            <img className={styles.leftDNA} src="./assest/login/dna-svgrepo-com 4.svg" alt="" />
+            <img className={styles.bigBottom} src="./assest/login/dna-svgrepo-com 3.svg" alt="" />
         </div>
 
-        <main>
-          <img id="heroLogo" src="./assest/logo.svg" alt="Medix" />
-          <h1 id="heroText">Reset Password Here!</h1>
-            <div id="loginSec">
-              <h1 id="secText">Email</h1>
+        <main className={styles.mainLog}>
+          <img className={styles.heroLogo} src="./assest/logo.svg" alt="Medix" />
+          <h1 className={styles.heroText}>Reset Password Here!</h1>
+            <div className={styles.loginSec}>
+              <h1 className={styles.secText}>Email</h1>
             </div>
 
-            <div className="input-box">
+            <div className={styles.inputBox}>
                 <input 
 
                 onKeyDown={(e) => {
@@ -44,10 +44,10 @@ function RestPassword() {
                 }}
                 
                 type="email" placeholder="example@gmail.com"/>
-                <span className="icon"><img src="./assest/login/person-svgrepo-com 1.svg" alt="" /></span>
+                <span className={styles.icon}><img src="./assest/login/person-svgrepo-com 1.svg" alt="" /></span>
             </div>
             
-            <button onClick={sentEmail} id="sendEmailButton">SEND EMAIL</button>
+            <button onClick={sentEmail} className={styles.sendEmailButton}>SEND EMAIL</button>
 
         </main>
 

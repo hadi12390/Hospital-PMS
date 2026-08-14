@@ -33,7 +33,7 @@ body{
 
 /* BackGround elements */
 
-#background-img {
+.backgroundImg {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -43,27 +43,27 @@ body{
     pointer-events: none;
 }
 
-#background-img img {
+.backgroundImg img {
     position: absolute;
     user-select: none;
 }
 
-#rightDNA {
+.rightDNA {
     left: 5%;
     top: 45%;
 }
 
-#rightTopDNA {
+.rightTopDNA {
     left: 30%;
     top: 5%;
 }
 
-#leftDNA {
+.leftDNA {
     right: 13%;
     top: 50%;
 }
 
-#bigBottom {
+.bigBottom {
     bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
@@ -85,40 +85,44 @@ main{
     border-radius: 1rem;
     padding: 2.5rem;
 }
-#heroLogo{
+.heroLogo{
     margin-bottom: 5rem;
 }
-#heroText{
+.heroText{
     font-family: "ExtraLight",sans-serif;
     color: #4d4d4d;
     letter-spacing: 4%;
     margin-bottom: 4rem;
 }
-#secText{
+.secText{
     font-family: "ExtraLight",sans-serif;
     color: #21599F;
     font-size: 1.4rem;
+
+    text-align: start;
 }
-#loginSec{
+.loginSec{
     width: 100%;
 }
 
 
 /* LOGIN INPUTS */
 
-.input-box {
+.inputBox {
     position: relative;
-    width: 500px;
+    width: 100%;
     margin: 20px 0;
+
+    align-self: flex-start;
 }
-.input-box span{
+.inputBox span{
     position: absolute;
     right: 5px;
     bottom: 6px; 
     display: flex;
     align-items: center;
 }
-.input-box input {
+.inputBox input {
     width: 100%;
     padding: 12px 35px 7px 10px;
     border: none;
@@ -128,12 +132,14 @@ main{
     background: transparent;
     color: #4d4d4d;
 }
-
-.input-box input:focus {
+.inputBox input:focus {
+    transition: all 0.4s ease-in-out;
+}
+.inputBox input:focus {
     border-bottom-color: #2563eb;
 }
 
-.input-box input::placeholder {
+.inputBox input::placeholder {
     color: #4d4d4d69;
 }
 
@@ -146,17 +152,17 @@ main{
     color: #4d4d4d;
 }
 
-#passVi{
+.passVi{
     cursor: pointer;
 }
-#passViB{
+.passViB{
     background-color: transparent;
     margin: 0;
     height:25px;
     border: none;
 }
 
-#frog{
+.frog{
     color: #21599F;
     font-family: "ExtraLight",sans-serif;
     text-decoration: none;
@@ -164,18 +170,18 @@ main{
     margin-bottom: 2rem;
     transition: all 0.3s ease;
 }
-#frog:hover{
+.frog:hover{
     color: #2d8cff;
 }
 
 /* Sign In Button */
 
 
-#signInButton{
+.signInButton{
     color: white;
     background-color: #185fa5;
 }
-#signInButton{
+.signInButton{
     font-family: "bold", sans-serif ;
     font-size: 1.3rem;
     letter-spacing: 5%;
@@ -187,28 +193,43 @@ main{
     transition: all 0.3s ease;
     margin-bottom: 1rem;
 }
-#signInButton:hover{
+.signInButton:hover{
     background-color: #1c6fc3;
 }
 
 /* Dont have an account? */
 
-#dontSignUp{
+.dontSignUp{
     font-family: "ExtraLight",sans-serif;
     color: #4d4d4d;
 }
-#dontSignUp span a{
+.dontSignUp span a{
     font-family: "bold", sans-serif ;
     color: #1c6fc3;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
-#dontSignUp span a:hover{
+.dontSignUp span a:hover{
     color: #2d8cff;
 }
-#frogo{
+.frogo{
     text-decoration: none;
     align-self: self-end;
     margin-bottom: .5rem;
+}
+.mainLog{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+
+    background-color: rgba(255, 255, 255, 0.699);
+
+}
+.loginpage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }

@@ -266,7 +266,10 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,.04);
 
     transform: translateZ(0); 
-    will-change: transform;    
+    will-change: transform;   
+    
+
+
 }
 
 .navContent {

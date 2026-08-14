@@ -1,4 +1,4 @@
-import "./RestPasswordDone.css";
+import styles from "./RestPasswordDone.module.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -11,22 +11,22 @@ function RestPasswordDone() {
 
 
   return (
-    <div>
-        <div id="background-img">
-            <img id="rightDNA" src="./assest/login/dna-svgrepo-com 1.svg" alt="" />
-            <img id="rightTopDNA" src="./assest/login/dna-svgrepo-com 2.svg" alt="" />
-            <img id="leftDNA" src="./assest/login/dna-svgrepo-com 4.svg" alt="" />
-            <img id="bigBottom" src="./assest/login/dna-svgrepo-com 3.svg" alt="" />
+    <div className={styles.loginpage}>
+        <div className={styles.backgroundImg}>
+            <img className={styles.rightDNA} src="./assest/login/dna-svgrepo-com 1.svg" alt="" />
+            <img className={styles.rightTopDNA} src="./assest/login/dna-svgrepo-com 2.svg" alt="" />
+            <img className={styles.leftDNA} src="./assest/login/dna-svgrepo-com 4.svg" alt="" />
+            <img className={styles.bigBottom} src="./assest/login/dna-svgrepo-com 3.svg" alt="" />
         </div>
 
-        <main>
-          <img id="heroLogo" src="./assest/logo.svg" alt="Medix" />
-          <h1 id="heroText">Check Your Email!</h1>
-            <div id="loginSec">
-              <h1 id="secText">We've sent a password reset link to your email address. <br /> If you don't see it within a few minutes, check your spam or junk folder.</h1>
+        <main className={styles.mainLog}>
+          <img className={styles.heroLogo} src="./assest/logo.svg" alt="Medix" />
+          <h1 className={styles.heroText}>Check Your Email!</h1>
+            <div className={styles.loginSec}>
+              <h1 className={styles.secText}>We've sent a password reset link to your email address. <br /> If you don't see it within a few minutes, check your spam or junk folder.</h1>
             </div>
             
-            <button onClick={()=> {navigate("/login")}} id="BackToLoginButton">BACK TO LOGIN</button>
+            <button onClick={()=> {navigate("/login")}} className={styles.backToLoginButton}>BACK TO LOGIN</button>
 
         </main>
 

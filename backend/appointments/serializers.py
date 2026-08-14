@@ -195,9 +195,6 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 class ManagerAppointmentSerializer(BaseAppointmentSerializer):
     end_time = serializers.ReadOnlyField()
 
-    doctor = serializers.UUIDField(write_only=True)
-    patient = serializers.UUIDField(write_only=True)
-
     class Meta:
         model = Appointment
         fields = [

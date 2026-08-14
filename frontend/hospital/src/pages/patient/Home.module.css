@@ -849,6 +849,12 @@ body {
   gap: 10px;
 
   align-self: flex-end;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+.bObutton:hover{
+  transform: scale(1.05);
 }
 .glass {
   position: relative;
@@ -1200,6 +1206,7 @@ body {
 }
 .buttnotif:hover{
   transform: scale(1.05);
+  cursor: pointer;
 }
 .Arrownoti path{
   fill: #4d4d4d;

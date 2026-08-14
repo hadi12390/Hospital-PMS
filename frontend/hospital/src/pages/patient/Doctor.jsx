@@ -232,12 +232,6 @@ function PatientDoctor(){
           />
         </div>
         <div className={`${styles.navContent} ${styles.glass}`}>
-          <div className={styles.buttonAddAppoi}>
-            <button>
-              <div className={styles.addDivApp}>+</div>
-              Make an New Appointment
-            </button>
-          </div>
   
           <div className={styles.profileSec}>
             <div className={styles.profilePic}>

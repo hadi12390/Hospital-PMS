@@ -30,6 +30,7 @@ import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 import { useEffect, useRef, useState } from 'react';
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import AppointmentButton from "./AppointmentButton";
 
@@ -43,12 +44,34 @@ const initialNotifications = [
   { id: 7, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
   { id: 8, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
   { id: 9, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
-  { id: 10, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
+  { id: 11, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
+  { id: 12, time: "10:00 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Ahmad has been confirmed" },
+  { id: 13, time: "9:45 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Sarah has been confirmed" },
+  { id: 14, time: "9:30 AM", title: "Prescription Ready", message: "Your prescription is ready for pickup at the pharmacy" },
+  { id: 15, time: "9:10 AM", title: "Appointment Reminder", message: "You have an appointment with Dr.Khaled tomorrow at 11:00 AM" },
+  { id: 16, time: "8:50 AM", title: "Lab Results Ready", message: "Your recent lab results have been uploaded to your profile" },
+  { id: 17, time: "8:30 AM", title: "Appointment Rescheduled", message: "Your appointment with Dr.Ahmad was moved to 2:00 PM" },
+  { id: 18, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
+  { id: 19, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
+  { id: 20, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
+  { id: 21, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
+  { id: 22, time: "10:00 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Ahmad has been confirmed" },
+  { id: 23, time: "9:45 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Sarah has been confirmed" },
+  { id: 24, time: "9:30 AM", title: "Prescription Ready", message: "Your prescription is ready for pickup at the pharmacy" },
+  { id: 25, time: "9:10 AM", title: "Appointment Reminder", message: "You have an appointment with Dr.Khaled tomorrow at 11:00 AM" },
+  { id: 26, time: "8:50 AM", title: "Lab Results Ready", message: "Your recent lab results have been uploaded to your profile" },
+  { id: 27, time: "8:30 AM", title: "Appointment Rescheduled", message: "Your appointment with Dr.Ahmad was moved to 2:00 PM" },
+  { id: 28, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
+  { id: 29, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
+  { id: 30, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
+  { id: 31, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
+  
 ];
 
 function NotificationCard({ notification, stage, index, onClear, onOverlayEnd, onCollapseEnd }) {
   const wrapperRef = useRef(null);
   const [height, setHeight] = useState(null);
+
 
   // When collapsing starts: measure the real pixel height first, then on the
   // next frame animate it down to 0. Avoids the grid 1fr->0fr snap issue.
@@ -110,6 +133,8 @@ function notification(){
   const [searchValue, setSearchValue] = useState('');
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef(null);
+  const navigate = useNavigate();
+
 
   const [notifications, setNotifications] = useState(initialNotifications);
   // stages keyed by notification id: "idle" | "clearing" | "collapsing"
@@ -337,12 +362,15 @@ function notification(){
           />
         </div>
         <div className={`${styles.navContent} ${styles.glass}`}>
-          <div className={styles.buttonAddAppoi}>
-            <button>
-              <div className={styles.addDivApp}>+</div>
-              Make an New Appointment
-            </button>
-          </div>
+        <div className={styles.buttonAddAppoi}>
+          <button
+            className={styles.mappbut}
+            onClick={() => navigate("/patient/make&appointment")}
+          >
+            <div className={styles.addDivApp}>+</div>
+            Make an New Appointment
+          </button>
+        </div>
   
           <div className={styles.profileSec}>
             <div className={styles.profilePic}>

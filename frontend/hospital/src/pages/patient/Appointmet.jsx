@@ -24,8 +24,10 @@ import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 import { useRef, useState } from 'react';
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function PatientAppointment(){
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef(null);
@@ -227,7 +229,10 @@ function PatientAppointment(){
         </div>
         <div className={`${styles.navContent} ${styles.glass}`}>
           <div className={styles.buttonAddAppoi}>
-            <button>
+            <button
+              className={styles.mappbut}
+              onClick={() => navigate("/patient/make&appointment")}
+            >
               <div className={styles.addDivApp}>+</div>
               Make an New Appointment
             </button>

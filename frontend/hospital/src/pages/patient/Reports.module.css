@@ -871,3 +871,42 @@ body {
 .notificationlogoicon polygon {
     stroke: #2986DC;
 }
+
+/* ==========================================================================
+   PAGE-OPEN ANIMATION
+   ========================================================================== */
+
+@keyframes pageFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroNameOB {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+.heroNameOB:nth-of-type(1) { animation-delay: 0s; }
+.heroNameOB:nth-of-type(2) { animation-delay: .35s; }
+
+.lastReportCard {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+.lastReportCard:nth-of-type(1) { animation-delay: .1s; }
+.lastReportCard:nth-of-type(2) { animation-delay: .45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .heroNameOB,
+  .lastReportCard {
+    animation: none;
+    opacity: 1;
+  }
+}

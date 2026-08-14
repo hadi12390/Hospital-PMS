@@ -20,8 +20,11 @@ import NotificationLogo from "../../assets/patient/notification.svg?react";
 import { NavLink } from "react-router-dom";
 import { useRef, useState } from 'react';
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 function PatientHome(){
+   const navigate = useNavigate();
 
    // ---------- Date helpers ----------
     function getCurrentDate() {
@@ -384,7 +387,10 @@ function PatientHome(){
       <nav className={styles.nav}>
         <div className={`${styles.navContent} ${styles.glass}`}>
           <div className={styles.buttonAddAppoi}>
-            <button>
+            <button
+              className={styles.mappbut}
+              onClick={() => navigate("/patient/make&appointment")}
+            >
               <div className={styles.addDivApp}>+</div>
               Make an New Appointment
             </button>
@@ -460,7 +466,15 @@ function PatientHome(){
                 <h1>Today</h1>
                 <div className={styles.bOflex}><div className={`${styles.bOsectwoA} ${styles.glass}`}> <p>Appointment</p> </div> <div className={`${styles.bOsectwoA} ${styles.glass}`}> <p>10:00AM</p></div></div>
                 <div className={styles.bOflex}><div className={`${styles.bOsectwoA} ${styles.glass}`}> <p>Dr.Jessica</p> </div> <div className={`${styles.bOsectwoA} ${styles.glass}`}> <p>Room 204</p></div></div>
-                <div className={styles.bOflex}><button className={`${styles.bObutton} ${styles.glass}`}> <p>More Info</p> <Arrow/></button></div>
+                <div className={styles.bOflex}>
+                <button
+                  className={`${styles.bObutton} ${styles.glass}`}
+                  onClick={() => navigate("/patient/appointment")}
+                  >
+                      <p>More Info</p>
+                      <Arrow />
+                  </button>
+          </div>
               </div>
             </div>
 

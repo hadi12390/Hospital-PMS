@@ -17,6 +17,7 @@ import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /* ==========================================================================
    PaymentRow — shared row for Recent Payments + Outstanding Balance
@@ -118,6 +119,7 @@ function PaymentStats({ totalPaid, outstanding, invoiceCount, thisMonth, outstan
    ========================================================================== */
 
 function Payment() {
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
 
   // sample data — swap for your API response
@@ -315,7 +317,10 @@ function Payment() {
           </div>
           <div className={`${styles.navContent} ${styles.glass}`}>
             <div className={styles.buttonAddAppoi}>
-              <button>
+              <button
+                className={styles.mappbut}
+                onClick={() => navigate("/patient/make&appointment")}
+              >
                 <div className={styles.addDivApp}>+</div>
                 Make an New Appointment
               </button>

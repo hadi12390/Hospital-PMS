@@ -898,3 +898,82 @@ body {
 .notificationlogoicon polygon {
   stroke: #2986DC;
 }
+/* ==========================================================================
+   PAGE-OPEN ANIMATION
+   ========================================================================== */
+
+@keyframes pageFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pagePopIn {
+  from {
+    opacity: 0;
+    transform: scale(.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* stat cards pop in one after another */
+.statsGrid .statCard {
+  opacity: 0;
+  animation: pagePopIn .5s cubic-bezier(.34, 1.56, .64, 1) forwards;
+}
+
+.statsGrid .statCard:nth-child(1) { animation-delay: .05s; }
+.statsGrid .statCard:nth-child(2) { animation-delay: .12s; }
+.statsGrid .statCard:nth-child(3) { animation-delay: .19s; }
+.statsGrid .statCard:nth-child(4) { animation-delay: .26s; }
+
+/* section titles + outstanding balance card */
+.statsSection .sectionTitle {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+  animation-delay: .34s;
+}
+
+.outstandingCard {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+  animation-delay: .42s;
+}
+
+/* Recent Payments title */
+.recentPaymentsCard .sectionTitle {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+  animation-delay: .5s;
+}
+
+/* recent payment rows, staggered */
+.paymentsList .paymentRow {
+  opacity: 0;
+  animation: pageFadeUp .5s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+.paymentsList .paymentRow:nth-child(1) { animation-delay: .58s; }
+.paymentsList .paymentRow:nth-child(2) { animation-delay: .65s; }
+.paymentsList .paymentRow:nth-child(3) { animation-delay: .72s; }
+.paymentsList .paymentRow:nth-child(4) { animation-delay: .79s; }
+.paymentsList .paymentRow:nth-child(5) { animation-delay: .86s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .statsGrid .statCard,
+  .statsSection .sectionTitle,
+  .outstandingCard,
+  .recentPaymentsCard .sectionTitle,
+  .paymentsList .paymentRow {
+    animation: none;
+    opacity: 1;
+  }
+}

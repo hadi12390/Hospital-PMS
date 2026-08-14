@@ -272,11 +272,10 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
         return attrs
 
 
-
-
 # =========================
 # Patient Create Appointment
 # =========================
+
 
 class PatientAppointmentSerializer(BaseAppointmentSerializer):
 

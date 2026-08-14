@@ -37,7 +37,6 @@ TENANT_APPS = [
     'patient',
     'manager',
     'appointments',
-    'medical_records',
     'notifications',
     'logs',
     'allauth',

@@ -151,89 +151,22 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
 # Manager Create Serializer
 # =========================
 
-class ManagerAppointmentCreateSerializer(BaseAppointmentSerializer):
+class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
     doctor = serializers.SlugRelatedField(
         slug_field="user__public_id",
         queryset=Doctor.objects.all(),
-        write_only=True,
     )
 
     patient = serializers.SlugRelatedField(
         slug_field="user__public_id",
         queryset=Patient.objects.all(),
-        write_only=True,
     )
-
-
-    class Meta:
-        model = Appointment
-        fields = [
-            "doctor",
-            "patient",
-            "scheduled_time",
-            "reason_for_visit",
-            "notes",
-            "status",
-            "appointment_type",
-            "duration_minutes",
-        ]
-
-
-    def validate(self, attrs):
-        
-        if self.is_in_the_past(attrs["scheduled_time"]):
-            raise serializers.ValidationError(
-                "You cannot create an appointment for a date or time in the past."
-            )
-        
-        if self.has_conflict(
-            doctor=attrs["doctor"],
-            patient=attrs["patient"],
-            scheduled_time=attrs["scheduled_time"],
-            appointment_type=attrs.get("appointment_type"),
-            duration_minutes=attrs.get("duration_minutes"),
-            exclude_id=(
-                self.instance.id
-                if self.instance
-                else None
-            ),
-        ):
-            raise serializers.ValidationError(
-                "This time slot conflicts with another appointment."
-            )
-        
-        if not self.suitable_for_dr(
-            doctor=attrs["doctor"],
-            patient=attrs["patient"],
-            scheduled_time=attrs["scheduled_time"],
-            appointment_type=attrs.get("appointment_type"),
-            duration_minutes=attrs.get("duration_minutes"),
-        ):
-            raise serializers.ValidationError({
-                "scheduled_time": "This appointment may fall outside the doctor's working hours."
-            })
-
-
-        return attrs
-
-
-
-# =========================
-# Manager Read Serializer
-# =========================
-
-class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
     end_time = serializers.ReadOnlyField()
 
-    doctor = serializers.SerializerMethodField()
-    patient = serializers.SerializerMethodField()
-
-
     class Meta:
         model = Appointment
-
         fields = [
             "public_id",
             "doctor",
@@ -247,13 +180,56 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
             "end_time",
         ]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["doctor"] = self.get_person_repr(instance.doctor)
+        data["patient"] = self.get_person_repr(instance.patient)
+        return data
 
-    def get_doctor(self, obj):
-        return self.get_person_repr(obj.doctor)
 
 
-    def get_patient(self, obj):
-        return self.get_person_repr(obj.patient)
+# =========================
+# Manager Read Serializer
+# =========================
+
+class ManagerAppointmentSerializer(BaseAppointmentSerializer):
+    end_time = serializers.ReadOnlyField()
+
+    doctor = serializers.UUIDField(write_only=True)
+    patient = serializers.UUIDField(write_only=True)
+
+    class Meta:
+        model = Appointment
+        fields = [
+            "public_id",
+            "doctor",
+            "patient",
+            "scheduled_time",
+            "reason_for_visit",
+            "notes",
+            "status",
+            "appointment_type",
+            "created_at",
+            "end_time",
+        ]
+
+    def validate_doctor(self, value):
+        try:
+            return Doctor.objects.get(public_id=value)
+        except Doctor.DoesNotExist:
+            raise serializers.ValidationError("Doctor not found.")
+
+    def validate_patient(self, value):
+        try:
+            return Patient.objects.get(public_id=value)
+        except Patient.DoesNotExist:
+            raise serializers.ValidationError("Patient not found.")
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["doctor"] = self.get_person_repr(instance.doctor)
+        rep["patient"] = self.get_person_repr(instance.patient)
+        return rep
 
 
 

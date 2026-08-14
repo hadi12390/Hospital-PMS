@@ -47,6 +47,21 @@ class ManagerListCreateAppointment(ListCreateAPIView):
                 f"with doctor {appointment.doctor.user.username}."
             ),
         )
+        Notification.create_notification(
+            user=appointment.doctor.user,
+            notification_type=Notification.Type.APPOINTMENT,
+            title="Appointment created",
+            message=f"An appointment was booked for you with patient {appointment.patient.user.get_full_name()} by {request.user.get_full_name()}.",
+            appointment=appointment,
+        )
+
+        Notification.create_notification(
+            user=appointment.patient.user,
+            notification_type=Notification.Type.APPOINTMENT,
+            title="Appointment created",
+            message=f"An appointment was booked for you with Dr. {appointment.doctor.user.get_full_name()}.",
+            appointment=appointment,
+        )
 
 
 

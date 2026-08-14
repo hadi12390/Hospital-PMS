@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 class Notification(models.Model):
 
@@ -7,12 +8,17 @@ class Notification(models.Model):
         APPOINTMENT = "appointment", "Appointment"
         REMINDER = "reminder", "Reminder"
 
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="notifications",
     )
-
     appointment = models.ForeignKey(
         "appointments.Appointment",
         on_delete=models.SET_NULL,

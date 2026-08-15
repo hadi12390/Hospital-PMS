@@ -7,10 +7,11 @@ from django.utils.dateparse import parse_date
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateAPIView
 
 from accounts.permissions import IsDoctor
 from appointments.models import Appointment
-
+from .serializers import DoctorSerializer
 
 class DoctorDashboard(APIView):
 
@@ -231,3 +232,11 @@ class DoctorDashboard(APIView):
         stats["last_patient"] = self.appointment_summary(last_patient)
 
         return Response(stats)
+
+class DoctorProfileEditView(RetrieveUpdateAPIView):
+    
+    serializer_class = DoctorSerializer
+    permission_classes = [IsDoctor]
+
+    def get_object(self):
+        return self.request.user.doctor

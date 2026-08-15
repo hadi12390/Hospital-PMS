@@ -9,7 +9,7 @@ from appointments.models import Appointment
 from accounts.permissions import IsPatient
 from notifications.models import Notification
 
-class ProfileEditView(RetrieveUpdateAPIView):
+class PatientProfileEditView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsPatient]
 

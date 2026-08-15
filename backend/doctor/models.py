@@ -29,5 +29,6 @@ class Doctor(models.Model):
     start_time = models.TimeField(blank=True)
     end_time = models.TimeField(blank=True)
     created_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f"Dr. {self.user.get_full_name() or self.user.username}"

@@ -33,10 +33,10 @@ class StaffPatientSerializer(serializers.ModelSerializer):
             'blood_type',
         ]
 
-class ProfileSerializer(serializers.ModelSerializer):\
+class ProfileSerializer(serializers.ModelSerializer):
 
-    first_name = serializers.CharField(source='user.first_name', read_only=True)
-    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
     
     class Meta:
         model = Patient
@@ -49,4 +49,18 @@ class ProfileSerializer(serializers.ModelSerializer):\
             'phone_number',
             'blood_type',
         ]
-        read_only_fields = fields
+        
+    def update(self, instance, validated_data):
+
+        user_data = validated_data.pop('user', {})
+        user_instance = instance.user
+        for attrs, value in user_data.items():
+            setattr(user_instance, attrs, value)
+        
+        user_instance.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance

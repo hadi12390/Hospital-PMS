@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework.generics import RetrieveUpdateAPIView
+from accounts.permissions import IsPatient
+from .serializers import ProfileSerializer
 
-# Create your views here.
+class ProfileEditView(RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsPatient]
+
+    def get_object(self):
+        return self.request.user.patient

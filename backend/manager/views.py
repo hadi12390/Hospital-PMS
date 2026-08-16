@@ -30,13 +30,6 @@ class ManagerDashboard(APIView):
 
     def get(self, request):
         
-        manager_profile = getattr(request.user, "manager", None)
-        if not manager_profile:
-            return Response(
-                {"detail": "Manager profile not found"},
-                status=404,
-            )
-        
         now = timezone.now()
         appointments = Appointment.objects.all().select_related(
             "patient__user", "doctor__user"
@@ -101,3 +94,4 @@ class ManagerDashboard(APIView):
                 for log in logs
             ],
         }, status=200)
+

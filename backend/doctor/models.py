@@ -26,8 +26,8 @@ class Doctor(models.Model):
     )
 
     phone_number = models.CharField(max_length=15, blank=True)
-    start_time = models.TimeField(blank=True)
-    end_time = models.TimeField(blank=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

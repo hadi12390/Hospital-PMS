@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.contrib.auth import get_user_model
 from datetime import date
 
@@ -29,8 +29,9 @@ class ManagerDashboard(APIView):
     permission_classes = [IsManager]
 
     def get(self, request):
-        
-        now = timezone.now()
+
+        now_time = timezone.localtime(timezone.now()).time()
+
         appointments = Appointment.objects.all().select_related(
             "patient__user", "doctor__user"
         )
@@ -49,9 +50,9 @@ class ManagerDashboard(APIView):
         ]
         today_patients_count = len({appt.patient_id for appt in today_appointments})
         active_doctors = Doctor.objects.filter(
-            start_time__lte=now.time(),
-            end_time__gte=now.time(),
-            user__status=User.Status.ACTIVE
+            Q(start_time__lte=F("end_time")) & Q(start_time__lte=now_time, end_time__gte=now_time)
+            | Q(start_time__gt=F("end_time")) & (Q(start_time__lte=now_time) | Q(end_time__gte=now_time)),
+            user__status=User.Status.ACTIVE,
         )
         active_doctors_count = active_doctors.count()
         appointment_status = appointments.aggregate(
@@ -95,3 +96,58 @@ class ManagerDashboard(APIView):
             ],
         }, status=200)
 
+class ManageDoctors(APIView):
+    permission_classes = [IsManager]
+
+    def doctor_summary(self, doctor):
+        if not doctor or not doctor.user:
+            return None
+
+        start = doctor.start_time
+        end = doctor.end_time
+
+        if start and end:
+            now = timezone.localtime(timezone.now()).time()
+
+            if start <= end:
+                # normal shift, e.g. 09:00 -> 17:00
+                is_active = start <= now <= end
+            else:
+                # overnight shift, e.g. 22:00 -> 06:00
+                is_active = now >= start or now <= end
+
+            status = "Active" if is_active else "On Leave"
+        else:
+            status = "Not exist"
+
+        return {
+            "doctor": {
+                "public_id": str(doctor.user.public_id),
+                "name": doctor.user.get_full_name(),
+            },
+            "specialty": doctor.specialty,
+            "schedule": {
+                "start_time": start,
+                "end_time": end
+            },
+            "status": status
+        }
+
+    def get(self, request):
+
+        now_time = timezone.localtime(timezone.now()).time()
+        doctors = Doctor.objects.filter(user__status=User.Status.ACTIVE).select_related("user")
+        stats = doctors.aggregate(
+            total_doctors=Count("id"),
+            active_doctors=Count(
+                "id",
+                filter=Q(start_time__lte=F("end_time")) &
+                Q(start_time__lte=now_time, end_time__gte=now_time) |
+                Q(start_time__gt=F("end_time")) &
+                (Q(start_time__lte=now_time) | Q(end_time__gte=now_time))
+            ),
+        )
+        stats["on_leave_doctors"] = stats["total_doctors"] - stats["active_doctors"]
+        stats["doctors"] = [self.doctor_summary(doc) for doc in doctors]
+
+        return Response(stats)

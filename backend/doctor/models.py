@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+import datetime
+from datetime import timedelta
 
 class Doctor(models.Model):  
     user = models.OneToOneField(
@@ -32,3 +34,4 @@ class Doctor(models.Model):
 
     def __str__(self):
         return f"Dr. {self.user.get_full_name() or self.user.username}"
+    

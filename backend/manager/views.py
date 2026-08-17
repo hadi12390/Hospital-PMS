@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from datetime import datetime, timedelta
@@ -6,9 +6,11 @@ from django.utils import timezone
 from django.db.models import Count, Q, F, Prefetch
 from django.contrib.auth import get_user_model
 from django.db.models import Min
+import uuid
+from django.shortcuts import get_object_or_404
 
 from accounts.permissions import IsManager
-from .serializers import AddDoctorSerializer
+from .serializers import AddDoctorSerializer, DoctorOverviewSerializer
 from appointments.serializers import ManagerAppointmentSerializer
 from appointments.models import Appointment
 from doctor.models import Doctor
@@ -395,3 +397,17 @@ class ManagePatients(APIView):
         }
 
         return Response(response_data)
+
+
+class DoctorOverView(RetrieveUpdateAPIView):
+    permission_classes = [IsManager]
+    serializer_class = DoctorOverviewSerializer
+
+    def get_object(self):
+        public_id = self.kwargs["public_id"]
+
+        return get_object_or_404(
+            Doctor.objects.select_related("user"),
+            user__public_id=public_id,
+        )
+

@@ -3,7 +3,7 @@ from django.conf import settings
 from configuration.models import ClinicConfiguration
 from django.db.models import Count, Q, F
 from datetime import timedelta
-#patient/model
+
 class Patient(models.Model):  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 

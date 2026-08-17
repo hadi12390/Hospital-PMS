@@ -67,7 +67,7 @@ class ManagerDashboard(APIView):
                 "appointments_count": today_appointments_count,
                 "last_three": [
                     {
-                        "public_id": appt.public_id,
+                        "public_id": str(appt.public_id),
                         "patient_name": (
                             appt.patient.user.get_full_name()
                             if appt.patient and appt.patient.user else None
@@ -246,5 +246,61 @@ class ManageDoctors(APIView):
             )
         else:
             stats["capacity"] = 0
+
+        return Response(stats)
+    
+
+class ManageAppointments(APIView):
+    permission_classes = [IsManager]
+
+    def appointment_summary(self, appointment):
+        patient_obj = appointment.patient
+        patient_user = patient_obj.user if patient_obj else None
+
+        if patient_user:
+            patient_public_id = str(patient_user.public_id)
+            patient_name = patient_user.get_full_name()
+        elif patient_obj:
+            patient_public_id = "User Is guest."
+            patient_name = patient_obj.get_full_name()
+        else:
+            patient_public_id = None
+            patient_name = "Unknown"
+
+        doctor_user = getattr(appointment.doctor, "user", None) if appointment.doctor else None
+        doctor_public_id = str(doctor_user.public_id) if doctor_user else None
+        doctor_name = doctor_user.get_full_name() if doctor_user else "Unassigned"
+
+        return {
+            "appointment_public_id": str(appointment.public_id),
+            "patient": {
+                "public_id": patient_public_id,
+                "name": patient_name,
+            },
+            "doctor": {
+                "public_id": doctor_public_id,
+                "name": doctor_name,
+            },
+            "appointment_type": appointment.appointment_type,
+            "date": appointment.scheduled_time,
+            "status": appointment.status,
+        }
+
+    def get(self, request):
+        appointments = Appointment.objects.all().select_related("patient__user", "doctor__user")
+
+        stats = appointments.aggregate(
+            total_appointments=Count("id"),
+            cancelled_appointments=Count("id", filter=Q(status=Appointment.Status.CANCELLED)),
+            pending_appointments=Count("id", filter=Q(status=Appointment.Status.PENDING)),
+            completed_appointments=Count("id", filter=Q(status=Appointment.Status.COMPLETED)),
+            confirmed_appointments=Count("id", filter=Q(status=Appointment.Status.CONFIRMED)),
+            no_show_appointments=Count("id", filter=Q(status=Appointment.Status.NO_SHOW)),
+        )
+
+        stats["appointments"] = [
+            self.appointment_summary(app)
+            for app in appointments
+        ]
 
         return Response(stats)

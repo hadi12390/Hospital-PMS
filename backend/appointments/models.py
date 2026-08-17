@@ -4,7 +4,7 @@ from doctor.models import Doctor
 from patient.models import Patient
 from datetime import timedelta
 import uuid
-
+# appointments/model
 class Appointment(models.Model):
 
     class Status(models.TextChoices):

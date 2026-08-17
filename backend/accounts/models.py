@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 import uuid
-
+#accounts/model
 class User(AbstractUser):
     id = models.BigAutoField(primary_key=True)
 

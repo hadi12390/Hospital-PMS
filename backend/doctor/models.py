@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 import datetime
 from datetime import timedelta
-
+# doctor/models
 class Doctor(models.Model):  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 

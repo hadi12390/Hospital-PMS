@@ -3,8 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.utils import timezone
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Prefetch
 from django.contrib.auth import get_user_model
+from django.db.models import Min
 
 from accounts.permissions import IsManager
 from .serializers import AddDoctorSerializer
@@ -12,6 +13,7 @@ from appointments.serializers import ManagerAppointmentSerializer
 from appointments.models import Appointment
 from doctor.models import Doctor
 from logs.models import ActivityLog
+from patient.models import Patient
 
 User = get_user_model()
 today = timezone.localdate()
@@ -304,3 +306,92 @@ class ManageAppointments(APIView):
         ]
 
         return Response(stats)
+
+class ManagePatients(APIView):
+    permission_classes = [IsManager]
+
+    def patient_summary(self, patient, appointment):
+        today = timezone.now().date()
+
+        if patient and getattr(patient, 'user', None):
+            patient_public_id = str(patient.user.public_id)
+            patient_name = patient.user.get_full_name()
+        elif patient:
+            patient_public_id = "User Is guest."
+            patient_name = patient.get_full_name()
+        else:
+            patient_public_id = None
+            patient_name = "Unknown"
+
+        if appointment:
+            appointment_public_id = str(appointment.public_id)
+            appointment_date = appointment.scheduled_time
+        else:
+            appointment_public_id = None
+            appointment_date = None
+
+        # Safe attributes extraction
+        phone_number = getattr(patient, 'phone_number', None)
+        birth_date = getattr(patient, 'birth_date', None)
+
+        # Calculate age safely if birth_date exists
+        age = None
+        if birth_date:
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+        return {
+            "patient": {
+                "public_id": patient_public_id,
+                "name": patient_name
+            },
+            "phone": phone_number,
+            "last_appointment": {
+                "appointment_public_id": appointment_public_id,
+                "appointment_date": appointment_date
+            },
+            "birth_date": birth_date,
+            "age": age
+        }
+    
+    def get(self, request):
+        today = timezone.now().date()
+
+        # 1. Calculate aggregate stats (1 DB query)
+        stats = Patient.objects.annotate(
+            first_appointment=Min("appointments__scheduled_time")
+        ).aggregate(
+            total_patients=Count("id", distinct=True),
+            new_patients_count=Count(
+                "id",
+                distinct=True,
+                filter=Q(
+                    first_appointment__year=today.year,
+                    first_appointment__month=today.month
+                )
+            )
+        )
+
+        # 2. Fetch patients with their single latest appointment prefetched (2 DB queries)
+        latest_appointments = Appointment.objects.order_by('-scheduled_time')
+
+        patients = Patient.objects.select_related('user').prefetch_related(
+            Prefetch(
+                'appointments',
+                queryset=latest_appointments,
+                to_attr='latest_appointments_list'
+            )
+        )
+
+        # 3. Build the summarized patient list
+        patient_summaries = []
+        for patient in patients:
+            last_appt = patient.latest_appointments_list[0] if patient.latest_appointments_list else None
+            patient_summaries.append(self.patient_summary(patient, last_appt))
+
+        # 4. Construct final payload
+        response_data = {
+            "stats": stats,
+            "patients": patient_summaries
+        }
+
+        return Response(response_data)

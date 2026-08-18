@@ -1,4 +1,4 @@
-from rest_framework .generics import CreateAPIView
+from rest_framework .generics import CreateAPIView, RetrieveUpdateAPIView
 from .serializers import StaffCreateUserSerializer
 from .permissions import IsManager, IsDoctor, IsPatient, IsUnregisteredPatient
 from logs.models import ActivityLog
@@ -6,6 +6,7 @@ from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from allauth.account.models import EmailAddress
+from .serializers import PersonalInformationSerializer
 
 class StaffCreateUserView(CreateAPIView):
     serializer_class = StaffCreateUserSerializer
@@ -112,3 +113,10 @@ class ChangeEmailView(APIView):
         return Response({
             "detail": "Confirmation email sent to new address."
         })
+
+class PersonalInformationEditView(RetrieveUpdateAPIView):
+    serializer_class = PersonalInformationSerializer
+    permission_classes = [IsManager | IsDoctor | IsPatient]
+
+    def get_object(self):
+        return self.request.user

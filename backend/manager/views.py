@@ -371,9 +371,12 @@ class ManageAppointments(APIView):
         if patient_user:
             patient_public_id = str(patient_user.public_id)
             patient_name = patient_user.get_full_name()
+            patient_phone_number = patient_obj.phone_number
         elif patient_obj:
             patient_public_id = "User Is guest."
             patient_name = patient_obj.get_full_name()
+            patient_phone_number = patient_obj.phone_number
+
         else:
             patient_public_id = None
             patient_name = "Unknown"
@@ -387,6 +390,7 @@ class ManageAppointments(APIView):
             "patient": {
                 "public_id": patient_public_id,
                 "name": patient_name,
+                "patient_phone_number": patient_phone_number,
             },
             "doctor": {
                 "public_id": doctor_public_id,

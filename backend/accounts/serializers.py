@@ -77,3 +77,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Stamp the current database schema name into the JWT
         token['tenant_schema'] = connection.schema_name
         return token
+
+
+class PersonalInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+        ]
+        read_only_fields = ['email']
+        
+
+        

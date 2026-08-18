@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
@@ -9,6 +9,7 @@ from appointments.models import Appointment
 from accounts.permissions import IsPatient, IsDoctor, IsManager
 from notifications.models import Notification
 from .models import Patient
+
 
 class PatientProfileEditView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
@@ -124,8 +125,11 @@ class PatientDashboard(APIView):
         return Response(stats)
 
 class patientPublicView(RetrieveAPIView):
-    queryset = Patient.objects.select_related("user")
     serializer_class = PatientPublicSerializer
+    queryset = Patient.objects.select_related("user")
     lookup_field = "user__public_id"
     lookup_url_kwarg = "public_id"
     permission_classes = [IsDoctor | IsManager]
+
+
+    

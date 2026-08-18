@@ -7,11 +7,17 @@ from django.utils.dateparse import parse_date
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
+from django.contrib.auth import get_user_model
 
-from accounts.permissions import IsDoctor
+from accounts.permissions import IsDoctor, IsPatient, IsManager, IsUnregisteredPatient
 from appointments.models import Appointment
-from .serializers import DoctorSerializer
+from .serializers import DoctorSerializer, ViewAllDoctorsSerializer
+from .models import Doctor
+
+
+User = get_user_model()
+
 
 class DoctorDashboard(APIView):
 
@@ -240,3 +246,9 @@ class DoctorProfileEditView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.doctor
+
+class ViewAllDoctors(ListAPIView):
+
+    serializer_class = ViewAllDoctorsSerializer
+    permission_classes = [IsDoctor | IsManager | IsPatient | IsUnregisteredPatient]
+    queryset = Doctor.objects.select_related("user").filter(user__status=User.Status.ACTIVE)

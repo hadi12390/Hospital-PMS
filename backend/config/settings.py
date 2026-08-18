@@ -229,3 +229,10 @@ TEMPLATES = [
 ]
 
 ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
+
+CACHES = { # Redis is better.
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "email-rate-limit",
+    }
+}

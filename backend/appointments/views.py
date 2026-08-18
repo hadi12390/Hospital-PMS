@@ -167,20 +167,20 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
         new_status = serializer.validated_data.get("status", old_status)
 
         if old_status != new_status:
-            if new_status == "confirmed":
+            if new_status == Appointment.Status.CONFIRMED:
                 extra_kwargs["confirmed_at"] = now
 
-            elif new_status == "completed":
+            elif new_status == Appointment.Status.COMPLETED:
                 extra_kwargs["completed_at"] = now
 
-            elif new_status == "cancelled":
+            elif new_status == Appointment.Status.CANCELLED:
                 extra_kwargs["cancelled_at"] = now
 
         # Save once with timestamps included — avoids calling appointment.save() twice!
         appointment = serializer.save(**extra_kwargs)
 
         if old_status != new_status:
-            if new_status == "confirmed":
+            if new_status == Appointment.Status.CONFIRMED:
                 Notification.create_notification(
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
@@ -188,7 +188,7 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     message=f"Your appointment with Dr. {self.request.user.get_full_name()} has just been confirmed.",
                     appointment=instance
                 )
-            elif new_status == "completed":
+            elif new_status == Appointment.Status.COMPLETED:
                 Notification.create_notification(
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
@@ -196,7 +196,7 @@ class DoctorAppointmentDetailView(RetrieveUpdateAPIView):
                     message=f"You have completed an appointment with Dr. {self.request.user.get_full_name()}.",
                     appointment=instance,
                 )
-            elif new_status == "cancelled":
+            elif new_status == Appointment.Status.CANCELLED:
                 Notification.create_notification(
                     user=instance.patient.user,
                     notification_type=Notification.Type.APPOINTMENT,
@@ -366,4 +366,93 @@ class AppointmentCancelView(UpdateAPIView):
         return Appointment.objects.filter(
             patient=self.request.user.patient
         )
-    
+
+class ManagerAppointmentUpdateView(RetrieveUpdateAPIView):
+    serializer_class = DoctorAppointmentUpdateSerializer
+    permission_classes = [IsManager]
+    lookup_field = "public_id"
+    queryset = Appointment.objects.select_related("doctor__user", "patient__user")
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        # 1. Grab old_status BEFORE saving (reuse the instance DRF already fetched)
+        instance = serializer.instance
+        old_status = instance.status
+
+        # 2. Save directly via serializer (pass extra kwargs to update_fields safely)
+        now = timezone.now()
+        extra_kwargs = {}
+
+        # Check updated validated data from serializer
+        new_status = serializer.validated_data.get("status", old_status)
+
+        if old_status != new_status:
+            if new_status == Appointment.Status.CONFIRMED:
+                extra_kwargs["confirmed_at"] = now
+
+            elif new_status == Appointment.Status.COMPLETED:
+                extra_kwargs["completed_at"] = now
+
+            elif new_status == Appointment.Status.CANCELLED:
+                extra_kwargs["cancelled_at"] = now
+
+        # Save once with timestamps included — avoids calling appointment.save() twice!
+        appointment = serializer.save(**extra_kwargs)
+
+        if old_status != new_status:
+            if new_status == Appointment.Status.CONFIRMED:
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment confirmed",
+                    message=f"Your appointment with Dr. {instance.doctor.user.get_full_name()} has just been confirmed.",
+                    appointment=instance
+                )
+                Notification.create_notification(
+                    user=instance.doctor.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment confirmed",
+                    message=f"Your appointment with {instance.patient.user.get_full_name()} has just been confirmed.",
+                    appointment=instance
+                )
+            elif new_status == Appointment.Status.COMPLETED:
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment completed",
+                    message=f"You have completed an appointment with Dr. {instance.doctor.user.get_full_name()}.",
+                    appointment=instance,
+                )
+                Notification.create_notification(
+                    user=instance.doctor.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment completed",
+                    message=f"Your appointment with {instance.patient.user.get_full_name()} has just been completed.",
+                    appointment=instance
+                )
+
+            elif new_status == Appointment.Status.CANCELLED:
+                Notification.create_notification(
+                    user=instance.patient.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment cancelled",
+                    message=f"Your appointment with Dr. {instance.doctor.user.get_full_name()} has been cancelled by the manager.",
+                    appointment=instance,
+                )
+
+                Notification.create_notification(
+                    user=instance.doctor.user,
+                    notification_type=Notification.Type.APPOINTMENT,
+                    title="Appointment cancelled",
+                    message=f"Your appointment with {instance.patient.user.get_full_name()} has just been cancelled by the manager.",
+                    appointment=instance
+                )
+
+            ActivityLog.objects.create(
+                user=self.request.user,
+                action=ActivityLog.Action.APPOINTMENT_UPDATED,
+                description=(
+                    f"Manager {self.request.user.get_full_name()} updated appointment status "
+                    f"from '{old_status}' to '{new_status}' for doctor {appointment.doctor.user.get_full_name()} and patient {appointment.patient.user.get_full_name()}."
+                ),
+            )

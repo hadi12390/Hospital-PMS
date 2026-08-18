@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Count, Q
 
-from .serializers import ProfileSerializer
+from .serializers import ProfileSerializer, PatientPublicSerializer
 from appointments.models import Appointment
-from accounts.permissions import IsPatient
+from accounts.permissions import IsPatient, IsDoctor, IsManager
 from notifications.models import Notification
+from .models import Patient
 
 class PatientProfileEditView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
@@ -122,5 +123,9 @@ class PatientDashboard(APIView):
 
         return Response(stats)
 
-# class patientPublicView(RetrieveAPIView):
-#     serializer_class = 
+class patientPublicView(RetrieveAPIView):
+    queryset = Patient.objects.select_related("user")
+    serializer_class = PatientPublicSerializer
+    lookup_field = "user__public_id"
+    lookup_url_kwarg = "public_id"
+    permission_classes = [IsDoctor | IsManager]

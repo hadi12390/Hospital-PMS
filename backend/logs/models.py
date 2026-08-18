@@ -5,9 +5,10 @@ class ActivityLog(models.Model):
     class Action(models.TextChoices):
         REGISTER = "register", "Register"
         EMAIL_VERIFIED = "email_verified", "Email Verified"
+        EMAIL_CHANGED = "email_changed", "Email Changed"
         APPOINTMENT_CREATED = "appointment_created", "Appointment Created"
         APPOINTMENT_UPDATED = "appointment_updated", "Appointment Updated"
-    
+        
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

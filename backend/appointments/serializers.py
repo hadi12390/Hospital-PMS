@@ -579,3 +579,92 @@ class PatientCancelAppointment(serializers.ModelSerializer):
         )
 
         return instance
+
+class ManagerAppointmentUpdateSerializer(BaseAppointmentSerializer):
+    
+    patient = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = Appointment
+
+        fields = [
+            "patient",
+            "scheduled_time",
+            "duration_minutes",
+            "reason_for_visit",
+            "appointment_type",
+            "created_at",
+            "status",
+            "notes",
+        ]
+
+        read_only_fields = [
+            "patient",
+            "scheduled_time",
+            "reason_for_visit",
+            "created_at",
+        ]
+
+
+    def get_patient(self, obj):
+        return self.get_person_repr(
+            obj.patient
+        )
+
+
+    def validate_status(self, value):
+
+        if self.instance.status == Appointment.Status.COMPLETED:
+            raise serializers.ValidationError(
+                "Cannot change the status of a completed appointment."
+            )
+
+        return value
+
+
+
+    def validate(self, attrs):
+
+        scheduled_time = attrs.get("scheduled_time")
+
+        if scheduled_time and self.is_in_the_past(scheduled_time):
+            raise serializers.ValidationError(
+                "You cannot create an appointment for a date or time in the past."
+            )
+        if self.has_conflict(
+            doctor=self.instance.doctor,
+            patient=self.instance.patient,
+            scheduled_time=self.instance.scheduled_time,
+            appointment_type=attrs.get(
+                "appointment_type",
+                self.instance.appointment_type,
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes",
+                self.instance.duration_minutes,
+            ),
+            exclude_id=self.instance.id,
+        ):
+            raise serializers.ValidationError(
+                "This time slot conflicts with another appointment."
+            )
+        
+        if not self.suitable_for_dr(
+            doctor=self.instance.doctor,
+            patient=self.instance.patient,
+            scheduled_time=self.instance.scheduled_time,
+            appointment_type=attrs.get(
+                "appointment_type",
+                self.instance.appointment_type,
+            ),
+            duration_minutes=attrs.get(
+                "duration_minutes",
+                self.instance.duration_minutes,
+            ),
+        ):
+            raise serializers.ValidationError({
+                "scheduled_time": "This appointment may fall outside the doctor's working hours."
+            })
+
+        return attrs

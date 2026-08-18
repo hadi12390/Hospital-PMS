@@ -329,15 +329,27 @@ class ManagePatients(APIView):
             last_appointment_public_id = str(last_appointment.public_id)
             last_appointment_date = last_appointment.scheduled_time
             last_appointment_doctor = last_appointment.doctor.user.get_full_name()
+            last_appointment_doctor_public_id = str(last_appointment.doctor.user.public_id)
         else:
             last_appointment_public_id = None
             last_appointment_date = None
+            last_appointment_doctor = None
+            last_appointment_doctor_public_id = None
 
-        # Safe attributes extraction
+        if next_appointment:
+            next_appointment_public_id = str(next_appointment.public_id)
+            next_appointment_date = next_appointment.scheduled_time
+            next_appointment_doctor = next_appointment.doctor.user.get_full_name()
+            next_appointment_doctor_public_id = str(next_appointment.doctor.user.public_id)
+        else:
+            next_appointment_public_id = None
+            next_appointment_date = None
+            next_appointment_doctor = None
+            next_appointment_doctor_public_id = None
+
         phone_number = getattr(patient, 'phone_number', None)
         birth_date = getattr(patient, 'birth_date', None)
 
-        # Calculate age safely if birth_date exists
         age = None
         if birth_date:
             age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
@@ -348,18 +360,32 @@ class ManagePatients(APIView):
                 "name": patient_name
             },
             "phone": phone_number,
+            "appointment_counts": {
+                "total": getattr(patient, "total_appointments_count", 0),
+                "completed": getattr(patient, "completed_appointments_count", 0),
+                "confirmed": getattr(patient, "confirmed_appointments_count", 0),
+                "cancelled": getattr(patient, "cancelled_appointments_count", 0),
+            },
             "last_appointment": {
-                "appointment_public_id": appointment_public_id,
-                "appointment_date": appointment_date
+                "appointment_public_id": last_appointment_public_id,
+                "appointment_date": last_appointment_date,
+                "doctor_name": last_appointment_doctor,
+                "doctor_public_id": last_appointment_doctor_public_id
+            },
+            "next_appointment": {
+                "appointment_public_id": next_appointment_public_id,
+                "appointment_date": next_appointment_date,
+                "doctor_name": next_appointment_doctor,
+                "doctor_public_id": next_appointment_doctor_public_id
             },
             "birth_date": birth_date,
             "age": age
         }
-    
+
     def get(self, request):
         today = timezone.now().date()
 
-        # 1. Calculate aggregate stats (1 DB query)
+        # 1. Aggregate global stats across all appointments
         stats = Patient.objects.annotate(
             first_appointment=Min("appointments__scheduled_time")
         ).aggregate(
@@ -371,34 +397,77 @@ class ManagePatients(APIView):
                     first_appointment__year=today.year,
                     first_appointment__month=today.month
                 )
-            )
+            ),
+            total_appointments=Count("appointments__id"),
+            completed_appointments=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.COMPLETED)
+            ),
+            confirmed_appointments=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.CONFIRMED)
+            ),
+            cancelled_appointments=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.CANCELLED)
+            ),
         )
 
-        # 2. Fetch patients with their single latest appointment prefetched (2 DB queries)
-        latest_appointments = Appointment.objects.order_by('-scheduled_time').select_related("doctor__user")
+        # 2. Querysets for prefetching single appointments
+        latest_appointments = Appointment.objects.filter(
+            status=Appointment.Status.COMPLETED
+        ).order_by('-scheduled_time').select_related("doctor__user")
 
-        patients = Patient.objects.select_related('user').prefetch_related(
+        next_appointments = Appointment.objects.filter(
+            status=Appointment.Status.CONFIRMED,
+            scheduled_time__gte=timezone.now()
+        ).order_by('scheduled_time').select_related("doctor__user")
+
+        # 3. Fetch patients with conditional annotations per patient and prefetches
+        patients = Patient.objects.select_related('user').annotate(
+            total_appointments_count=Count("appointments__id"),
+            completed_appointments_count=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.COMPLETED)
+            ),
+            confirmed_appointments_count=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.CONFIRMED)
+            ),
+            cancelled_appointments_count=Count(
+                "appointments__id",
+                filter=Q(appointments__status=Appointment.Status.CANCELLED)
+            ),
+        ).prefetch_related(
             Prefetch(
                 'appointments',
                 queryset=latest_appointments,
                 to_attr='latest_appointments_list'
+            ),
+            Prefetch(
+                'appointments',
+                queryset=next_appointments,
+                to_attr='next_appointments_list'
             )
         )
 
-        # 3. Build the summarized patient list
+        # 4. Build summarized list
         patient_summaries = []
         for patient in patients:
             last_appt = patient.latest_appointments_list[0] if patient.latest_appointments_list else None
-            patient_summaries.append(self.patient_summary(patient, last_appt))
+            next_appt = patient.next_appointments_list[0] if patient.next_appointments_list else None
 
-        # 4. Construct final payload
+            patient_summaries.append(
+                self.patient_summary(patient, last_appt, next_appt)
+            )
+
+        # 5. Final payload
         response_data = {
             "stats": stats,
             "patients": patient_summaries
         }
 
         return Response(response_data)
-
 
 class DoctorOverView(RetrieveUpdateAPIView):
     permission_classes = [IsManager]

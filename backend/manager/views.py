@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Count, Q, F, Prefetch
 from django.contrib.auth import get_user_model
-from django.db.models import Min
+from django.db.models import Subquery, OuterRef, Min
 import uuid
 from django.shortcuts import get_object_or_404
 
@@ -100,18 +100,52 @@ class ManagerDashboard(APIView):
                 for log in logs
             ],
         }, status=200)
+    
 
 class ManageDoctors(APIView):
     permission_classes = [IsManager]
 
-    def doctor_summary(self, doctor, stats_by_doctor=None):
+    def doctor_summary(
+        self,
+        doctor,
+        today_stats_by_doctor=None,
+        total_stats_by_doctor=None,
+        next_appt_by_doctor=None,
+    ):
         if not doctor or not doctor.user:
             return None
 
         start = doctor.start_time
         end = doctor.end_time
 
-        # 1. Guard against incomplete profiles or missing schedule
+        today_counts = (today_stats_by_doctor or {}).get(doctor.id, {})
+        total_counts = (total_stats_by_doctor or {}).get(doctor.id, {})
+
+        appointment_counts = {
+            "total": total_counts.get("total", 0),
+            "completed": total_counts.get("completed", 0),
+            "confirmed": total_counts.get("confirmed", 0),
+            "pending": total_counts.get("pending", 0),
+            "cancelled": total_counts.get("cancelled", 0),
+        }
+
+        # Next appointment for this doctor
+        next_appt = (next_appt_by_doctor or {}).get(doctor.id)
+        next_appointment = None
+        if next_appt:
+            next_appointment = {
+                "public_id": str(next_appt.public_id),
+                "scheduled_time": next_appt.scheduled_time,
+                "appointment_type": next_appt.appointment_type,
+                "patient": {
+                    "public_id": str(next_appt.patient.user.public_id),
+                    "name": next_appt.patient.user.get_full_name(),
+                }
+                if next_appt.patient and next_appt.patient.user
+                else None,
+            }
+
+        # Guard against incomplete profiles or missing schedule
         if not start or not end:
             return {
                 "doctor": {
@@ -122,9 +156,11 @@ class ManageDoctors(APIView):
                 "schedule": {"start_time": None, "end_time": None},
                 "capacity": 0,
                 "status": "Not exist",
+                "appointment_counts": appointment_counts,
+                "next_appointment": next_appointment,
             }
 
-        # 2. Evaluate active status
+        # Evaluate active status
         now = timezone.localtime(timezone.now()).time()
         if start <= end:
             is_active = start <= now <= end
@@ -133,7 +169,7 @@ class ManageDoctors(APIView):
 
         status = "Active" if is_active else "On Leave"
 
-        # 3. Calculate shift duration (handles overnight shifts)
+        # Calculate shift duration
         dummy_date = datetime.today().date()
         start_shift = datetime.combine(dummy_date, start)
         end_shift = datetime.combine(dummy_date, end)
@@ -143,21 +179,16 @@ class ManageDoctors(APIView):
 
         doctor_shift_minutes = (end_shift - start_shift).total_seconds() / 60
 
-        # 4. Fetch pre-calculated appointment counts (O(1) memory lookup)
-        counts = (stats_by_doctor or {}).get(
-            doctor.id, {"follow_up": 0, "checkups": 0, "consultations": 0}
-        )
-
+        # Calculate capacity using TODAY's appointment durations
         total_booked_minutes = (
-            (counts.get("follow_up", 0) * (doctor.follow_up_duration or 0))
-            + (counts.get("checkups", 0) * (doctor.checkup_duration or 0))
+            (today_counts.get("follow_up", 0) * (doctor.follow_up_duration or 0))
+            + (today_counts.get("checkups", 0) * (doctor.checkup_duration or 0))
             + (
-                counts.get("consultations", 0)
+                today_counts.get("consultations", 0)
                 * (doctor.consultation_duration or 0)
             )
         )
 
-        # 5. Safe capacity calculation
         if doctor_shift_minutes > 0 and total_booked_minutes > 0:
             capacity = round((total_booked_minutes / doctor_shift_minutes) * 100)
         else:
@@ -172,52 +203,124 @@ class ManageDoctors(APIView):
             "schedule": {"start_time": start, "end_time": end},
             "capacity": capacity,
             "status": status,
+            "appointment_counts": appointment_counts,
+            "next_appointment": next_appointment,
         }
 
     def get(self, request):
         now_time = timezone.localtime(timezone.now()).time()
+        now = timezone.now()
         today = timezone.localdate()
 
         doctors = Doctor.objects.filter(
             user__status=User.Status.ACTIVE
         ).select_related("user")
 
-        # Aggregate appointments per doctor in 1 database query
-        appointment_stats = (
-            Appointment.objects.filter(
-                scheduled_time__date=today,
-                status__in=[
-                    Appointment.Status.COMPLETED,
-                    Appointment.Status.CONFIRMED,
-                    Appointment.Status.PENDING,
-                ],
-            )
+        # --- Today's stats (for capacity calculation) ---
+        today_appointment_stats = (
+            Appointment.objects.filter(scheduled_time__date=today)
             .values("doctor_id")
             .annotate(
                 follow_up=Count(
                     "id",
                     filter=Q(
-                        appointment_type=Appointment.AppointmentType.FOLLOW_UP
+                        appointment_type=Appointment.AppointmentType.FOLLOW_UP,
+                        status__in=[
+                            Appointment.Status.COMPLETED,
+                            Appointment.Status.CONFIRMED,
+                            Appointment.Status.PENDING,
+                        ],
                     ),
                 ),
                 checkups=Count(
                     "id",
                     filter=Q(
-                        appointment_type=Appointment.AppointmentType.CHECKUP
+                        appointment_type=Appointment.AppointmentType.CHECKUP,
+                        status__in=[
+                            Appointment.Status.COMPLETED,
+                            Appointment.Status.CONFIRMED,
+                            Appointment.Status.PENDING,
+                        ],
                     ),
                 ),
                 consultations=Count(
                     "id",
                     filter=Q(
-                        appointment_type=Appointment.AppointmentType.CONSULTATION
+                        appointment_type=Appointment.AppointmentType.CONSULTATION,
+                        status__in=[
+                            Appointment.Status.COMPLETED,
+                            Appointment.Status.CONFIRMED,
+                            Appointment.Status.PENDING,
+                        ],
                     ),
                 ),
             )
         )
-
-        stats_by_doctor = {
-            stat["doctor_id"]: stat for stat in appointment_stats
+        today_stats_by_doctor = {
+            stat["doctor_id"]: stat for stat in today_appointment_stats
         }
+
+        # --- All-time stats (for appointment_counts totals) ---
+        total_appointment_stats = (
+            Appointment.objects.values("doctor_id")
+            .annotate(
+                total=Count("id"),
+                completed=Count("id", filter=Q(status=Appointment.Status.COMPLETED)),
+                confirmed=Count("id", filter=Q(status=Appointment.Status.CONFIRMED)),
+                pending=Count("id", filter=Q(status=Appointment.Status.PENDING)),
+                cancelled=Count("id", filter=Q(status=Appointment.Status.CANCELLED)),
+            )
+        )
+        total_stats_by_doctor = {
+            stat["doctor_id"]: stat for stat in total_appointment_stats
+        }
+
+        # --- Next upcoming appointment per doctor ---
+        # Step 1: find the earliest future scheduled_time per doctor
+        next_times = (
+            Appointment.objects.filter(
+                doctor_id=OuterRef("doctor_id"),
+                scheduled_time__gte=now,
+                status__in=[
+                    Appointment.Status.PENDING,
+                    Appointment.Status.CONFIRMED,
+                ],
+            )
+            .order_by("scheduled_time")
+            .values("scheduled_time")[:1]
+        )
+
+        next_appt_ids = (
+            Appointment.objects.filter(
+                scheduled_time__gte=now,
+                status__in=[
+                    Appointment.Status.PENDING,
+                    Appointment.Status.CONFIRMED,
+                ],
+            )
+            .values("doctor_id")
+            .annotate(next_time=Min("scheduled_time"))
+        )
+
+        # Map doctor_id -> next_time, then fetch matching appointments in one query
+        next_time_by_doctor = {
+            row["doctor_id"]: row["next_time"] for row in next_appt_ids
+        }
+
+        next_appointments = Appointment.objects.filter(
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+            scheduled_time__in=next_time_by_doctor.values(),
+        ).select_related("patient__user")
+
+        next_appt_by_doctor = {}
+        for appt in next_appointments:
+            # Only keep it if it matches that doctor's actual next_time
+            # (guards against two doctors sharing the same scheduled_time)
+            if next_time_by_doctor.get(appt.doctor_id) == appt.scheduled_time:
+                next_appt_by_doctor[appt.doctor_id] = appt
 
         # Global doctor counts
         stats = doctors.aggregate(
@@ -234,25 +337,29 @@ class ManageDoctors(APIView):
             stats["total_doctors"] - stats["active_doctors"]
         )
 
-        # Build individual doctor summaries with pre-fetched stats
+        # Build doctor summaries with their specific appointment counts
         summaries = [
-            self.doctor_summary(doc, stats_by_doctor) for doc in doctors
+            self.doctor_summary(
+                doc,
+                today_stats_by_doctor,
+                total_stats_by_doctor,
+                next_appt_by_doctor,
+            )
+            for doc in doctors
         ]
         stats["doctors"] = summaries
 
-        # Safe average clinic capacity calculation
+        # Average clinic capacity calculation (based on today's utilization)
         valid_capacities = [
             doc["capacity"] for doc in summaries if doc and "capacity" in doc
         ]
-        if valid_capacities:
-            stats["capacity"] = round(
-                sum(valid_capacities) / len(valid_capacities)
-            )
-        else:
-            stats["capacity"] = 0
+        stats["capacity"] = (
+            round(sum(valid_capacities) / len(valid_capacities))
+            if valid_capacities
+            else 0
+        )
 
         return Response(stats)
-    
 
 class ManageAppointments(APIView):
     permission_classes = [IsManager]

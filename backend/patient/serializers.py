@@ -63,3 +63,20 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class PatientPublicSerializer(serializers.ModelSerializer):
+    
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    
+    class Meta:
+        model = Patient
+        fields = [
+            'personal_id', 
+            'first_name', 
+            'last_name', 
+            'birth_date',
+            'gender',
+            'phone_number',
+            'blood_type',
+        ]

@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
@@ -121,3 +121,6 @@ class PatientDashboard(APIView):
         stats["next_appointment"] = self.appointment_summary(next_appointment)
 
         return Response(stats)
+
+# class patientPublicView(RetrieveAPIView):
+#     serializer_class = 

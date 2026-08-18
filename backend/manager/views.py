@@ -312,7 +312,7 @@ class ManageAppointments(APIView):
 class ManagePatients(APIView):
     permission_classes = [IsManager]
 
-    def patient_summary(self, patient, appointment):
+    def patient_summary(self, patient, last_appointment, next_appointment):
         today = timezone.now().date()
 
         if patient and getattr(patient, 'user', None):
@@ -325,12 +325,13 @@ class ManagePatients(APIView):
             patient_public_id = None
             patient_name = "Unknown"
 
-        if appointment:
-            appointment_public_id = str(appointment.public_id)
-            appointment_date = appointment.scheduled_time
+        if last_appointment:
+            last_appointment_public_id = str(last_appointment.public_id)
+            last_appointment_date = last_appointment.scheduled_time
+            last_appointment_doctor = last_appointment.doctor.user.get_full_name()
         else:
-            appointment_public_id = None
-            appointment_date = None
+            last_appointment_public_id = None
+            last_appointment_date = None
 
         # Safe attributes extraction
         phone_number = getattr(patient, 'phone_number', None)
@@ -374,7 +375,7 @@ class ManagePatients(APIView):
         )
 
         # 2. Fetch patients with their single latest appointment prefetched (2 DB queries)
-        latest_appointments = Appointment.objects.order_by('-scheduled_time')
+        latest_appointments = Appointment.objects.order_by('-scheduled_time').select_related("doctor__user")
 
         patients = Patient.objects.select_related('user').prefetch_related(
             Prefetch(
@@ -410,4 +411,3 @@ class DoctorOverView(RetrieveUpdateAPIView):
             Doctor.objects.select_related("user"),
             user__public_id=public_id,
         )
-

@@ -481,7 +481,7 @@ class ManagePatients(APIView):
             "patient": {
                 "public_id": patient_public_id,
                 "name": patient_name,
-
+                'profile_picture': profile_picture
             },
             "phone": phone_number,
             "appointment_counts": {

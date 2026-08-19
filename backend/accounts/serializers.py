@@ -17,6 +17,7 @@ class StaffCreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "profile_picture",
             "username",
             "email",
             "first_name",
@@ -83,6 +84,7 @@ class PersonalInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "profile_picture",
             "username",
             "email",
             "first_name",

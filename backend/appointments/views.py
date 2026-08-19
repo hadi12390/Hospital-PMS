@@ -10,6 +10,8 @@ from rest_framework.generics import(
     ListAPIView,
     UpdateAPIView
 )
+from django.contrib.auth import get_user_model
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -20,6 +22,7 @@ from logs.models import ActivityLog
 from notifications.models import Notification
 from .models import Appointment
 from doctor.models import Doctor
+from patient.models import Patient
 from .serializers import (
     BaseAppointmentSerializer,
     DoctorAppointmentSerializer,
@@ -29,6 +32,8 @@ from .serializers import (
     DoctorPendingAppointmentSerializer,
     PatientCancelAppointment,
 )
+
+User = get_user_model()
 
 class ManagerListCreateAppointment(ListCreateAPIView):
     queryset = Appointment.objects.select_related("patient__user", "doctor__user").all()
@@ -232,14 +237,15 @@ class PendingAppointmentsView(ListAPIView):
         )
 
 class AvailableTimesView(APIView):
-    permission_classes = [IsAuthenticated, IsPatient]
+    permission_classes = [IsAuthenticated, IsPatient | IsManager]
 
     def get(self, request):
         # 1) Get the info from the request
         date_str = request.query_params.get("date")
         doctor_public_id = request.query_params.get("doctor")
         appointment_type = request.query_params.get("type")
-        
+        patient_public_id = request.query_params.get("patient")
+
         #  1.1) check the date
         if date_str:
             selected_date = parse_date(date_str)
@@ -283,6 +289,27 @@ class AvailableTimesView(APIView):
         else:
             return Response({"detail": "appointment type is required."}, status=400)
 
+        # 1.4) check the patient (if exist)
+        if request.user.role == User.Role.PATIENT:
+            patient = getattr(request.user, "patient", None)
+            if patient is None:
+                return Response({"detail": "No patient profile found for this account."}, status=404)
+
+        elif request.user.role == User.Role.MANAGER:
+            if not patient_public_id:
+                return Response({"detail": "Patient is required."}, status=400)
+            try:
+                uuid.UUID(patient_public_id)
+            except (ValueError, TypeError):
+                return Response({"detail": "Invalid patient id."}, status=400)
+
+            patient = Patient.objects.filter(user__public_id=patient_public_id).first()
+            if patient is None:
+                return Response({"detail": "Patient not found."}, status=404)
+
+        else:
+            return Response({"detail": "Unauthorized role."}, status=403)
+            
         # 2) Find the duration
         if appointment_type == Appointment.AppointmentType.CONSULTATION:
             duration = doctor.consultation_duration
@@ -335,7 +362,6 @@ class AvailableTimesView(APIView):
         available_times = future_times
 
         # 8) Mark the times that will conflict with the patient appointments
-        patient = request.user.patient
         patient_appointments = Appointment.objects.filter(
             patient=patient,
             scheduled_time__gte=day_start,

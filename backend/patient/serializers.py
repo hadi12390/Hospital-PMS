@@ -68,10 +68,12 @@ class PatientPublicSerializer(serializers.ModelSerializer):
     
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
-    
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = Patient
         fields = [
+            'profile_picture',
             'personal_id', 
             'first_name', 
             'last_name', 
@@ -81,9 +83,18 @@ class PatientPublicSerializer(serializers.ModelSerializer):
             'blood_type',
         ]
         read_only_fields = [
+            'profile_picture',
             'personal_id', 
             'birth_date',
             'gender',
             'phone_number',
             'blood_type',
         ]
+        
+    def get_profile_picture(self, obj):
+        if not obj.user.profile_picture:
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.user.profile_picture.url)
+        return obj.user.profile_picture.url

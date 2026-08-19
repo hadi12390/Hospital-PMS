@@ -23,7 +23,11 @@ class AddDoctorSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data["user"] = {
             "public_id": instance.user.public_id,
-            "name": instance.user.get_full_name()
+            "name": instance.user.get_full_name(),
+            "profile_picture": (
+                self.context['request'].buildw_absolute_uri(instance.user.profile_picture.url)
+                if instance.user.profile_picture else None
+            ),
         }
         return data
 
@@ -36,6 +40,7 @@ class DoctorOverviewSerializer(serializers.ModelSerializer):
         source="user.email",
         read_only=True,
     )
+    profile_picture = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
 
     class Meta:
@@ -43,6 +48,7 @@ class DoctorOverviewSerializer(serializers.ModelSerializer):
         fields = [
             "name",
             "email",
+            "profile_picture",
             "specialty",
             "phone_number",
             "start_time",
@@ -52,6 +58,14 @@ class DoctorOverviewSerializer(serializers.ModelSerializer):
             "checkup_duration",
             "status",
         ]
+
+    def get_profile_picture(self, obj):
+        if not obj.user.profile_picture:
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.user.profile_picture.url)
+        return obj.user.profile_picture.url
 
     def get_status(self, obj):
         now_time = timezone.localtime().time()

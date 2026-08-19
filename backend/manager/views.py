@@ -198,6 +198,10 @@ class ManageDoctors(APIView):
             "doctor": {
                 "public_id": str(doctor.user.public_id),
                 "name": doctor.user.get_full_name(),
+                'profile_picture': (
+                    self.context['request'].build_absolute_uri(doctor.user.profile_picture.url)
+                    if doctor.user.profile_picture else None
+                ),
             },
             "specialty": doctor.specialty,
             "schedule": {"start_time": start, "end_time": end},
@@ -429,9 +433,17 @@ class ManagePatients(APIView):
         if patient and getattr(patient, 'user', None):
             patient_public_id = str(patient.user.public_id)
             patient_name = patient.user.get_full_name()
+            profile_picture = (
+                self.context['request'].build_absolute_uri(patient.user.profile_picture.url)
+                if patient.user.profile_picture else None
+            ),
         elif patient:
             patient_public_id = "User Is guest."
             patient_name = patient.get_full_name()
+            profile_picture = (
+                self.context['request'].build_absolute_uri(patient.user.profile_picture.url)
+                if patient.user.profile_picture else None
+            ),
         else:
             patient_public_id = None
             patient_name = "Unknown"
@@ -468,7 +480,8 @@ class ManagePatients(APIView):
         return {
             "patient": {
                 "public_id": patient_public_id,
-                "name": patient_name
+                "name": patient_name,
+
             },
             "phone": phone_number,
             "appointment_counts": {

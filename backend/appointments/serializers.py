@@ -144,6 +144,10 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 else None
             ),
             "name": self.get_full_name(person),
+            'profile_picture': (
+                self.context['request'].build_absolute_uri(person.user.profile_picture.url)
+                if person.user.profile_picture else None
+            ),
         }
 
 
@@ -315,7 +319,7 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
 
         data = super().to_representation(instance)
 
-        data["doctor"] = self.get_person_repr(
+        data["doctor"] = self.get_person_reprget_person_repr(
             instance.doctor
         )
 

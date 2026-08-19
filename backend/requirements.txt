@@ -44,3 +44,4 @@ starlette-testclient==0.4.1
 typing_extensions==4.16.0
 urllib3==2.7.0
 Werkzeug==3.1.8
+pillow==12.3.0

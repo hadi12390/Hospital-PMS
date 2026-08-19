@@ -1,8 +1,12 @@
 from rest_framework import serializers
 from doctor.models import Doctor
 from django.utils import timezone
+from accounts.models import User  
 
 class AddDoctorSerializer(serializers.ModelSerializer):
+
+    user = serializers.UUIDField(write_only=True)
+
     class Meta:
         model = Doctor
         fields = [
@@ -25,11 +29,17 @@ class AddDoctorSerializer(serializers.ModelSerializer):
             "public_id": instance.user.public_id,
             "name": instance.user.get_full_name(),
             "profile_picture": (
-                self.context['request'].buildw_absolute_uri(instance.user.profile_picture.url)
+                self.context['request'].build_absolute_uri(instance.user.profile_picture.url)
                 if instance.user.profile_picture else None
             ),
         }
         return data
+
+    def validate_user(self, value):
+        try:
+            return User.objects.get(public_id=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found.")
 
 class DoctorOverviewSerializer(serializers.ModelSerializer):
     name = serializers.CharField(

@@ -149,6 +149,21 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 if person.user.profile_picture else None
             ),
         }
+    
+    patient = serializers.UUIDField(write_only=True)
+    doctor = serializers.UUIDField(write_only=True)
+
+    def validate_patient(self, value):
+        try:
+            return Patient.objects.get(user__public_id=value)
+        except Patient.DoesNotExist:
+            raise serializers.ValidationError("Patient not found.")
+        
+    def validate_doctor(self, value):
+        try:
+            return Doctor.objects.get(user__public_id=value)
+        except Patient.DoesNotExist:
+            raise serializers.ValidationError("Patient not found.")
 
 
 # =========================
@@ -178,7 +193,8 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
         data["doctor"] = self.get_person_repr(instance.doctor)
         data["patient"] = self.get_person_repr(instance.patient)
         return data
-
+    
+            
 
 
 

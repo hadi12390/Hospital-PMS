@@ -16,5 +16,5 @@ urlpatterns = [
     path('', ViewAllDoctors.as_view(), name="view-all-doctors"),
     path('patients/', DoctorPatients.as_view(), name="view-all-patients"),
     path('appointments/', DoctorAppointments.as_view(), name="appointments"),
-    path('today-schedule/', TodaySchedule.as_view(), name="today-schedule")
+    path('today-schedule', TodaySchedule.as_view(), name="today-schedule")
 ]

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django
+db.sqlite3
+*.log
+
+# Environment
+.venv/
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Media (if you don't want user uploads in Git)
+media/
+
+__pycache__/
+*.py[cod]
+.venv/
+db.sqlite3
+.DS_Store

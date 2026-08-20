@@ -1,113 +1,176 @@
 import styles from "./Dashboard.module.css";
-import { useRef, useState ,useMemo } from "react"
-import RevenueOverview from './RevenueOverview/RevenueOverview';
+import { useRef, useState, useEffect } from "react";
 import Sidebar from './Sidebar';
 
+const ISSUE_CATEGORIES = [
+  "Appointment",
+  "Payment",
+  "Patient",
+  "Technical Issue",
+  "Other",
+];
+
+/* ==========================================================================
+   AutoGrowTextarea
+   ========================================================================== */
+
+function AutoGrowTextarea({ value, onChange, placeholder }) {
+  const textareaRef = useRef(null);
+
+  const resize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    resize();
+  }, [value]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      className={styles.helpInput}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      rows={1}
+    />
+  );
+}
+
+/* ==========================================================================
+   Step 1 — Issue form
+   ========================================================================== */
+
+function IssueForm({ selectedCategory, onSelectCategory, subject, onSubjectChange, description, onDescriptionChange, onConfirm }) {
+  return (
+    <div className={styles.helpStep}>
+      <div className={styles.helpSection}>
+        <h2 className={styles.helpLabel}>Issue Category</h2>
+
+        <div className={styles.categoryRow}>
+          {ISSUE_CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`${styles.categoryPill} ${
+                selectedCategory === cat ? styles.categoryPillSelected : styles.categoryPillUnselected
+              }`}
+              onClick={() => onSelectCategory(cat)}
+            >
+              <span className={`${styles.categoryPillBg} ${styles.categoryPillBgUnselected}`} />
+              <span className={`${styles.categoryPillBg} ${styles.categoryPillBgSelected}`} />
+              <span className={styles.categoryPillLabel}>{cat}</span>
+            </button>
+          ))}
+        </div>
+
+        <h2 className={styles.helpLabel}>Subject</h2>
+        <AutoGrowTextarea
+          value={subject}
+          onChange={onSubjectChange}
+          placeholder="example: Patient record not syncing..."
+        />
+
+        <h2 className={styles.helpLabel}>Describe Your Issue</h2>
+        <AutoGrowTextarea
+          value={description}
+          onChange={onDescriptionChange}
+          placeholder="Describe Here..."
+        />
+      </div>
+
+      <div className={styles.confirmButtonWrap}>
+        <button
+          type="button"
+          className={styles.confirmButton}
+          disabled={!selectedCategory}
+          onClick={onConfirm}
+        >
+          Confirmed
+          <span className={styles.confirmIconCircle}>
+            <img src="/assest/doctor/cards/check.svg" alt="" className={styles.confirmIcon} />
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ==========================================================================
+   Step 2 — Confirmation
+   ========================================================================== */
+
+function ReportSentConfirmation({ category, submittedDay, submittedTime, onBackHome }) {
+  return (
+    <div className={styles.helpStep}>
+      <div className={styles.confirmationCard}>
+        <h2 className={styles.confirmationTitle}>Your report have been sent</h2>
+
+        <div className={styles.confirmationBody}>
+          <div className={styles.confirmationInfo}>
+            <p className={styles.confirmationCategory}>{category}</p>
+            <div className={styles.confirmationDateTime}>
+              <p>{submittedDay}</p>
+              <p>{submittedTime}</p>
+            </div>
+          </div>
+
+          <div className={styles.confirmationCheckCircle}>
+            <img src="/assest/doctor/cards/check-white.svg" alt="" className={styles.confirmationCheckIcon} />
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.backHomeButtonWrap}>
+        <button type="button" className={styles.backHomeButton} onClick={onBackHome}>
+          Back to Dashboard
+          <span className={styles.backHomeIconCircle}>
+            <img src="/assest/doctor/cards/home.svg" alt="" className={styles.backHomeIcon} />
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ==========================================================================
+   Help — page
+   ========================================================================== */
 
 function Help() {
-  // ---------- Date helpers ----------
-  function getCurrentDate() {
-    const date = new Date();
-    return `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
-  }
-
-  function getFormattedDate() {
-    const date = new Date();
-
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const dayName = days[date.getDay()];
-    const dayNumber = date.getDate();
-    const month = months[date.getMonth()];
-
-    function getSuffix(day) {
-      if (day > 3 && day < 21) return "th";
-
-      switch (day % 10) {
-        case 1:
-          return "st";
-        case 2:
-          return "nd";
-        case 3:
-          return "rd";
-        default:
-          return "th";
-      }
-    }
-
-    return {
-      dayName,
-      dayNumber,
-      suffix: getSuffix(dayNumber),
-      month,
-    };
-  }
-
-  function handleDateChange(e) {
-    const value = e.target.value;
-
-    if (!value) {
-      setCurrentDate("");
-      return;
-    }
-
-    const [year, month, day] = value.split("-");
-    setCurrentDate(`${day} / ${month} / ${year}`);
-  }
-
-  function formatTime(time) {
-    let [hour, minute] = time.split(":").map(Number);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-
-    return `${hour}:${String(minute).padStart(2, "0")} ${period}`;
-  }
-
-  // ---------- State ----------
-  const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [showMenu, setShowMenu] = useState(false);
-  const [activeNav, setActiveNav] = useState("dashboard");
-  const dateInput = useRef();
+  const [activeNav, setActiveNav] = useState("help");
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [step, setStep] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [submittedAt, setSubmittedAt] = useState(null);
 
-  const [pickedDate, setPickedDate] = useState("");
+  const handleConfirm = () => {
+    if (!selectedCategory) return;
 
-  function handleDateChange(e) {
-    const value = e.target.value; // "YYYY-MM-DD"
-    if (!value) {
-      setPickedDate("");
-      return;
-    }
-    const [year, month, day] = value.split("-");
-    setPickedDate(`${day} / ${month} / ${year}`);
-    if (onDateChange) onDateChange(value);
-  }
+    const now = new Date();
+    setSubmittedAt({
+      day: now.toLocaleDateString(undefined, { weekday: "long" }),
+      time: now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
+    });
 
+    setStep(2);
+  };
 
+  const handleBackHome = () => {
+    setStep(1);
+    setSelectedCategory("");
+    setSubject("");
+    setDescription("");
+    setSubmittedAt(null);
+    setActiveNav("dashboard");
+    // navigate("/doctor/home") — swap in your router call here
+  };
 
   return (
     <div className={styles.DoctorDashboard}>
@@ -134,7 +197,6 @@ function Help() {
               <div className={styles.profilePic}>M</div>
 
               <button
-              
                 className={styles.profBut}
                 onClick={() => setShowMenu(!showMenu)}
               >
@@ -159,7 +221,26 @@ function Help() {
 
         {/* Main Content */}
         <main className={styles.cards}>
-        
+          <div key={step} className={styles.stepFade}>
+            {step === 1 ? (
+              <IssueForm
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+                subject={subject}
+                onSubjectChange={setSubject}
+                description={description}
+                onDescriptionChange={setDescription}
+                onConfirm={handleConfirm}
+              />
+            ) : (
+              <ReportSentConfirmation
+                category={selectedCategory}
+                submittedDay={submittedAt?.day}
+                submittedTime={submittedAt?.time}
+                onBackHome={handleBackHome}
+              />
+            )}
+          </div>
         </main>
       </section>
     </div>

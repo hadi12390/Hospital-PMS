@@ -1,12 +1,12 @@
 import { NavLink } from "react-router-dom";
-import styles from "./Sidebar.module.css";
+import styles from "./sidebar.module.css";
 
 const DEFAULT_MENU_ITEMS = [
   {
     id: "dashboard",
     label: "DashBoard",
     icon: "/assest/doctor/sidebar/col-right-svgrepo-com 1.svg",
-    to: "/admin/dashboard", // ASSUMPTION: adjust if your dashboard route differs
+    to: "/admin/dashboard", 
   },
   {
     id: "doctors",
@@ -16,9 +16,9 @@ const DEFAULT_MENU_ITEMS = [
   },
   {
     id: "patients",
-    label: "Manage Patient",
+    label: "Manage Patients",
     icon: "/assest/doctor/sidebar/dwajdoies.svg",
-    to: "/admin/manage&patient",
+    to: "/admin/manage&patients",
   },
   {
     id: "appointments",

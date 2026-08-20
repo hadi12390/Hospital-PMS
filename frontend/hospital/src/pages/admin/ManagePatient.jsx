@@ -1,7 +1,31 @@
 import styles from "./Dashboard.module.css";
+import layoutStyles from "./ManageDoctors.module.css";
+import mvmodStyles from "./ManagePatient.module.css";
+
+
 import { useRef, useState ,useMemo } from "react"
 import RevenueOverview from './RevenueOverview/RevenueOverview';
 import Sidebar from './Sidebar';
+
+import AddPatientModal from "./AddPatientModal";
+
+import Search from "../../assets/manager/search.svg?react";
+import Person from "../../assets/manager/person.svg?react";
+import ArrowDown from "../../assets/manager/arrowdown.svg?react";
+import Dot from "../../assets/manager/dot.svg?react";
+import Gear from "../../assets/manager/gear.svg?react";
+import Plus from "../../assets/manager/plus.svg?react";
+
+import Save from "../../assets/manager/approvedM.svg?react";
+import Approved from "../../assets/manager/saveM.svg?react";
+import Calender from "../../assets/manager/calenderM.svg?react";
+
+
+
+
+import PatientTable from "./ManagePatient/PatientTable.jsx";
+
+
 
 
 function ManagePatient() {
@@ -89,6 +113,7 @@ function ManagePatient() {
   // ---------- State ----------
   const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [showMenu, setShowMenu] = useState(false);
+  const [showAddPatient, setShowAddPatient] = useState(false);
   const [activeNav, setActiveNav] = useState("dashboard");
   const dateInput = useRef();
 
@@ -107,6 +132,10 @@ function ManagePatient() {
     if (onDateChange) onDateChange(value);
   }
 
+  function handleSavePatient(patientData) {
+    const newPatient = patientData; 
+    console.log("New patient saved:", newPatient);
+  }
 
 
   return (
@@ -119,9 +148,15 @@ function ManagePatient() {
       {/* Right Side */}
       <section className={styles.dashboardContent}>
         {/* Navbar */}
-        <nav className={styles.nav}>
-          <div className={styles.navContent}>
+        <nav className={`${styles.nav} ${layoutStyles.navContent}`}>
+          <div className={layoutStyles.pageanme}>
+            <Gear/>
+            Manage Patients
+          </div>
+          <div className={`${styles.navContent}`}>
+            
             <div className={styles.buttonAddAppoi}>
+              
               <button>
                 <img src="/assest/doctor/cards/Add.svg" alt="Add" />
                 Doctor
@@ -159,7 +194,38 @@ function ManagePatient() {
 
         {/* Main Content */}
         <main className={styles.cards}>
-        
+
+          <div className={layoutStyles.statsRow}>
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>Total Patient</p>
+              <p className={layoutStyles.statValue}>12</p>
+            </div>
+
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>Today</p>
+              <p className={layoutStyles.statValue}>10</p>
+            </div>
+
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>New This Month</p>
+              <p className={layoutStyles.statValue}>4</p>
+            </div>
+
+            <button 
+              onClick={() => setShowAddPatient(true)}
+              className={`${layoutStyles.statCard} ${layoutStyles.but} `}>
+              <Plus/>
+              <p className={layoutStyles.statLabel}>Patient</p>
+            </button>
+          </div>
+
+          <PatientTable/>
+            {showAddPatient && (
+            <AddPatientModal
+              onClose={() => setShowAddPatient(false)}
+              onSave={handleSavePatient}
+            />
+          )}
         </main>
       </section>
     </div>

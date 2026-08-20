@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 
+import NotFound from "../pages/auth/NotFound";
 import Login from "../pages/auth/Login";
 import AdminDashboard from "../pages/admin/Dashboard";
 import DoctorDashboard from "../pages/doctor/Dashboard";
@@ -20,16 +21,16 @@ import ManageDoctors from "../pages/admin/ManageDoctors";
 import ManagePatient from "../pages/admin/ManagePatient";
 import AppointmentAdmin from "../pages/admin/Appointments";
 import SettingsAdmin from "../pages/admin/Settings";
-import HelpAdmin from "../pages/admin/Appointments";
+import HelpAdmin from "../pages/admin/Help.jsx";
+
+import AddUserAdmin from "../pages/admin/AddUser.jsx";
 
 
+import DoctorProfile from "../pages/admin/ManageDoctors/doctorprofile/DoctorProfile.jsx";
+import ManageDoctorAppointments from "../pages/admin/ManageDoctors/doctorprofile/doctorappointments/DoctorAppointments.jsx";
 
-
-
-
-
-
-
+import PatientProfile from "../pages/admin/ManagePatient/patientprofile/PatientProfile.jsx";
+import ManagePatientAppointments from "../pages/admin/ManagePatient/patientprofile/appointmentappointments/Appointments.jsx";
 
 function AppRoutes() {
   return (
@@ -51,11 +52,24 @@ function AppRoutes() {
       <Route path="/patient/notifications" element={<Notification />} />
 
       <Route path="/admin/manage&doctors" element={<ManageDoctors />} />
-      <Route path="/admin/manage&patient" element={<ManagePatient />} />
+      <Route path="/admin/manage&patients" element={<ManagePatient />} />
       <Route path="/admin/appointments" element={<AppointmentAdmin />} />
       <Route path="/admin/settings" element={<SettingsAdmin />} />
       <Route path="/admin/help" element={<HelpAdmin />} />
 
+      <Route path="/admin/manage&doctors/doctor&profile" element={<DoctorProfile />} />
+      <Route path="/admin/manage&doctors/doctor&profile/appointments" element={<ManageDoctorAppointments />} />
+
+      <Route path="/admin/manage&patients/patient&profile" element={<PatientProfile />} />
+
+      <Route path="/admin/manage&patients/patient&profile/appointments" element={<ManagePatientAppointments />} />
+      
+      <Route path="/admin/add&user" element={<AddUserAdmin />} />
+
+
+      <Route path="*" element={<NotFound />} />
+
+      
 
     </Routes>
   );

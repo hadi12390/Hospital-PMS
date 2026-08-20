@@ -7,6 +7,165 @@
    somewhere on any page that renders <Sidebar />.
    ========================================================================== */
 
+
+.sideBar {
+
+    width: 250px;
+    min-height: 100vh;
+
+    flex-shrink: 0;
+
+    padding: 1.5em 0;
+
+    background: linear-gradient(
+        to bottom,
+        #000000,
+        #3F3F3F
+    );
+
+    border-top-right-radius: 2em;
+    border-bottom-right-radius: 2em;
+
+    overflow-y: auto;
+}
+
+/* NOTE: kept as a separate rule exactly as in the original file (not merged
+   with the .sideBar block above) so behavior/order stays unchanged. */
+.sideBar{
+
+    position: absolute;
+
+ 
+}
+
+.back{
+    width: 250px;
+    height: 50px;
+    background: rgba(255,255,255,.65);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid rgba(0,0,0,.06);
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.04);
+    position: relative;
+}
+
+/* ---- Sidebar text ---- */
+
+.optName {
+    text-align: start;
+
+    color: #D0D0D0;
+
+    font-size: 1rem;
+
+    margin: 1.5em 0 2em 15px;
+
+    font-family: "ExtraLightGEO";
+}
+
+/* ---- Sidebar buttons ---- */
+
+.optionsContainer {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.options {
+
+    position: relative;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    border: none;
+
+    width: 100%;
+
+
+    display: flex;
+
+    justify-content: flex-start;
+    align-items: center;
+
+
+    gap: 10px;
+
+
+    padding: 12px 20px;
+
+
+    color: #E4E4E4;
+
+    font-size: 1.1rem;
+
+
+    background: transparent;
+
+
+    border-left: 3px solid transparent;
+
+
+    transition: border-color .3s ease;
+}
+
+.options::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+
+    background: linear-gradient(
+        90deg,
+        #000000,
+        #3F3F3F
+    );
+
+
+    transform: translateX(-100%);
+
+
+    transition: transform .4s ease;
+
+
+    z-index: 0;
+}
+
+.options img,
+.options span {
+
+    position: relative;
+
+    z-index: 1;
+}
+
+.options:hover {
+
+    border-left-color: white;
+
+}
+
+.options:hover::before {
+
+    transform: translateX(0);
+
+}
+
+.otherMenu {
+
+    margin-bottom: 1em;
+
+}
+
+
 .sideBar {
     width: 250px;
     min-height: 100vh;
@@ -17,8 +176,8 @@
 
     background: linear-gradient(
         to bottom,
-        #0F172A,
-        #3F3F3F
+        #000000,
+        #202020
     );
 
     border-top-right-radius: 2em;
@@ -92,8 +251,8 @@
 
     background: linear-gradient(
         90deg,
-        #0F172A,
-        #3F3F3F
+        #000000,
+        #202020
     );
 
     transform: translateX(-100%);
@@ -133,3 +292,4 @@
 .active::before {
     transform: translateX(0);
 }
+

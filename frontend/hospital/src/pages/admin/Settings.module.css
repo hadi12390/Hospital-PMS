@@ -1,0 +1,251 @@
+.heroName h1 {
+  font-family: "GeologicaBold";
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  color: #4d4d4d;
+
+  text-align: start;
+}
+
+.SetSecOne {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  margin-top: 1.5em;
+  width: 100%;
+  max-width: 500px;
+
+  min-height: 70vh;
+}
+
+/* ---- Avatar ---- */
+
+.avatarWrap {
+  position: relative;
+  width: fit-content;
+}
+
+.devOne {
+  width: 7em;
+  height: 7em;
+  border-radius: 1.4em;
+
+  background: linear-gradient(60deg, #000000, #373737);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.devTwo {
+  font-family: "GeologicaBold";
+  font-size: 2.6rem;
+  color: #5c5c5c;
+}
+
+.devThree {
+  position: absolute;
+  bottom: -.5em;
+  right: -.5em;
+
+  width: 2.4em;
+  height: 2.4em;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  background: linear-gradient(60deg, #000000, #373737);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .25);
+
+  transition: transform .15s ease;
+}
+
+.devThree:hover {
+  transform: scale(1.08);
+}
+
+.devThree svg {
+  width: 50%;
+  height: 50%;
+  color: white;
+}
+
+/* ---- Editable field rows ---- */
+
+.fieldsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+
+.fieldRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .5em;
+
+  padding: 1em 1.4em;
+  border-radius: 999px;
+
+  background: linear-gradient(60deg, #C7C7C7, #B4B4B4);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, .3);
+}
+
+.fieldLabel {
+  font-family: "GeologicaBold";
+  font-size: 1.1rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.fieldValue {
+  font-family: "RegularGEO";
+  font-size: 1.1rem;
+  color: white;
+  flex: 1;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  text-align: start;
+}
+
+.fieldInput {
+  flex: 1;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-family: "RegularGEO";
+  font-size: 1.1rem;
+  color: white;
+
+}
+
+.fieldInput::placeholder {
+  color: rgba(255, 255, 255, .7);
+}
+
+.fieldEditBtn {
+  flex-shrink: 0;
+
+  width: 2em;
+  height: 2em;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+
+  transition: background .2s ease, transform .15s ease;
+}
+
+.fieldEditBtn:hover {
+  background: rgba(255, 255, 255, .25);
+  transform: scale(1.05);
+}
+
+.fieldEditBtn svg {
+  width: 60%;
+  height: 60%;
+  color: white;
+}
+
+/* ---- Save button ---- */
+
+.saveButton {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: .8em;
+
+  margin-top: .5em;
+
+  border: none;
+  cursor: pointer;
+
+  padding: .9em 1.6em;
+  border-radius: 999px;
+
+  background: linear-gradient(60deg, #000000, #373737);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: 1.1rem;
+
+  transition: transform .15s ease;
+}
+
+.saveButton:hover {
+  transform: translateY(-1px);
+}
+
+.saveButton:active {
+  transform: scale(0.97);
+}
+
+.saveIcon {
+  width: 1.2em;
+  height: 1.2em;
+  color: white;
+}
+.settingsPage {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5em;
+  width: 100%;
+}
+
+/* ---- Load-in animation ---- */
+
+.fadeUp {
+  opacity: 0;
+  animation: settingsFadeUp .5s cubic-bezier(.16, 1, .3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes settingsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fadeUp {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ---- Password error ---- */
+
+.fieldError {
+  color: #b3261e;
+  font-family: "RegularGEO";
+  font-size: .9rem;
+  margin-top: -.4em;
+}
+
+/* ---- Eye toggle icon sizing (reuses .fieldEditBtn) ---- */
+
+.fieldEditBtn svg {
+  width: 55%;
+  height: 55%;
+}

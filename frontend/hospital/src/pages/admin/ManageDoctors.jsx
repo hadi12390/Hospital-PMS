@@ -1,7 +1,20 @@
 import styles from "./Dashboard.module.css";
+import layoutStyles from "./ManageDoctors.module.css";
+
 import { useRef, useState ,useMemo } from "react"
 import RevenueOverview from './RevenueOverview/RevenueOverview';
 import Sidebar from './Sidebar';
+
+import Search from "../../assets/manager/search.svg?react";
+import Person from "../../assets/manager/person.svg?react";
+import ArrowDown from "../../assets/manager/arrowdown.svg?react";
+import Dot from "../../assets/manager/dot.svg?react";
+import Gear from "../../assets/manager/gear.svg?react";
+
+
+import DoctorsTable from "./ManageDoctors/DoctorsTable.jsx";
+
+
 
 
 function ManageDoctors() {
@@ -119,9 +132,15 @@ function ManageDoctors() {
       {/* Right Side */}
       <section className={styles.dashboardContent}>
         {/* Navbar */}
-        <nav className={styles.nav}>
-          <div className={styles.navContent}>
+        <nav className={`${styles.nav} ${layoutStyles.navContent}`}>
+          <div className={layoutStyles.pageanme}>
+            <Gear/>
+            Manage Doctors
+          </div>
+          <div className={`${styles.navContent}`}>
+            
             <div className={styles.buttonAddAppoi}>
+              
               <button>
                 <img src="/assest/doctor/cards/Add.svg" alt="Add" />
                 Doctor
@@ -159,6 +178,30 @@ function ManageDoctors() {
 
         {/* Main Content */}
         <main className={styles.cards}>
+
+          <div className={layoutStyles.statsRow}>
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>Total Doctors</p>
+              <p className={layoutStyles.statValue}>12</p>
+            </div>
+
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>Active</p>
+              <p className={layoutStyles.statValue}>10</p>
+            </div>
+
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>On Leave</p>
+              <p className={layoutStyles.statValue}>4</p>
+            </div>
+
+            <div className={layoutStyles.statCard}>
+              <p className={layoutStyles.statLabel}>Appointments Today</p>
+              <p className={layoutStyles.statValue}>32</p>
+            </div>
+          </div>
+
+          <DoctorsTable/>
         
         </main>
       </section>

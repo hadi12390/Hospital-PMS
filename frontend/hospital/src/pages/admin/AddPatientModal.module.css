@@ -1,0 +1,271 @@
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlayOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modalOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(16px) scale(0.97); }
+}
+
+@keyframes fieldIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  animation: overlayIn 0.25s ease both;
+}
+
+.overlayOut {
+  animation: overlayOut 0.2s ease both;
+}
+
+.modal {
+  position: relative;
+  width: min(640px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+
+  padding: 2.2em;
+  border-radius: 1.5em;
+
+  background: rgb(20, 20, 20);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.03);
+
+  background-clip: padding-box;
+
+  animation: modalIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.modalOut {
+  animation: modalOut 0.2s ease both;
+}
+
+.modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+.title {
+  font-family: "GeologicaBold";
+  font-size: 2rem;
+  color: #F1EFE8;
+  margin: 0 0 0.2em 0;
+
+  opacity: 0;
+  animation: fieldIn 0.35s ease both;
+  animation-delay: 0.05s;
+}
+
+.row {
+  display: flex;
+  gap: 1em;
+}
+
+.row > .field {
+  flex: 1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  opacity: 0;
+  animation: fieldIn 0.35s ease both;
+}
+
+/* stagger fields as they appear */
+.modal > .row:nth-of-type(1),
+.modal > .field:nth-of-type(1) { animation-delay: 0.08s; }
+.modal > .field:nth-of-type(2) { animation-delay: 0.12s; }
+.modal > .field:nth-of-type(3) { animation-delay: 0.16s; }
+.modal > .row:nth-of-type(2) { animation-delay: 0.2s; }
+.modal > .row:nth-of-type(3) { animation-delay: 0.24s; }
+.modal > .actions { animation-delay: 0.28s; }
+
+.field label {
+  font-family: "GeologicaBold";
+  font-size: 1.05rem;
+  color: #F1EFE8;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 0.85em 1.2em;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #F1EFE8;
+  font-family: "RegularGEO";
+  font-size: 1rem;
+
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.field input::placeholder {
+  color: rgba(241, 239, 232, 0.4);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.field select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.dateWrap {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.85em 1.2em;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.dateWrap:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dateValue {
+  color: #F1EFE8;
+  font-family: "RegularGEO";
+}
+
+.datePlaceholder {
+  color: rgba(241, 239, 232, 0.4);
+  font-family: "RegularGEO";
+}
+
+.calIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.hiddenDate {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin-top: 0.5em;
+
+  opacity: 0;
+  animation: fieldIn 0.35s ease both;
+}
+
+.cancelBtn,
+.saveBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+
+  padding: 0.8em 1.6em;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  font-family: "GeologicaBold";
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #F1EFE8;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.saveBtn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.saveBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btnIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.xIcon {
+  font-size: 0.9rem;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}

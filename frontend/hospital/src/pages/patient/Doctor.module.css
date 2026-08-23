@@ -1,0 +1,844 @@
+@font-face {
+    font-family: "RegularGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SoExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Cursive-Thin.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GeologicaBold";
+    src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
+}
+.PatientDashboard{
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    background: #F1EFE8;
+}
+.sideBar {
+
+    width: fit-content;
+    min-height: 100vh;
+
+    flex-shrink: 0;
+
+
+    background: transition;
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    overflow-y: auto;
+
+    
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1001;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.back{
+    width: 250px;
+    height: 50px;
+    background: rgba(255,255,255,.65);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid rgba(0,0,0,.06);
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.04);
+    position: relative;
+}
+
+/* ---- Sidebar text ---- */
+
+.optName {
+    text-align: start;
+
+    color: #D0D0D0;
+
+    font-size: 1rem;
+
+    margin: 1.5em 0 2em 15px;
+
+    font-family: "ExtraLightGEO";
+}
+
+/* ---- Sidebar buttons ---- */
+
+.optionsContainer {
+
+    display: flex;
+
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: white;
+    width: fit-content;
+    border-radius: 2em;
+    width:3.5em;
+    
+}
+
+.options {
+
+
+    position: relative;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    border: none;
+
+    width: 80%;
+
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+
+    gap: 10px;
+
+
+    padding: 12px 12px;
+
+
+    color: #E4E4E4;
+
+    font-size: 1.1rem;
+
+    background: transparent;
+
+    transition: border-color .3s ease;
+}
+
+
+.otherMenu {
+
+    margin-bottom: 1em;
+
+}
+.iicon {
+
+    background-color: #ff0000;
+
+    mask: url("/assest/patient/home.svg") no-repeat center;
+    mask-size: contain;
+
+    -webkit-mask: url("/assest/patient/home.svg") no-repeat center;
+    -webkit-mask-size: contain;
+}
+.optionsContainer *{
+    transition: all 0.3s ease;
+}
+
+.homeLogoButton .homelogoicon path,
+.homelogoicon circle,
+.homelogoicon rect,
+.homelogoicon polygon {
+  stroke: #4D4D4D;
+}
+
+.homeLogoButton:hover .homelogoicon path,
+.homelogoicon circle,
+.homelogoicon rect,
+.homelogoicon polygon {
+  stroke: #2986DC;
+}
+.appLogoButton:hover .applogoicon path,
+.applogoicon circle,
+.applogoicon rect,
+.applogoicon polygon{
+  stroke: #2986DC;
+}
+
+.docLogoButton{
+    background-color: #0F172A;
+    width: 100%;
+    border-radius: 999px;
+}
+.docLogoButton svg{
+    width: 80%;
+}
+.docLogoButton .doclogoicon path,
+.doclogoicon circle,
+.doclogoicon rect,
+.doclogoicon polygon{
+  fill: #2986DC;
+}
+
+.docLogoButton:hover .doclogoicon path,
+.doclogoicon circle,
+.doclogoicon rect,
+.doclogoicon polygon{
+  fill: #2986DC;
+}
+
+.pillLogoButton .pilllogoicon {
+  color: #4D4D4D; 
+}
+
+.pillLogoButton:hover .pilllogoicon {
+  color: #2986DC; 
+}
+.doculogoicon .moneyPath {
+    color: #4D4D4D;
+}
+.doculogoicon path:first-of-type {
+    transition: fill 0.3s ease;
+}
+
+.doculogoicon:hover path:first-of-type {
+    fill: #2986DC;
+    fill: #2986DC;
+}
+.doculogoicon path:nth-of-type(2) {
+    transition: stroke 0.3s ease;
+}
+
+.doculogoicon:hover path:nth-of-type(2) {
+    stroke: #2986DC;
+}
+
+
+
+.helpLogoButton:hover .helplogoicon path,
+.helplogoicon circle,
+.helplogoicon rect,
+.helplogoicon polygon{
+  stroke: #2986DC;
+}
+
+.settLogoButton:hover .settlogoicon path,
+.settlogoicon circle,
+.settlogoicon rect,
+.settlogoicon polygon{
+  stroke: #2986DC;
+}
+.logoutLogoButton{
+    width: 100%;
+}
+.logoutlogoicon{
+    align-self: flex-start;
+    justify-self: flex-start;
+
+    left: 0;
+    width: 100%;
+
+    margin-right: 5px;
+    margin-top: 10px;
+    
+}
+
+.logoutLogoButton:hover .logoutlogoicon path,
+.logoutlogoicon circle,
+.logoutlogoicon rect,
+.logoutlogoicon polygon{
+  stroke: #2986DC;
+}
+.appLogoButton svg{
+  stroke: #4d4d4d;
+}
+
+.Asettlogoicon{
+    opacity: 0;
+}
+.logoutsec *{
+    margin: 0;
+}
+.logoutsec {
+  position: relative;
+  height: 9em; 
+  background-color: #ffffff;
+  border-radius: 999px; 
+  box-sizing: border-box;
+
+  padding-top: .5em;
+  margin-bottom: 2em;
+}
+
+.logoutIcon {
+  width: 40%;
+  height: auto;
+  color: #4D4D4D; 
+}
+
+.profPicLogOut {
+  position: absolute;
+  bottom: -1em; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6em;
+  height: 6em;
+  border-radius: 50%;
+  background-color: #0F172A; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.profPicLogOut img {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+* {
+    font-family: "RegularGEO";
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+.DoctorDashboard {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    background: #F1EFE8;
+}
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 2em 2em;
+  
+}
+
+.navContent {
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 1em;
+
+  padding: 5px 5px;
+  border-radius: 999px;
+}
+
+/* ---- Add appointment button ---- */
+
+.buttonAddAppoi button {
+
+  cursor: pointer;
+
+  font-family: "GeologicaBold";
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 3px;
+  padding-right: 1em;
+
+  border: none;
+  border-radius: 9999px;
+
+  color: #4d4d4d;
+
+  background: white;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+.addDivApp{
+  background-color: #D9D9D9;
+  width: 2em;
+  height:2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 9999px;
+}
+
+.addDivApp {
+    transition: transform 0.3s ease;
+}
+
+.buttonAddAppoi button:hover .addDivApp {
+    transform: rotate(90deg);
+}
+
+.date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+}
+
+.date span{
+    border-bottom:2px #21599F solid ;
+}
+.date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.hiddenDate {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+
+/* ==========================================================================
+   PROFILE / DROPDOWN MENU
+   ========================================================================== */
+
+.profileSec {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: .7em;
+}
+
+/* NOTE: .profileSec / .profBut are each defined twice in the original file —
+   kept both, in order, unchanged. */
+.profileSec {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: .7em;
+}
+
+.profilePic {
+
+    width: 43.66px;
+    height: 43.66px;
+
+    border-radius: 50%;
+
+    background:#0F172A;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+
+    font-size: 1.5rem;
+
+    font-family: "GeologicaBold";
+}
+
+.profBut {
+
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+
+
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    padding-top: 2px;
+
+    border: 1px #4d4d4d solid;
+
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 10;
+
+    width: 110px;
+
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-radius: 12px;
+    overflow: hidden;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+
+    z-index: 999;
+}
+
+.dropdownMenu button {
+    width: 100%;
+    padding: 7px 3px;
+
+    border: none;
+    background-color: rgba(245, 242, 242, 0.054);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(5px);
+
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    transition: background .25s;
+
+    
+}
+
+.dropdownMenu button:hover {
+    background: #0f172a0b;
+}
+
+.cards {
+
+    flex: 1;
+
+    padding: 1em 1.5em;
+
+    background: #F1EFE8;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+}
+
+
+
+.dashboardContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    overscroll-behavior-y: contain;
+
+    margin-left: 170px;
+    width: calc(100% - 250px); /* explicitly reserve the sidebar's width */
+}
+.navPP{
+  width: 90%;
+  border-radius: 50%;
+}
+.nameNav{
+  color: #4D4D4D;
+  margin-right: 10px;
+}
+.contSide{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.15) 30%,
+    rgba(255, 255, 255, 0.05) 60%,
+    rgba(255, 255, 255, 0.25) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+.searchIcon{
+    background-color: white;
+    padding: .5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+.navContentSearch{
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-radius: 999px;
+    gap: .7em;
+    width: 40%;
+}
+
+.searchInput{
+    background: transparent;
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: .95em;
+    color: inherit;
+    min-width: 0; 
+}
+
+.searchInput::placeholder{
+    color: #4d4d4d; 
+}
+.cardsDCont{
+    display: grid;
+    gap: 1em;
+
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+
+}
+.Dcards{
+    background:linear-gradient(60deg,#0080ffae,#6da8e7c8,#4A91FF);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+
+    padding-bottom: 0em ;
+    width: 100%;
+
+    box-shadow: 0 12px 20px rgba(24, 95, 165, .3);
+
+}
+.timeICON svg path{
+    fill: white;
+}
+.photoCont{
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: .5rem;
+
+
+}
+.secOneBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: fit-content;
+
+    padding: 1.5em;
+}
+
+.heroCardInfo{
+    color: white;
+    font-size: 1.2rem;
+    text-align: start;
+}
+.infoDEV{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+
+    color: white;
+
+    gap: 10px;
+    height: fit-content;
+
+    position: relative;
+    transform: translateY(2em);
+}
+ 
+.makeAppBut{
+    display: flex;
+    padding: 5px;
+    border-radius: 999px;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+    gap: .3em;
+
+    transition: all 0.3s ease;
+}
+.thingsCards{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+    gap: .3em;
+
+    font-family: "SoExtraLightGEO";
+}
+
+.buttAddDiv{
+    align-self: flex-end;
+    margin: 1em;
+    /*here please*/    
+}
+.infoANDb{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+
+    height: 100%;
+    position: relative;   /* ADD THIS */
+
+}   
+.thePLusIcon{
+    padding: 1em;
+    background-color: white;
+    padding: .5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+.infoshehe{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 10px;
+    gap: .5em;
+}
+.makeAppBut:hover{
+    transform: scale(1.05);
+    cursor: pointer;
+}
+@media (max-width:1479px) {
+    .infoDEV{
+        font-size: .8rem;
+    }
+}
+.makeAppBut {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.shineLayer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle 120px at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.35),
+        rgba(255, 255, 255, 0) 70%
+    );
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.makeAppBut:hover .shineLayer {
+    opacity: 1;
+}
+
+.thePLusIcon {
+    position: relative;
+    z-index: 2;
+}
+
+.btnLabel {
+    position: relative;
+    z-index: 2;
+}
+.pillLogoButton:hover .pilllogoicon path,
+.pillLogoButton circle,
+.pillLogoButton rect,
+.pillLogoButton polygon{
+  fill: #2986DC;
+}
+.optionsContainerNN{
+    height: 7em;
+}
+.settLogoButton{
+    width: 100%;
+    margin-top: 1em;
+}
+.helpLogoButton{
+    margin-top: 10px;
+}
+
+.optionsContainerLL {
+    display: flex;
+    flex-direction: column-reverse;
+}
+.notificationLogoButton:hover .notificationlogoicon path,
+.notificationlogoicon circle,
+.notificationlogoicon rect,
+.notificationlogoicon polygon {
+    stroke: #2986DC;
+}

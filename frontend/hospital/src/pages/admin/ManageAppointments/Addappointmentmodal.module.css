@@ -1,0 +1,29 @@
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.timeSlot {
+  padding: 12px 8px;
+  border-radius: 999px;
+
+  border: none;
+  cursor: pointer;
+
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 0.95rem;
+  text-align: center;
+
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.timeSlot:hover {
+  transform: scale(1.03);
+}
+
+.timeSlotActive {
+  background: rgba(241, 239, 232, 0.9);
+  color: #111111;
+}

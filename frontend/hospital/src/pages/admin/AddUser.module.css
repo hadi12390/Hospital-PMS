@@ -1,0 +1,318 @@
+/* ==========================================================================
+   GLASS EFFECT
+   ========================================================================== */
+
+.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.03);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   FORM CARD
+   ========================================================================== */
+
+.formCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px 20rem;
+
+  width: 100%;
+
+  background: #0F172A;
+  background: linear-gradient(160deg, #000000, #262626);
+
+  padding: 2em;
+  border-radius: 1.2em;
+
+  min-height: 85vh;
+}
+
+.formTitle {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 2rem;
+
+  text-align: start;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.fieldRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.fieldLabel {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.2rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fieldInput {
+  flex: 1;
+  max-width: 70%;
+
+  padding: 12px 18px;
+  border-radius: 20px;
+
+  border: none;
+  outline: none;
+
+  color: #F1EFE8;
+  font-family: "RegularGEO";
+  font-size: 1rem;
+}
+
+.fieldInput::placeholder {
+  color: rgba(241, 239, 232, 0.4);
+}
+
+.fieldSelect {
+  flex: 1;
+  max-width: 70%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 18px;
+  border-radius: 20px;
+
+  border: none;
+  cursor: pointer;
+
+  color: rgba(241, 239, 232, 0.85);
+  font-family: "RegularGEO";
+  font-size: 1rem;
+}
+
+.selectIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ---- Add button ---- */
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  align-self: flex-end;
+  justify-self: flex-end;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-self: flex-end;
+  align-self: flex-end;
+  gap: 8px;
+
+  padding: 14px 28px;
+  border-radius: 999px;
+
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: #F1EFE8;
+
+  font-family: "GeologicaBold";
+  font-size: 1.05rem;
+
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s ease;
+}
+
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.03);
+}
+
+.addBtn:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   CONFIRMATION STEP
+   ========================================================================== */
+
+.confirmCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  width: 100%;
+
+  background: #0F172A;
+  background: linear-gradient(160deg, #000000, #262626);
+
+  padding: 2em;
+  border-radius: 1.2em;
+
+  min-height: 70vh;
+  justify-content: space-between;
+}
+
+.confirmTitle {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 2rem;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 20px 24px;
+  border-radius: 1em;
+}
+
+.userAvatar {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 2rem;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.userHandle {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.5rem;
+
+  text-align: start;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: rgba(241, 239, 232, 0.7);
+  font-size: 1rem;
+}
+
+.metaIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 14px 28px;
+  border-radius: 999px;
+
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: #F1EFE8;
+
+  font-family: "GeologicaBold";
+  font-size: 1.05rem;
+
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s ease;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.03);
+}
+
+.backBtn:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   ENTRANCE ANIMATION
+   ========================================================================== */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.formCard,
+.confirmCard {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

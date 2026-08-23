@@ -1,0 +1,27 @@
+
+@font-face {
+    font-family: "RegularGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SoExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Cursive-Thin.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GeologicaBold";
+    src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
+}
+
+.heroName{
+    font-size: 3rem;
+    margin: .5em 0;
+
+    font-family:"SoExtraLightGEO" ;
+}

@@ -86,13 +86,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        'ENGINE': 'django_tenants.postgresql_backend',
-        "NAME": "hospital_pms",
-        "USER": "hadi",
-        "PASSWORD": "hadi",
-        "HOST": "localhost",
-        "PORT": "5432",
+    'default': {
+        'ENGINE': 'django_tenants.postgresql_backend', # or 'django.db.backends.postgresql'
+        'NAME': 'hospital_pms_db',
+        'USER': 'mvmod',  # Changed from 'hadi' to your active system user
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -155,6 +155,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "core.permissions.IsValidTenantUser",
     ),
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+    ),
 }
 
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
@@ -196,7 +199,7 @@ REST_AUTH = {
 
 # --- CORS: talk to a Vite dev server ---
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://.*\.localhost:5173$",
+    r"^http://([a-zA-Z0-9-]+\.)?localhost:5173$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -236,3 +239,7 @@ CACHES = { # Redis is better.
         "LOCATION": "email-rate-limit",
     }
 }
+
+CSRF_TRUSTED_ORIGINS = ["http://*.localhost:5173", "http://*.localhost:8000"]
+
+CSRF_COOKIE_DOMAIN = ".localhost"

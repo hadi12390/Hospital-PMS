@@ -1,16 +1,49 @@
 import styles from "./Login.module.css";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-    const handleLogin = () => {
-      console.log("Login");
-    
 
+    const handleLogin = async () => {
+      setError("");
+      setLoading(true);
+
+      try {
+        const response = await fetch("http://alpha.localhost:8000/dj-rest-auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Login failed");
+        }
+
+        console.log("Login successful:", data);
+        // e.g. save token and redirect
+        // localStorage.setItem("token", data.token);
+        // navigate("/dashboard");
+
+      } catch (err) {
+        console.error("Login error:", err);
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
     };
+
   return (
     <div className={styles.loginpage}>
         <div className={styles.backgroundImg}>
@@ -28,12 +61,17 @@ function Login() {
             </div>
 
             <div className={styles.inputBox}>
-                <input type="email" placeholder="example@gmail.com"/>
+                <input 
+                  type="email" 
+                  placeholder="example@gmail.com"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
                 <span className={styles.icon}><img src="./assest/login/person-svgrepo-com 1.svg" alt="" /></span>
             </div>
 
             <div className={styles.inputBox}>
                 <input
+                onChange={(e) => setPassword(e.target.value)}
 
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {

@@ -32,6 +32,18 @@ import ManageDoctorAppointments from "../pages/admin/ManageDoctors/doctorprofile
 import PatientProfile from "../pages/admin/ManagePatient/patientprofile/PatientProfile.jsx";
 import ManagePatientAppointments from "../pages/admin/ManagePatient/patientprofile/appointmentappointments/Appointments.jsx";
 
+
+import DoctorManagePatient from "../pages/doctor/ManagePatient.jsx";
+import DoctorAppointments from "../pages/doctor/Appointments.jsx";
+import DoctorSchedule from "../pages/doctor/Schedule.jsx";
+import DoctorHelp from "../pages/doctor/Help.jsx";
+import DoctorSettings from "../pages/doctor/Settings.jsx";
+import DoctorPending from "../pages/doctor/Pending.jsx";
+import AddAppointment from "../pages/doctor/AddAppointment.jsx";
+
+
+
+
 function AppRoutes() {
   return (
     <Routes>
@@ -65,6 +77,17 @@ function AppRoutes() {
       <Route path="/admin/manage&patients/patient&profile/appointments" element={<ManagePatientAppointments />} />
       
       <Route path="/admin/add&user" element={<AddUserAdmin />} />
+    
+
+
+      <Route path="/doctor/mypatients" element={<DoctorManagePatient />} />
+      <Route path="/doctor/myappointments" element={<DoctorAppointments />} />
+      <Route path="/doctor/myschedule" element={<DoctorSchedule />} />
+      <Route path="/doctor/help" element={<DoctorHelp />} />
+      <Route path="/doctor/settings" element={<DoctorSettings />} />
+      <Route path="/doctor/pending" element={<DoctorPending />} />
+      <Route path="/doctor/add&appointment" element={<AddAppointment/>} />
+
 
 
       <Route path="*" element={<NotFound />} />

@@ -1,7 +1,17 @@
 import styles from "./Dashboard.module.css";
 import { useRef, useState } from "react"
+import Sidebar from "./sidebarD";
+
 
 function DoctorDashboard() {
+  const [activeNav, setActiveNav] = useState("appointment");
+
+  
+  function handleSelect(id) {
+    console.log("Sidebar clicked:", id); 
+    setActiveNav(id);
+  }
+
   // ---------- Date helpers ----------
   function getCurrentDate() {
     const date = new Date();
@@ -168,58 +178,7 @@ function DoctorDashboard() {
       <div className={styles.back}></div>
 
       {/* Sidebar */}
-      <aside className={styles.sideBar}>
-        <img src="/assest/doctor/sidebar/logo.svg" alt="Logo" />
-
-        <p className={styles.optName}>MENU</p>
-
-        <div className={styles.optionsContainer}>
-          <button className={styles.options}>
-            <img
-              src="/assest/doctor/sidebar/col-right-svgrepo-com 1.svg"
-              alt=""
-            />
-            <span>Appointment</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/person.svg" alt="" />
-            <span>My Patient</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/dwajdoies.svg" alt="" />
-            <span>Patient Info</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/SVGRepo_iconCarriear.svg" alt="" />
-            <span>Checkup</span>
-          </button>
-
-          <button className={styles.options}>
-            <img src="/assest/doctor/sidebar/TAQWI.svg" alt="" />
-            <span>My Schedule</span>
-          </button>
-        </div>
-
-        <p className={styles.optName}>OTHER MENU</p>
-
-        <div className={styles.optionsContainer}>
-          <button className={`${styles.options} ${styles.otherMenu}`}>
-            <img
-              src="/assest/doctor/sidebar/SVGRepo_iconCarrier (1).svg"
-              alt=""
-            />
-            <span>Help & Center</span>
-          </button>
-
-          <button className={`${styles.options} ${styles.otherMenu}`}>
-            <img src="/assest/doctor/sidebar/SVGRepo_iconCarrier.svg" alt="" />
-            <span>Settings</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar activeId={activeNav} onSelect={setActiveNav} />
 
       {/* Right Side */}
       <section className={styles.dashboardContent}>

@@ -5,21 +5,11 @@ import { Link } from "react-router-dom";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
-    
-    const [Password, setPassword] = useState("");
-    const [Email, setEmail] = useState("");
-
 
     const handleLogin = () => {
-
-      {/*console section*/}
       console.log("Login");
-      console.log("======================");
-      console.log(`Email: ${Email}`);
-      console.log(`Password: ${Password}`);
+    
 
-      {/*API section*/}
-      
     };
   return (
     <div className={styles.loginpage}>
@@ -38,11 +28,7 @@ function Login() {
             </div>
 
             <div className={styles.inputBox}>
-                <input
-                  type="email"
-                  placeholder="example@gmail.com"
-                  onChange={(e) => setEmail(e.target.value)}
-                  />
+                <input type="email" placeholder="example@gmail.com"/>
                 <span className={styles.icon}><img src="./assest/login/person-svgrepo-com 1.svg" alt="" /></span>
             </div>
 
@@ -54,7 +40,6 @@ function Login() {
                     handleLogin();
                   }
                 }}
-                onChange={(e) => setPassword(e.target.value)}
                 
                 type={showPassword ? "text" : "password"} placeholder="Password"/>
 

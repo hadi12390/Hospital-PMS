@@ -1,0 +1,518 @@
+
+.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.03);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+
+  animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  width: 100%;
+  max-width: 620px;
+
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 32px;
+  border-radius: 1.5em;
+
+  background: #000;
+  background: linear-gradient(160deg, #000, #262626);
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.title {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 2.2rem;
+}
+
+.statusBadge {
+  align-self: flex-start;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 18px;
+  border-radius: 999px;
+
+
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.1rem;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F1EFE8;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-left: 10px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: #F1EFE8;
+  font-size: 1.3rem;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionTitle {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.3rem;
+}
+
+.sectionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: rgba(241, 239, 232, 0.85);
+  font-size: 1.15rem;
+  margin-left: 10px;
+}
+
+.noteText {
+  color: rgba(241, 239, 232, 0.6);
+  font-size: 1.1rem;
+  margin-left: 10px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.cancelBtn,
+.doneBtn {
+  flex: 1;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  padding: 16px;
+  border-radius: 999px;
+
+  border: none;
+  cursor: pointer;
+
+  font-family: "GeologicaBold";
+  font-size: 1.1rem;
+
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s ease;
+}
+
+.cancelBtn {
+  background: rgba(125, 112, 112, 0);
+  color: #F1EFE8;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: scale(1.02);
+}
+
+.doneBtn {
+  background: #f1efe800;
+  color: #ffffff;
+}
+
+.doneBtn:hover {
+  background: #ffffff2a;
+  transform: scale(1.02);
+}
+
+.cancelBtn:active,
+.doneBtn:active {
+  transform: scale(0.98);
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+
+  animation: fadeIn 0.3s ease both;
+}
+.contCard{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  margin-left: 20px;
+}
+/* ==========================================================================
+   GLASS EFFECT
+   ========================================================================== */
+
+.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2em;
+}
+
+.modal {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  padding: 2em;
+  border-radius: 2em;
+
+  background: linear-gradient(135deg, #5b8fdb, #4a7fd0 60%, #3f74c9);
+  box-shadow: 0 24px 60px rgba(20, 60, 120, 0.35);
+
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.title {
+  font-family: "GeologicaBold";
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+/* ---- Photo + patient info ---- */
+
+.topRow {
+  display: flex;
+  gap: 1em;
+}
+
+.photoBox {
+  flex-shrink: 0;
+  width: 9em;
+  height: 9em;
+  border-radius: 0.4em;
+  overflow: hidden;
+  padding: 5px;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.infoCard {
+  flex: 1;
+  border-radius: 1.2em;
+  padding: 1em 1.2em;
+
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+}
+
+.nameLine {
+  font-family: "RegularGEO";
+  font-size: 1.05rem;
+}
+
+.nameLine strong {
+  font-family: "GeologicaBold";
+}
+
+.infoGrid {
+  margin-top: .5em;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6em 1em;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  font-family: "RegularGEO";
+  font-size: .95rem;
+}
+
+.strongText {
+  font-family: "GeologicaBold";
+}
+
+/* ---- Appointment details + notes ---- */
+
+.detailsCard {
+  border-radius: 1.5em;
+  padding: 1.4em 1.6em;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em 1.5em;
+}
+
+.detailsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.detailLine {
+  display: flex;
+  align-items: center;
+  gap: .6em;
+  font-family: "RegularGEO";
+  font-size: 1.05rem;
+}
+
+.notesCol {
+  display: flex;
+  flex-direction: column;
+  gap: .6em;
+}
+
+.notesLabel {
+  font-family: "RegularGEO";
+  font-size: 1.05rem;
+}
+
+.notesBox {
+  flex: 1;
+  min-height: 12em;
+  border-radius: 1em;
+  padding: 1em;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.noteText {
+  font-family: "RegularGEO";
+  font-size: .95rem;
+  color: white;
+}
+
+.noNoteText {
+  font-family: "RegularGEO";
+  font-size: .95rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Icons ---- */
+
+.icon {
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+  color: white;
+}
+
+/* ---- Actions ---- */
+
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editBtn,
+.doneBtn {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+
+  border: none;
+  cursor: pointer;
+
+  padding: .7em 1.4em;
+  border-radius: 999px;
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: 1rem;
+
+  transition: transform 220ms cubic-bezier(0.36, 0.66, 0.04, 1),
+              filter 200ms ease;
+}
+
+.editBtn:hover,
+.doneBtn:hover {
+  filter: brightness(1.08);
+}
+
+.editBtn:active,
+.doneBtn:active {
+  transform: scale(0.95);
+}
+
+/* ---- Mobile ---- */
+
+@media (max-width: 560px) {
+  .topRow {
+    flex-direction: column;
+    align-items: center;
+  }
+  .detailsCard {
+    grid-template-columns: 1fr;
+  }
+}

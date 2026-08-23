@@ -1,0 +1,381 @@
+@font-face {
+    font-family: "RegularGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SoExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Cursive-Thin.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GeologicaBold";
+    src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
+}
+
+
+
+.statsRow {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+
+.statCard {
+    position: relative;
+    overflow: hidden;
+
+    flex: 1;
+    width: 100%;
+    padding: 1.5em;
+
+    border-radius: 0.5em;
+
+    background: #000;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.statCard::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+
+    background: linear-gradient(
+        60deg,
+        #000000,
+        #373737
+    );
+
+    transform: translateX(-20%);
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+    z-index: 0;
+}
+
+.statCard:hover::before {
+    transform: translateX(20%);
+}
+
+.statCard > * {
+    position: relative;
+    z-index: 1;
+}
+.statCardFit {
+    flex: 0 0 auto;
+    width: fit-content;
+
+    background: white;
+    border-radius: .5em;
+    padding: 1.5em;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.statLabel {
+    font-family: "SoExtraLightGEO";
+
+    color: #fff;
+    text-align: left;
+    font-size: 1.5rem;
+    white-space: nowrap;
+}
+
+.statValue {
+    font-size: 3.5rem;
+    font-family: "GeologicaBold";
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   GLASS EFFECT
+   ========================================================================== */
+
+.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.03);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   WRAPPER
+   ========================================================================== */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+
+  background: #0F172A;
+  background: linear-gradient(160deg, #0F172A, #262626);
+
+  padding: 1.5em;
+  border-radius: 1em;
+}
+
+/* ==========================================================================
+   FILTERS ROW
+   ========================================================================== */
+
+.filtersRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.searchBox {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 20px;
+  border-radius: 12px;
+}
+
+.searchInput {
+  flex: 1;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #F1EFE8;
+  font-size: 1.1rem;
+  font-family: "RegularGEO";
+}
+
+.searchInput::placeholder {
+  color: rgba(241, 239, 232, 0.5);
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 20px;
+  border-radius: 12px;
+
+  color: #F1EFE8;
+  font-size: 1.1rem;
+  font-family: "GeologicaBold";
+
+  border: none;
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   TABLE
+   ========================================================================== */
+
+.tableCard {
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 1em;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+
+  padding: 20px 28px;
+
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.6rem;
+}
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  padding: 12px;
+  padding-top: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr;
+  align-items: center;
+
+  padding: 14px 20px;
+  border-radius: 14px;
+
+  color: #F1EFE8;
+  font-family: "RegularGEO";
+  font-size: 1.1rem;
+}
+
+/* ---- Columns ---- */
+
+.colDoctor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  font-family: "GeologicaBold";
+}
+
+.colSpecialty,
+.colSchedule {
+  color: rgba(241, 239, 232, 0.85);
+}
+
+.colStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  justify-self: end;
+
+  color: #F1EFE8;
+}
+
+.dotIcon {
+  width: 8px;
+  height: 8px;
+}
+
+/* ---- Avatar ---- */
+
+.avatar {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+.personIcon {
+  width: 20px;
+  height: 20px;
+}
+/* ---------- Page entrance animation (no JSX changes) ---------- */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stat cards stagger in */
+.statsRow > .statCard {
+  opacity: 0;
+  animation: fadeSlideUp 0.45s ease both;
+}
+
+.statsRow > .statCard:nth-child(1) { animation-delay: 0.10s; }
+.statsRow > .statCard:nth-child(2) { animation-delay: 0.18s; }
+.statsRow > .statCard:nth-child(3) { animation-delay: 0.26s; }
+.statsRow > .statCard:nth-child(4) { animation-delay: 0.34s; }
+.statsRow > .statCard:nth-child(5) { animation-delay: 0.42s; }
+
+/* Table fades in after the stats */
+.statsRow + * {
+  opacity: 0;
+  animation: fadeSlideUp 0.5s ease both;
+  animation-delay: 0.50s;
+}
+.navContent{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.pageanme{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 1.5rem;
+}
+.but{
+  flex: 1.4;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+.but:hover{
+  flex: 1.5;
+}
+.but p{
+  font-size: 2rem;
+  font-family:"GeologicaBold" ;
+}

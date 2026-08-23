@@ -1,0 +1,197 @@
+.modal {
+  --modal-radius: 28px;
+  --field-radius: 999px;
+  width: min(100%, 92vw);
+  padding: 40px 44px 32px;
+  border-radius: var(--modal-radius);
+  background: linear-gradient(135deg, #2f5a9e 0%, #4574b8 45%, #7099cf 100%);
+  box-shadow: 0 30px 60px -20px rgba(20, 40, 80, 0.45);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  color: #ffffff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 40px;
+}
+
+.formCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  letter-spacing: 0.2px;
+}
+
+.formCol .label:first-child {
+  margin-top: 0;
+}
+
+.durationLabel {
+  margin-top: 22px;
+}
+
+/* Pill-shaped field wrapper shared by selects + date input */
+.selectWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--field-radius);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.select,
+.dateInput {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #eef3fb;
+  font-size: 17px;
+  padding: 14px 44px 14px 22px;
+  border-radius: var(--field-radius);
+  cursor: pointer;
+}
+
+.select option {
+  color: #1f2937;
+  background: #ffffff;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.chevron,
+.calendarIcon {
+  position: absolute;
+  right: 20px;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.calendarIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Right column note */
+.noteCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.noteBox {
+  position: relative;
+  flex: 1;
+  min-height: 260px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.noteTextarea {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  font-family: inherit;
+  text-align: center;
+  padding-top: 90px;
+  line-height: 1.4;
+}
+
+.noteTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pencilIcon {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+  width: 46px;
+  height: 46px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 36px;
+}
+
+.cancelBtn,
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--field-radius);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.cancelBtn:hover,
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.cancelBtn:active,
+.addBtn:active {
+  transform: scale(0.97);
+}
+
+.xIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .noteBox {
+    min-height: 160px;
+  }
+}

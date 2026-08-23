@@ -1,0 +1,153 @@
+/* ==========================================================================
+   GLASS EFFECT
+   ========================================================================== */
+
+.glass {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.03);
+
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   CARD
+   ========================================================================== */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+
+  background: #0F172A;
+  background: linear-gradient(160deg, #000000, #262626);
+
+  padding: 1.5em;
+  border-radius: 1em;
+}
+
+.title {
+  color: #F1EFE8;
+  font-family: "GeologicaBold";
+  font-size: 1.7rem;
+  text-align: start;
+}
+
+/* ==========================================================================
+   LIST
+   ========================================================================== */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 2fr 1.2fr;
+  align-items: center;
+
+  padding: 16px 24px;
+  border-radius: 14px;
+
+  color: #F1EFE8;
+  font-family: "RegularGEO";
+  font-size: 1.1rem;
+
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.4s ease;
+}
+
+.row:hover {
+  transform: scale(1.005);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Columns ---- */
+
+.colDate {
+  font-family: "GeologicaBold";
+  text-align: start;
+}
+
+.colDoctor {
+  color: rgba(241, 239, 232, 0.9);
+  font-family: "GeologicaBold";
+}
+
+.colType {
+  color: rgba(241, 239, 232, 0.85);
+}
+
+.colStatus {
+  justify-self: end;
+  color: rgba(241, 239, 232, 0.85);
+}
+/* ==========================================================================
+   ENTRANCE ANIMATION
+   ========================================================================== */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.row {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.row:nth-child(1) { animation-delay: 0.05s; }
+.row:nth-child(2) { animation-delay: 0.1s; }
+.row:nth-child(3) { animation-delay: 0.15s; }
+.row:nth-child(4) { animation-delay: 0.2s; }
+.row:nth-child(5) { animation-delay: 0.25s; }
+.row:nth-child(6) { animation-delay: 0.3s; }
+.row:nth-child(7) { animation-delay: 0.35s; }
+.row:nth-child(8) { animation-delay: 0.4s; }
+.row:nth-child(9) { animation-delay: 0.45s; }

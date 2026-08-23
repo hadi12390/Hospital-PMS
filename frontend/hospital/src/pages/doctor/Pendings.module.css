@@ -1,0 +1,188 @@
+.pendingList {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
+.pendingCard {
+  border-radius: 1.4em;
+  padding: 1.2em 1.6em;
+
+  background: linear-gradient(120deg, #2986DC, #21599F ,#2986DC);
+  box-shadow:
+    0 8px 20px rgba(24, 95, 165, .18),
+    0 2px 8px rgba(24, 95, 165, .1);
+
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  gap: .3em;
+
+  transition: transform 220ms cubic-bezier(0.36, 0.66, 0.04, 1),
+              box-shadow 220ms ease;
+}
+
+.pendingCard:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 26px rgba(24, 95, 165, .22),
+    0 4px 10px rgba(24, 95, 165, .13);
+}
+
+/* ---- Top row: title + date ---- */
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cardTitle {
+  font-family: "GeologicaBold";
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+}
+
+.cardDate {
+  font-family: "RegularGEO";
+  font-size: .95rem;
+  color: rgba(255, 255, 255, .85);
+  flex-shrink: 0;
+}
+
+.cardSubtitle {
+  font-size: .95rem;
+  text-align: start;
+}
+
+/* ---- Bottom row: reason + actions ---- */
+
+.cardBottom {
+  margin-top: .8em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .8em;
+}
+
+.reasonText {
+  font-family: "GeologicaBold";
+  font-size: .95rem;
+}
+
+.actionsRow {
+  display: flex;
+  gap: .7em;
+  flex-shrink: 0;
+}
+
+.cancelBtn,
+.confirmBtn {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+
+  border: none;
+  cursor: pointer;
+
+  padding: .5em 1.1em;
+  border-radius: 999px;
+
+  color: white;
+  font-family: "GeologicaBold";
+  font-size: .9rem;
+
+  transition: transform 200ms cubic-bezier(0.36, 0.66, 0.04, 1), filter 180ms ease;
+}
+
+.cancelBtn:hover,
+.confirmBtn:hover {
+  filter: brightness(1.08);
+}
+
+.cancelBtn:active,
+.confirmBtn:active {
+  transform: scale(0.94);
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  color: white;
+}
+
+/* ---- Empty state ---- */
+
+.emptyState {
+  color: #4d4d4d;
+  font-family: "RegularGEO";
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 2em 0;
+}
+
+/* ---- Load-in animation ---- */
+
+.fadeUp {
+  opacity: 0;
+  animation: pendingFadeUp .5s cubic-bezier(.16, 1, .3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes pendingFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Exit animation on confirm/cancel ---- */
+
+.cardRemoving {
+  animation: pendingCardExit 320ms cubic-bezier(0.36, 0.66, 0.04, 1) forwards !important;
+  pointer-events: none;
+}
+
+@keyframes pendingCardExit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-height: 300px;
+    margin-bottom: 0;
+  }
+  60% {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: -1em; /* collapses the gap left by flex `gap` */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fadeUp,
+  .cardRemoving,
+  .pendingCard {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- Mobile ---- */
+
+@media (max-width: 640px) {
+  .cardBottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .actionsRow {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,77 @@
+
+@font-face {
+    font-family: "RegularGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Auto-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SoExtraLightGEO";
+    src: url("/assest/fonts/Geologica/static/Geologica_Cursive-Thin.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GeologicaBold";
+    src: url("/assest/fonts/Geologica/static/Geologica-Bold.ttf") format("truetype");
+}
+.heroLogo{
+    margin-bottom: 3em;
+}
+.main{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.card{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+
+    background-color: rgba(255, 255, 255, 0.699);
+
+    padding: 2em;
+    border-radius: 1rem;
+
+    gap: 1em;
+}
+.error{
+    font-size: 5rem;
+}
+.label{
+    font-size: 2rem;
+    font-family: "SoExtraLightGEO";
+    margin-bottom: .7em;
+}
+.message{
+    font-size: 1.3rem;
+    font-family: "SoExtraLightGEO";
+    margin-bottom: .7em;
+}
+.card button{
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.3rem;
+    padding: 15px 25px;
+    background-color: #185FA5;
+
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.card button:hover{
+    background-color: #185ea5d1;
+
+}
+.card button:active{
+    transform: scale(1.01);
+}

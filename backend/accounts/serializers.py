@@ -9,6 +9,9 @@ from .forms import CustomAllAuthPasswordResetForm
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db import connection
+from doctor.models import Doctor
+from patient.models import Patient
+from manager.models import Manager
 
 class StaffCreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -93,4 +96,28 @@ class PersonalInformationSerializer(serializers.ModelSerializer):
         read_only_fields = ['email']
         
 
-        
+
+class BaseMeSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
+
+    class Meta:
+        fields = ["public_id", "role", "email", "first_name", "last_name"]
+
+
+class DoctorMeSerializer(BaseMeSerializer):
+    class Meta(BaseMeSerializer.Meta):
+        model = Doctor
+        fields = BaseMeSerializer.Meta.fields + ["specialty"]
+
+class PatientMeSerializer(BaseMeSerializer):
+    class Meta(BaseMeSerializer.Meta):
+        model = Patient
+        fields = BaseMeSerializer.Meta.fields + ["reliability_score"]
+
+class ManagerMeSerializer(BaseMeSerializer):
+    class Meta(BaseMeSerializer.Meta):
+        model = Manager
+        fields = BaseMeSerializer.Meta.fields

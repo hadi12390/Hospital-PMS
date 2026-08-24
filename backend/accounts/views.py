@@ -6,7 +6,8 @@ from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from allauth.account.models import EmailAddress
-from .serializers import PersonalInformationSerializer
+from .serializers import PersonalInformationSerializer, ManagerMeSerializer, DoctorMeSerializer, PatientMeSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class StaffCreateUserView(CreateAPIView):
     serializer_class = StaffCreateUserSerializer
@@ -120,3 +121,15 @@ class PersonalInformationEditView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer_class = {
+            "manager": ManagerMeSerializer,
+            "doctor": DoctorMeSerializer,
+            "patient": PatientMeSerializer,
+        }[user.role]
+        return Response(serializer_class(user).data)

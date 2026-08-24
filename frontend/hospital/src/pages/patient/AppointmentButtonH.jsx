@@ -1,10 +1,9 @@
 import styles from "./MakeAppointment.module.css";
-import {
-    Pill,
-    Star,
-    Location,
-    TimePast
-} from "../../../assets/patient/icons";
+
+import Pill from "./makeapp/icons/pill.svg?react";
+import Star from "./makeapp/icons/star.svg?react";
+import Location from "./makeapp/icons/location.svg?react";
+import TimePast from "./makeapp/icons/time-past.svg?react";
 function AppointmentButton({ isSelected, onSelect }) {
     const handleMove = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();

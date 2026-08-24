@@ -17,7 +17,8 @@ function Login() {
       setLoading(true);
 
       try {
-        const response = await fetch("http://alpha.localhost:8000/dj-rest-auth/login", {
+        const hostname = window.location.hostname;
+        const response = await fetch(`http://${hostname}:8000/dj-rest-auth/login`, {
           method: "POST",
           credentials: "include",
           headers: {

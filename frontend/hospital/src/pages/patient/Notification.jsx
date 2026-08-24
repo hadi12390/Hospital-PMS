@@ -23,7 +23,7 @@ import Pill from "../../assets/patient/drugs.svg?react";
 import Star from "../../assets/patient/star.svg?react";
 import Locwhite from "../../assets/patient/locwhite.svg?react";
 import Plusvec from "../../assets/patient/plusvec.svg?react";
-import Deletel from "../../assets/patient/DeleteL.svg?react";
+import Deletel from "../../assets/patient/deleteL.svg?react";
 import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 

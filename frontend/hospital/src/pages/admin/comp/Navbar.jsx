@@ -1,4 +1,4 @@
-import styles from "./Dashboard.module.css";
+import styles from "../Dashboard.module.css";
 import { useState } from "react";
 
 function Navbar() {

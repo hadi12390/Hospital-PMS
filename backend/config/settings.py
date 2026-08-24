@@ -90,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django_tenants.postgresql_backend', # or 'django.db.backends.postgresql'
         'NAME': 'hospital_pms_db',
         'USER': 'mvmod',  # Changed from 'hadi' to your active system user
-        'PASSWORD': '',
+        'PASSWORD': 'jooj12332',
         'HOST': 'localhost',
         'PORT': '5432',
     }

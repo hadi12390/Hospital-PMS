@@ -111,12 +111,12 @@ class BaseMeSerializer(serializers.ModelSerializer):
 class DoctorMeSerializer(BaseMeSerializer):
     class Meta(BaseMeSerializer.Meta):
         model = Doctor
-        fields = BaseMeSerializer.Meta.fields + ["specialty"]
+        fields = BaseMeSerializer.Meta.fields 
 
 class PatientMeSerializer(BaseMeSerializer):
     class Meta(BaseMeSerializer.Meta):
         model = Patient
-        fields = BaseMeSerializer.Meta.fields + ["reliability"]
+        fields = BaseMeSerializer.Meta.fields
 
 class ManagerMeSerializer(BaseMeSerializer):
     class Meta(BaseMeSerializer.Meta):

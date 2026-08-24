@@ -1,11 +1,97 @@
 import styles from "./Register.module.css";
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Logo from "./svg/logo.svg?react";
 import CalendarIcon from "./svg/calendar.svg?react";
 import DropdownIcon from "./svg/dropdown.svg?react";
 import SaveIcon from "./svg/save.svg?react";
+
+// ---- inline glass dropdown (native <select> can't be blurred, so this replaces it) ----
+function Dropdown({ options, value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [openUp, setOpenUp] = useState(false);
+  const rootRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  // decide whether the menu should drop up or down based on available space
+  useLayoutEffect(() => {
+    if (!open || !rootRef.current) return;
+
+    const triggerRect = rootRef.current.getBoundingClientRect();
+    const menuHeight = menuRef.current?.offsetHeight ?? 220;
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    // only flip up if there's not enough room below AND more room above
+    setOpenUp(spaceBelow < menuHeight && spaceAbove > spaceBelow);
+  }, [open]);
+
+  const handleSelect = (optValue) => {
+    onChange(optValue);
+    setOpen(false);
+  };
+
+  return (
+    <div className={styles.dropdownRoot} ref={rootRef}>
+      <button
+        type="button"
+        className={`${styles.inputBox} ${styles.glass} ${styles.dropdownTrigger}`}
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+      >
+        <span className={styles.triggerLabel}>{value}</span>
+        <span className={`${styles.icon} ${open ? styles.iconOpen : ""}`}>
+          <DropdownIcon />
+        </span>
+      </button>
+
+      {open && (
+        <ul
+          ref={menuRef}
+          className={`${styles.dropdownMenu} ${styles.glass} ${
+            openUp ? styles.dropdownMenuUp : ""
+          }`}
+          role="listbox"
+        >
+          {options.map((opt) => (
+            <li
+              key={opt}
+              role="option"
+              aria-selected={opt === value}
+              className={`${styles.dropdownOption} ${
+                opt === value ? styles.dropdownOptionActive : ""
+              }`}
+              onClick={() => handleSelect(opt)}
+            >
+              {opt}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function Register() {
   const navigate = useNavigate();
@@ -26,6 +112,10 @@ function Register() {
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleSelectChange = (field) => (val) => {
+    setFormData((prev) => ({ ...prev, [field]: val }));
   };
 
   const openDatePicker = () => {
@@ -67,11 +157,10 @@ function Register() {
 
   return (
     <div className={styles.registerPage}>
-      <div className={styles.headerLogo}>
-        <Logo />
-      </div>
-
       <main className={styles.mainLog}>
+        <div className={styles.headerLogo}>
+          <Logo />
+        </div>
         <h1 className={styles.heroText}>
           Register your information to access Medix.
         </h1>
@@ -80,7 +169,7 @@ function Register() {
 
         <div className={styles.field}>
           <label className={styles.label}>Email:</label>
-          <div className={`${styles.inputBox} glass`}>
+          <div className={`${styles.inputBox} ${styles.glass}`}>
             <input
               type="email"
               placeholder="example@clinic.com"
@@ -92,7 +181,7 @@ function Register() {
 
         <div className={styles.field}>
           <label className={styles.label}>User Name (optional):</label>
-          <div className={`${styles.inputBox} glass`}>
+          <div className={`${styles.inputBox} ${styles.glass}`}>
             <input
               type="text"
               placeholder="@MiaQuien"
@@ -104,7 +193,7 @@ function Register() {
 
         <div className={styles.field}>
           <label className={styles.label}>Phone Number:</label>
-          <div className={`${styles.inputBox} glass`}>
+          <div className={`${styles.inputBox} ${styles.glass}`}>
             <input
               type="tel"
               placeholder="+962 79 120 0976"
@@ -117,7 +206,7 @@ function Register() {
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label}>Date of Birth:</label>
-            <div className={`${styles.inputBox} glass`}>
+            <div className={`${styles.inputBox} ${styles.glass}`}>
               <input
                 ref={dobRef}
                 type="date"
@@ -137,26 +226,18 @@ function Register() {
 
           <div className={styles.field}>
             <label className={styles.label}>Gender:</label>
-            <div className={`${styles.inputBox} glass`}>
-              <select
-                className={styles.selectInput}
-                value={formData.gender}
-                onChange={handleChange("gender")}
-              >
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-              </select>
-              <span className={styles.icon}>
-                <DropdownIcon />
-              </span>
-            </div>
+            <Dropdown
+              options={["Female", "Male"]}
+              value={formData.gender}
+              onChange={handleSelectChange("gender")}
+            />
           </div>
         </div>
 
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label}>Personal ID:</label>
-            <div className={`${styles.inputBox} glass`}>
+            <div className={`${styles.inputBox} ${styles.glass}`}>
               <input
                 type="text"
                 placeholder="123421"
@@ -168,24 +249,11 @@ function Register() {
 
           <div className={styles.field}>
             <label className={styles.label}>Blood Type:</label>
-            <div className={`${styles.inputBox} glass`}>
-              <select
-                className={styles.selectInput}
-                value={formData.blood_type}
-                onChange={handleChange("blood_type")}
-              >
-                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
-                  (bt) => (
-                    <option key={bt} value={bt}>
-                      {bt}
-                    </option>
-                  )
-                )}
-              </select>
-              <span className={styles.icon}>
-                <DropdownIcon />
-              </span>
-            </div>
+            <Dropdown
+              options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+              value={formData.blood_type}
+              onChange={handleSelectChange("blood_type")}
+            />
           </div>
         </div>
 
@@ -193,7 +261,7 @@ function Register() {
           type="button"
           onClick={handleRegister}
           disabled={loading}
-          className={`${styles.saveButton} glass`}
+          className={`${styles.saveButton} ${styles.glass}`}
         >
           {loading ? "Saving..." : "Save"}
           <SaveIcon className={styles.saveIcon} />

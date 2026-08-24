@@ -8,6 +8,9 @@ from rest_framework.response import Response
 from allauth.account.models import EmailAddress
 from .serializers import PersonalInformationSerializer, ManagerMeSerializer, DoctorMeSerializer, PatientMeSerializer
 from rest_framework.permissions import IsAuthenticated
+from dj_rest_auth.views import LoginView
+from dj_rest_auth.registration.views import RegisterView
+from rest_framework.permissions import AllowAny
 
 class StaffCreateUserView(CreateAPIView):
     serializer_class = StaffCreateUserSerializer
@@ -133,3 +136,10 @@ class MeView(APIView):
             "patient": PatientMeSerializer,
         }[user.role]
         return Response(serializer_class(user).data)
+
+class CustomLoginView(LoginView):
+    permission_classes = [AllowAny]
+
+
+class CustomRegisterView(RegisterView):
+    permission_classes = [AllowAny]

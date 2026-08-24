@@ -150,7 +150,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "core.permissions.IsValidTenantUser",
@@ -178,8 +177,9 @@ REST_AUTH = {
     "JWT_AUTH_HTTPONLY": True,
     "JWT_AUTH_COOKIE": "access_token",
     "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
-    "JWT_AUTH_COOKIE_DOMAIN": ".localhost",
+    "JWT_AUTH_COOKIE_DOMAIN": None,
     "JWT_AUTH_SAMESITE": "Lax",
+    "JWT_AUTH_SECURE": False,
     "TOKEN_MODEL": None,
     "JWT_SERIALIZER": "accounts.serializers.CustomTokenObtainPairSerializer", # use the new serializer that add the schema name to the token
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
@@ -193,8 +193,8 @@ REST_AUTH = {
 
 # ⚠️⚠️⚠️⚠️set these two lines⚠️⚠️⚠️⚠️
 
-#SESSION_COOKIE_SECURE = True 
-#CSRF_COOKIE_SECURE = True 
+# SESSION_COOKIE_SECURE = True ⚠️
+# CSRF_COOKIE_SECURE = True ⚠️
 
 
 # --- CORS: talk to a Vite dev server ---
@@ -242,4 +242,4 @@ CACHES = { # Redis is better.
 
 CSRF_TRUSTED_ORIGINS = ["http://*.localhost:5173", "http://*.localhost:8000"]
 
-CSRF_COOKIE_DOMAIN = ".localhost"
+CSRF_COOKIE_DOMAIN = None

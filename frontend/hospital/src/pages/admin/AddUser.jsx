@@ -7,7 +7,7 @@ import ArrowDown from "../../assets/manager/arrowdown.svg?react";
 import PersonM from "../../assets/manager/persons.svg?react";
 import Mail from "../../assets/manager/mail.svg?react";
 
-const ROLE_OPTIONS = ["Manager", "Doctor", "Patient"];
+const ROLE_OPTIONS = ["manager", "doctor", "patient"];
 
 /* ==========================================================================
    Step 1 — Add User form
@@ -219,7 +219,8 @@ function AddUser() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://alpha.localhost:8000/accounts/create-user/", {
+      const hostname = window.location.hostname;
+      const response = await fetch(`http://${hostname}:8000/accounts/create-user/`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -231,7 +232,7 @@ function AddUser() {
           first_name: firstName,
           last_name: lastName,
           password,
-          confirm_password: confirmPassword,
+          password2: confirmPassword,
           role,
         }),
       });

@@ -19,6 +19,7 @@ function Login() {
       try {
         const response = await fetch("http://alpha.localhost:8000/dj-rest-auth/login", {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -32,9 +33,33 @@ function Login() {
         }
 
         console.log("Login successful:", data);
-        // e.g. save token and redirect
-        // localStorage.setItem("token", data.token);
-        // navigate("/dashboard");
+
+        const meResponse = await fetch("http://alpha.localhost:8000/accounts/me/", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const meData = await meResponse.json();
+
+        if (!meResponse.ok) {
+          throw new Error(meData.message || "Failed to fetch user info");
+        }
+
+        const role = meData.role;
+        console.log("User role:", role);
+
+        if (role === "manager") {
+          navigate("/admin/dashboard");
+        } else if (role === "doctor") {
+          navigate("/doctor/dashboard");
+        } else if (role === "patient") {
+          navigate("/patient/home");
+        } else {
+          setError("Unknown role, please contact support");
+        }
 
       } catch (err) {
         console.error("Login error:", err);

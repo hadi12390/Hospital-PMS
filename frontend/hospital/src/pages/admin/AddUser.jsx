@@ -209,10 +209,51 @@ function AddUser() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
 
-  const handleConfirm = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleConfirm = async () => {
     if (!username || !email) return;
-    setStep(2);
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://alpha.localhost:8000/accounts/create-user/", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          password,
+          confirm_password: confirmPassword,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("403 response body:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add user");
+      }
+
+      setStep(2);
+
+    } catch (err) {
+      console.error("Add user error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  
 
   const handleBackHome = () => {
     setStep(1);

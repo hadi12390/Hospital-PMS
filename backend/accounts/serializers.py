@@ -116,7 +116,7 @@ class DoctorMeSerializer(BaseMeSerializer):
 class PatientMeSerializer(BaseMeSerializer):
     class Meta(BaseMeSerializer.Meta):
         model = Patient
-        fields = BaseMeSerializer.Meta.fields + ["reliability_score"]
+        fields = BaseMeSerializer.Meta.fields + ["reliability"]
 
 class ManagerMeSerializer(BaseMeSerializer):
     class Meta(BaseMeSerializer.Meta):

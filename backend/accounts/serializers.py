@@ -102,6 +102,7 @@ class BaseMeSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
+    public_id = serializers.CharField(source="user.public_id", read_only=True)
 
     class Meta:
         fields = ["public_id", "role", "email", "first_name", "last_name"]

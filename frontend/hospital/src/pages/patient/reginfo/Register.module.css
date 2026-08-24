@@ -1,0 +1,146 @@
+.loginpage{
+    height: 100vh;
+    background-color: #F1EFE8;
+}
+.registerPage {
+  min-height: 100vh;
+  padding: 48px 64px;
+  background: #F0EEE6;
+  box-sizing: border-box;
+}
+
+.headerLogo {
+  margin-bottom: 24px;
+}
+
+.mainLog {
+  max-width: 900px;
+}
+
+.heroText {
+  font-size: 32px;
+  font-weight: 500;
+  color: #2b2b2b;
+  margin: 0 0 32px 0;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2b2b2b;
+}
+
+/* pill shape is required so .glass::before's "border-radius: inherit" works */
+.inputBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px 4px 20px;
+  min-height: 46px;
+}
+
+.inputBox input,
+.inputBox select {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #fff;
+  padding: 8px 0;
+}
+
+.inputBox input::placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* hide native date/select chrome so our SVGs are the only visible affordance */
+.dateInput {
+  color-scheme: light;
+}
+.dateInput::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.selectInput {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 28px;
+}
+
+.icon,
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.selectInput ~ .icon,
+.icon {
+  margin-right: 6px;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  margin-left: auto;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(70, 130, 220, 0.55); /* blue tint under the glass layer */
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.saveIcon {
+  width: 18px;
+  height: 18px;
+}

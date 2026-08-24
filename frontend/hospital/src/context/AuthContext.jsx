@@ -8,8 +8,9 @@ export function AuthProvider({ children }) {
 
   const getCurrentUser = async () => {
     try {
+      const hostname = window.location.hostname;
       const response = await fetch(
-        "http://alpha.localhost:8000/accounts/me/",
+        `http://${hostname}:8000/accounts/me/`,
         {
           method: "GET",
           credentials: "include",

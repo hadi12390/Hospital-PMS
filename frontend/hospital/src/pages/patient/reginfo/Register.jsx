@@ -128,8 +128,9 @@ function Register() {
     setLoading(true);
 
     try {
+      const hostname = window.location.hostname;
       const response = await fetch(
-        "http://alpha.localhost:8000/dj-rest-auth/registration/",
+        `http://${hostname}:8000/dj-rest-auth/registration/`,
         {
           method: "POST",
           credentials: "include",

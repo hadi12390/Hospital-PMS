@@ -34,8 +34,7 @@ function Login() {
         }
 
         console.log("Login successful:", data);
-
-        const meResponse = await fetch("http://alpha.localhost:8000/accounts/me/", {
+        const meResponse = await fetch(`http://${hostname}:8000/accounts/me/`, {
           method: "GET",
           credentials: "include",
           headers: {

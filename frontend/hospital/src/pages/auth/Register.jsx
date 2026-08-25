@@ -19,7 +19,7 @@ function Register() {
             setMatch(false);
         }
     };
-    
+
 
   return (
     <div className={styles.loginpage}>

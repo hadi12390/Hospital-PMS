@@ -198,9 +198,10 @@ class ManageDoctors(APIView):
             "doctor": {
                 "public_id": str(doctor.user.public_id),
                 "name": doctor.user.get_full_name(),
-                'profile_picture': (
-                    self.context['request'].build_absolute_uri(doctor.user.profile_picture.url)
-                    if doctor.user.profile_picture else None
+                "profile_picture": (
+                    self.request.build_absolute_uri(doctor.user.profile_picture.url)
+                    if doctor.user and doctor.user.profile_picture
+                    else None
                 ),
             },
             "specialty": doctor.specialty,

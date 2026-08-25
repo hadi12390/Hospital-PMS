@@ -109,6 +109,24 @@ function Dashboard() {
   const dateInput = useRef();
 
   // ---------- Data ----------
+  try {
+    const hostname = window.location.hostname;
+    const response = await fetch(`http://${hostname}:8000/manager/dashboard/`, {
+      method = "GET",
+      credentials = "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok){
+      throw new Error(data.message || "Failed to fetch");
+      
+    }
+
+  };
+
   const today = getFormattedDate();
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

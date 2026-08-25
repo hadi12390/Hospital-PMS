@@ -24,6 +24,7 @@ SHARED_APPS = [
     'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
+    'drf_spectacular',
 ]
 
 TENANT_APPS = [
@@ -157,6 +158,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
@@ -243,3 +245,10 @@ CACHES = { # Redis is better.
 CSRF_TRUSTED_ORIGINS = ["http://*.localhost:5173", "http://*.localhost:8000"]
 
 CSRF_COOKIE_DOMAIN = None
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

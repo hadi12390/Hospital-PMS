@@ -1,5 +1,5 @@
 import styles from "./DoctorsTable.module.css";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Search from "./svg/search.svg?react";
@@ -7,84 +7,44 @@ import Person from "./svg/person.svg?react";
 import ArrowDown from "./svg/arrowdown.svg?react";
 import Dot from "./svg/dot.svg?react";
 
-const specialtyOptions = [
-  "Software Engineering",
-  "Network Engineering",
-  "Cyber Security",
-  "Data Science",
-  "Dentist",
-];
+const statusOptions = ["Active", "On Leave", "Not exist"];
 
-const statusOptions = ["Active", "Not Active"];
-
-const doctors = [
-  { id: 1, name: "Dr. Jessica", specialty: "Dentist", schedule: "09:00 - 18:00", status: "Active" },
-  { id: 2, name: "Dr. Ahmad", specialty: "Software Engineering", schedule: "09:00 - 18:00", status: "Active" },
-  { id: 3, name: "Dr. Lina", specialty: "Data Science", schedule: "10:00 - 18:00", status: "Not Active" },
-  { id: 4, name: "Dr. Omar", specialty: "Cyber Security", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 5, name: "Dr. Sara", specialty: "Network Engineering", schedule: "09:00 - 17:00", status: "Not Active" },
-  { id: 6, name: "Dr. Khaled", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 7, name: "Dr. Noor", specialty: "Dentist", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 8, name: "Dr. Yazan", specialty: "Cyber Security", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 9, name: "Dr. Rania", specialty: "Data Science", schedule: "08:00 - 15:00", status: "Not Active" },
-  { id: 10, name: "Dr. Tareq", specialty: "Network Engineering", schedule: "11:00 - 19:00", status: "Active" },
-
-  { id: 11, name: "Dr. Hala", specialty: "Dentist", schedule: "09:00 - 18:00", status: "Active" },
-  { id: 12, name: "Dr. Sami", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 13, name: "Dr. Dana", specialty: "Data Science", schedule: "09:00 - 17:00", status: "Not Active" },
-  { id: 14, name: "Dr. Fadi", specialty: "Cyber Security", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 15, name: "Dr. Maya", specialty: "Network Engineering", schedule: "08:00 - 15:00", status: "Active" },
-  { id: 16, name: "Dr. Zaid", specialty: "Software Engineering", schedule: "09:00 - 18:00", status: "Active" },
-  { id: 17, name: "Dr. Reem", specialty: "Dentist", schedule: "10:00 - 19:00", status: "Not Active" },
-  { id: 18, name: "Dr. Basel", specialty: "Network Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 19, name: "Dr. Aya", specialty: "Data Science", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 20, name: "Dr. Laith", specialty: "Cyber Security", schedule: "09:00 - 18:00", status: "Not Active" },
-
-  { id: 21, name: "Dr. Farah", specialty: "Software Engineering", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 22, name: "Dr. Nasser", specialty: "Network Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 23, name: "Dr. Salma", specialty: "Dentist", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 24, name: "Dr. Ibrahim", specialty: "Cyber Security", schedule: "24 Hours", status: "Active" },
-  { id: 25, name: "Dr. Leen", specialty: "Data Science", schedule: "09:00 - 18:00", status: "Not Active" },
-  { id: 26, name: "Dr. Adam", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 27, name: "Dr. Mariam", specialty: "Dentist", schedule: "10:00 - 19:00", status: "Active" },
-  { id: 28, name: "Dr. Hamza", specialty: "Cyber Security", schedule: "09:00 - 17:00", status: "Not Active" },
-  { id: 29, name: "Dr. Yasmeen", specialty: "Data Science", schedule: "08:00 - 15:00", status: "Active" },
-  { id: 30, name: "Dr. Wael", specialty: "Network Engineering", schedule: "09:00 - 18:00", status: "Active" },
-
-  { id: 31, name: "Dr. Jana", specialty: "Dentist", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 32, name: "Dr. Murad", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Not Active" },
-  { id: 33, name: "Dr. Tala", specialty: "Cyber Security", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 34, name: "Dr. Anas", specialty: "Data Science", schedule: "11:00 - 19:00", status: "Active" },
-  { id: 35, name: "Dr. Rawan", specialty: "Network Engineering", schedule: "09:00 - 18:00", status: "Not Active" },
-  { id: 36, name: "Dr. Mahmoud", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 37, name: "Dr. Dalia", specialty: "Dentist", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 38, name: "Dr. Saif", specialty: "Cyber Security", schedule: "09:00 - 17:00", status: "Not Active" },
-  { id: 39, name: "Dr. Esraa", specialty: "Data Science", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 40, name: "Dr. Rami", specialty: "Network Engineering", schedule: "09:00 - 18:00", status: "Active" },
-
-  { id: 41, name: "Dr. Malak", specialty: "Dentist", schedule: "10:00 - 18:00", status: "Active" },
-  { id: 42, name: "Dr. Ayman", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Not Active" },
-  { id: 43, name: "Dr. Nour", specialty: "Data Science", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 44, name: "Dr. Qasem", specialty: "Cyber Security", schedule: "09:00 - 18:00", status: "Active" },
-  { id: 45, name: "Dr. Batool", specialty: "Network Engineering", schedule: "10:00 - 19:00", status: "Not Active" },
-  { id: 46, name: "Dr. Yousef", specialty: "Software Engineering", schedule: "08:00 - 16:00", status: "Active" },
-  { id: 47, name: "Dr. Sawsan", specialty: "Dentist", schedule: "09:00 - 17:00", status: "Active" },
-  { id: 48, name: "Dr. Iyad", specialty: "Cyber Security", schedule: "24 Hours", status: "Active" },
-  { id: 49, name: "Dr. Haneen", specialty: "Data Science", schedule: "10:00 - 18:00", status: "Not Active" },
-  { id: 50, name: "Dr. Majd", specialty: "Network Engineering", schedule: "09:00 - 18:00", status: "Active" },
-];
-
-function DoctorsTable() {
+function DoctorsTable({ doctors = [], loading = false }) {
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
-
   const [openDropdown, setOpenDropdown] = useState(null); // "specialty" | "status" | null
 
-  function handleDoctorClick(doctorId) {
-    navigate("/admin/manage&doctors/doctor&profile", { state: { doctorId } });
+  // Build specialty options dynamically from the real data
+  const specialtyOptions = useMemo(() => {
+    const set = new Set();
+    doctors.forEach((doc) => {
+      if (doc?.specialty) set.add(doc.specialty);
+    });
+    return Array.from(set).sort();
+  }, [doctors]);
+
+  function formatSchedule(schedule) {
+    if (!schedule || !schedule.start_time || !schedule.end_time) {
+      return "—";
+    }
+
+    // API returns time as "HH:MM:SS" or "HH:MM"
+    const format = (t) => {
+      if (!t) return "";
+      const [h, m] = t.split(":");
+      return `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
+    };
+
+    return `${format(schedule.start_time)} - ${format(schedule.end_time)}`;
+  }
+
+  function handleDoctorClick(publicId) {
+    navigate("/admin/manage&doctors/doctor&profile", {
+      state: { doctorId: publicId },
+    });
   }
 
   function toggleDropdown(name) {
@@ -101,21 +61,30 @@ function DoctorsTable() {
     setOpenDropdown(null);
   }
 
-  const filteredDoctors = doctors.filter((doc) => {
-    const matchesSearch = doc.name
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
+  // Normalize + filter
+  const filteredDoctors = useMemo(() => {
+    return doctors
+      .filter((item) => item && item.doctor) // guard against null summaries
+      .filter((item) => {
+        const name = item.doctor.name || "";
+        const specialty = item.specialty || "";
+        const status = item.status || "";
 
-    const matchesSpecialty = selectedSpecialty
-      ? doc.specialty === selectedSpecialty
-      : true;
+        const matchesSearch = name
+          .toLowerCase()
+          .includes(searchText.toLowerCase());
 
-    const matchesStatus = selectedStatus
-      ? doc.status === selectedStatus
-      : true;
+        const matchesSpecialty = selectedSpecialty
+          ? specialty === selectedSpecialty
+          : true;
 
-    return matchesSearch && matchesSpecialty && matchesStatus;
-  });
+        const matchesStatus = selectedStatus
+          ? status === selectedStatus
+          : true;
+
+        return matchesSearch && matchesSpecialty && matchesStatus;
+      });
+  }, [doctors, searchText, selectedSpecialty, selectedStatus]);
 
   return (
     <div className={styles.wrapper}>
@@ -148,6 +117,9 @@ function DoctorsTable() {
 
           {openDropdown === "specialty" && (
             <div className={`${styles.dropdownMenu} ${styles.glass}`}>
+              {specialtyOptions.length === 0 && (
+                <div className={styles.dropdownItem}>No specialties</div>
+              )}
               {specialtyOptions.map((option) => (
                 <button
                   key={option}
@@ -205,32 +177,46 @@ function DoctorsTable() {
         </div>
 
         <div className={styles.tableBody}>
-          {filteredDoctors.length === 0 && (
+          {loading && (
+            <p className={styles.emptyState}>Loading doctors…</p>
+          )}
+
+          {!loading && filteredDoctors.length === 0 && (
             <p className={styles.emptyState}>No doctors found</p>
           )}
 
-          {filteredDoctors.map((doc) => (
-            <button
-              key={doc.id}
-              className={`${styles.row} ${styles.glass}`}
-              onClick={() => handleDoctorClick(doc.id)}
-            >
-              <div className={styles.colDoctor}>
-                <div className={styles.avatar}>
-                  <Person className={styles.personIcon} />
-                </div>
-                <span>{doc.name}</span>
-              </div>
+          {!loading &&
+            filteredDoctors.map((item) => {
+              const doc = item.doctor;
+              const publicId = doc.public_id;
+              const name = doc.name || "—";
+              const specialty = item.specialty || "—";
+              const scheduleText = formatSchedule(item.schedule);
+              const status = item.status || "—";
 
-              <div className={styles.colSpecialty}>{doc.specialty}</div>
-              <div className={styles.colSchedule}>{doc.schedule}</div>
+              return (
+                <button
+                  key={publicId}
+                  className={`${styles.row} ${styles.glass}`}
+                  onClick={() => handleDoctorClick(publicId)}
+                >
+                  <div className={styles.colDoctor}>
+                    <div className={styles.avatar}>
+                      <Person className={styles.personIcon} />
+                    </div>
+                    <span>{name}</span>
+                  </div>
 
-              <div className={styles.colStatus}>
-                <Dot className={styles.dotIcon} />
-                {doc.status}
-              </div>
-            </button>
-          ))}
+                  <div className={styles.colSpecialty}>{specialty}</div>
+                  <div className={styles.colSchedule}>{scheduleText}</div>
+
+                  <div className={styles.colStatus}>
+                    <Dot className={styles.dotIcon} />
+                    {status}
+                  </div>
+                </button>
+              );
+            })}
         </div>
       </div>
     </div>

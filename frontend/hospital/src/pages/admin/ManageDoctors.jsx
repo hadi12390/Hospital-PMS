@@ -1,127 +1,66 @@
 import styles from "./Dashboard.module.css";
 import layoutStyles from "./ManageDoctors.module.css";
 
-import { useRef, useState ,useMemo } from "react"
-import RevenueOverview from './RevenueOverview/RevenueOverview';
-import Sidebar from './Sidebar';
-
-import Search from "../../assets/manager/search.svg?react";
-import Person from "../../assets/manager/person.svg?react";
-import ArrowDown from "../../assets/manager/arrowdown.svg?react";
-import Dot from "../../assets/manager/dot.svg?react";
-import Gear from "../../assets/manager/gear.svg?react";
-
-
+import { useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
 import DoctorsTable from "./ManageDoctors/DoctorsTable.jsx";
 
-
-
+import Gear from "../../assets/manager/gear.svg?react";
 
 function ManageDoctors() {
-  // ---------- Date helpers ----------
-  function getCurrentDate() {
-    const date = new Date();
-    return `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
-  }
-
-  function getFormattedDate() {
-    const date = new Date();
-
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const dayName = days[date.getDay()];
-    const dayNumber = date.getDate();
-    const month = months[date.getMonth()];
-
-    function getSuffix(day) {
-      if (day > 3 && day < 21) return "th";
-
-      switch (day % 10) {
-        case 1:
-          return "st";
-        case 2:
-          return "nd";
-        case 3:
-          return "rd";
-        default:
-          return "th";
-      }
-    }
-
-    return {
-      dayName,
-      dayNumber,
-      suffix: getSuffix(dayNumber),
-      month,
-    };
-  }
-
-  function handleDateChange(e) {
-    const value = e.target.value;
-
-    if (!value) {
-      setCurrentDate("");
-      return;
-    }
-
-    const [year, month, day] = value.split("-");
-    setCurrentDate(`${day} / ${month} / ${year}`);
-  }
-
-  function formatTime(time) {
-    let [hour, minute] = time.split(":").map(Number);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-
-    return `${hour}:${String(minute).padStart(2, "0")} ${period}`;
-  }
-
   // ---------- State ----------
-  const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [showMenu, setShowMenu] = useState(false);
-  const [activeNav, setActiveNav] = useState("dashboard");
-  const dateInput = useRef();
+  const [activeNav, setActiveNav] = useState("manage-doctors");
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [pickedDate, setPickedDate] = useState("");
+  // ---------- Fetch ----------
+  const getManageDoctors = async () => {
+    setLoading(true);
+    setError(null);
 
-  function handleDateChange(e) {
-    const value = e.target.value; // "YYYY-MM-DD"
-    if (!value) {
-      setPickedDate("");
-      return;
+    try {
+      const hostname = window.location.hostname;
+      const response = await fetch(
+        `http://${hostname}:8000/manager/manage-doctors/`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to fetch doctors data");
+      }
+
+      setData(result);
+    } catch (err) {
+      console.error("Manage doctors fetch error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    const [year, month, day] = value.split("-");
-    setPickedDate(`${day} / ${month} / ${year}`);
-    if (onDateChange) onDateChange(value);
-  }
+  };
 
+  useEffect(() => {
+    getManageDoctors();
+  }, []);
 
+  // ---------- Derived values ----------
+  const totalDoctors = data?.total_doctors ?? 0;
+  const activeDoctors = data?.active_doctors ?? 0;
+  const onLeaveDoctors = data?.on_leave_doctors ?? 0;
+  const capacity = data?.capacity ?? 0;
+  const doctors = data?.doctors ?? [];
 
+  // ---------- Render ----------
   return (
     <div className={styles.DoctorDashboard}>
       <div className={styles.back}></div>
@@ -134,13 +73,12 @@ function ManageDoctors() {
         {/* Navbar */}
         <nav className={`${styles.nav} ${layoutStyles.navContent}`}>
           <div className={layoutStyles.pageanme}>
-            <Gear/>
+            <Gear />
             Manage Doctors
           </div>
-          <div className={`${styles.navContent}`}>
-            
+
+          <div className={styles.navContent}>
             <div className={styles.buttonAddAppoi}>
-              
               <button>
                 <img src="/assest/doctor/cards/Add.svg" alt="Add" />
                 Doctor
@@ -153,7 +91,6 @@ function ManageDoctors() {
               <div className={styles.profilePic}>M</div>
 
               <button
-              
                 className={styles.profBut}
                 onClick={() => setShowMenu(!showMenu)}
               >
@@ -178,31 +115,36 @@ function ManageDoctors() {
 
         {/* Main Content */}
         <main className={styles.cards}>
+          {loading && (
+            <div className={styles.loadingBanner}>Loading doctors…</div>
+          )}
+          {error && <div className={styles.errorBanner}>{error}</div>}
 
+          {/* Stats Row */}
           <div className={layoutStyles.statsRow}>
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Total Doctors</p>
-              <p className={layoutStyles.statValue}>12</p>
+              <p className={layoutStyles.statValue}>{totalDoctors}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Active</p>
-              <p className={layoutStyles.statValue}>10</p>
+              <p className={layoutStyles.statValue}>{activeDoctors}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>On Leave</p>
-              <p className={layoutStyles.statValue}>4</p>
+              <p className={layoutStyles.statValue}>{onLeaveDoctors}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
-              <p className={layoutStyles.statLabel}>Appointments Today</p>
-              <p className={layoutStyles.statValue}>32</p>
+              <p className={layoutStyles.statLabel}>Capacity</p>
+              <p className={layoutStyles.statValue}>{capacity}%</p>
             </div>
           </div>
 
-          <DoctorsTable/>
-        
+          {/* Doctors Table */}
+          <DoctorsTable doctors={doctors} loading={loading} />
         </main>
       </section>
     </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiFetch } from "../api/apiFetch";
 
 const AuthContext = createContext(null);
 
@@ -9,11 +10,10 @@ export function AuthProvider({ children }) {
   const getCurrentUser = async () => {
     try {
       const hostname = window.location.hostname;
-      const response = await fetch(
-        `http://${hostname}:8000/accounts/me/`,
+      const response = await apiFetch(
+        "/accounts/me/",
         {
           method: "GET",
-          credentials: "include",
         }
       );
 

@@ -1,49 +1,141 @@
 import styles from "../../Dashboard.module.css";
 import layoutStyles from "../../ManageDoctors.module.css";
-
 import profileStyles from "./DoctorProfile.module.css";
 
-import { useRef, useState} from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import Sidebar from '../../Sidebar';
+import Sidebar from "../../Sidebar";
 
-import doctorImg from "./doctor.png";
+import doctorImg from "./doctor.png"; // fallback image
 
 import Doctor from "../../../../assets/manager/doctor.svg?react";
 import Time from "../../../../assets/manager/time.svg?react";
 import Drug from "../../../../assets/manager/drug.svg?react";
 import Star from "../../../../assets/manager/star.svg?react";
-import Person from "../../../../assets/manager/person.svg?react";
 
 function DoctorProfile() {
-  const [showMenu, setShowMenu] = useState(false);
-  const [activeNav, setActiveNav] = useState("dashboard");
-
-  const doctor = {
-    name: "Dr. Jassica Smith",
-    fullName: "Jassica Smeth Al-batawnah",
-    specialty: "Dentistry",
-    specialtyLabel: "Pediatrician",
-    rating: 4.9,
-    reviews: 364,
-    status: "Active",
-    phone: "+962 79 120 0976",
-    email: "jessicasmeth@clinic.com",
-    photo: {doctorImg},
-    overview: {
-      appointments: 8,
-      completed: 5,
-      upcoming: 3,
-      cancelled: 0,
-    },
-    nextAppointment: {
-      time: "10:30 AM",
-      patient: "MIA Quien",
-    },
-  };
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const [showMenu, setShowMenu] = useState(false);
+  const [activeNav, setActiveNav] = useState("manage-doctors");
+
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // public_id comes from the table click
+  const publicId = location.state?.doctorId;
+
+  useEffect(() => {
+    if (!publicId) {
+      setError("No doctor selected");
+      setLoading(false);
+      return;
+    }
+
+    const fetchDoctor = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const hostname = window.location.hostname;
+        const response = await fetch(
+          `http://${hostname}:8000/manager/manage-doctors/${publicId}/`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || data.message || "Failed to load doctor");
+        }
+
+        setDoctor(data);
+      } catch (err) {
+        console.error("Doctor profile fetch error:", err);
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctor();
+  }, [publicId]);
+
+  // ---------- Helpers ----------
+  function formatTime(time) {
+    if (!time) return "—";
+    // API returns "HH:MM:SS" or "HH:MM"
+    const [h, m] = time.split(":");
+    const hour = Number(h);
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${m.padStart(2, "0")} ${period}`;
+  }
+
+  function formatSchedule(start, end) {
+    if (!start || !end) return "Not set";
+    return `${formatTime(start)} - ${formatTime(end)}`;
+  }
+
+  // ---------- Loading / Error states ----------
+  if (loading) {
+    return (
+      <div className={styles.DoctorDashboard}>
+        <div className={styles.back}></div>
+        <Sidebar activeId={activeNav} onSelect={setActiveNav} />
+        <section className={styles.dashboardContent}>
+          <main className={styles.cards}>
+            <p style={{ padding: "2rem", color: "#fff" }}>Loading doctor profile…</p>
+          </main>
+        </section>
+      </div>
+    );
+  }
+
+  if (error || !doctor) {
+    return (
+      <div className={styles.DoctorDashboard}>
+        <div className={styles.back}></div>
+        <Sidebar activeId={activeNav} onSelect={setActiveNav} />
+        <section className={styles.dashboardContent}>
+          <main className={styles.cards}>
+            <p style={{ padding: "2rem", color: "#ff6b6b" }}>
+              {error || "Doctor not found"}
+            </p>
+            <button
+              onClick={() => navigate(-1)}
+              style={{ marginLeft: "2rem" }}
+            >
+              ← Go back
+            </button>
+          </main>
+        </section>
+      </div>
+    );
+  }
+
+  // ---------- Derived values from API ----------
+  const name = doctor.name || "—";
+  const email = doctor.email || "—";
+  const specialty = doctor.specialty || "—";
+  const phone = doctor.phone_number || "—";
+  const status = doctor.status === "active" ? "Active" : "Inactive";
+  const photo = doctor.profile_picture || doctorImg;
+  const scheduleText = formatSchedule(doctor.start_time, doctor.end_time);
+
+  // These fields are not returned by the current serializer.
+  // Kept as placeholders so the UI doesn't break.
+  const rating = "—";
+  const reviews = "—";
 
   return (
     <div className={styles.DoctorDashboard}>
@@ -57,6 +149,7 @@ function DoctorProfile() {
             <Doctor />
             Doctor profile
           </div>
+
           <div className={styles.navContent}>
             <div className={styles.buttonAddAppoi}>
               <button>
@@ -79,7 +172,11 @@ function DoctorProfile() {
               {showMenu && (
                 <div className={styles.dropdownMenu}>
                   <button>
-                    <img width="40%" src="/assest/doctor/cards/log-out.svg" alt="a" />
+                    <img
+                      width="40%"
+                      src="/assest/doctor/cards/log-out.svg"
+                      alt="a"
+                    />
                     Logout
                   </button>
                 </div>
@@ -95,89 +192,87 @@ function DoctorProfile() {
             <div className={`${profileStyles.headerCard} ${profileStyles.glass}`}>
               <div className={profileStyles.photoWrapper}>
                 <div className={`${profileStyles.glassDIv} ${profileStyles.glass}`}>
-                    <img
-                    src={doctorImg}
-                    alt={doctor.name}
+                  <img
+                    src={photo}
+                    alt={name}
                     className={profileStyles.photo}
-                    />
+                  />
                 </div>
               </div>
 
               <div className={profileStyles.headerInfo}>
-                <h1 className={profileStyles.doctorName}>{doctor.name}</h1>
+                <h1 className={profileStyles.doctorName}>{name}</h1>
 
                 <div className={profileStyles.ratingRow}>
                   <Star className={profileStyles.icon} />
                   <span>
-                    {doctor.rating} ({doctor.reviews} Reviews)
+                    {rating} ({reviews} Reviews)
                   </span>
                 </div>
 
                 <div className={profileStyles.metaRow}>
                   <div className={profileStyles.metaItem}>
                     <Time className={profileStyles.icon} />
-                    <span>Available Now</span>
+                    <span>{scheduleText}</span>
                   </div>
 
                   <div className={profileStyles.metaItem}>
                     <Drug className={profileStyles.icon} />
-                    <span>{doctor.specialtyLabel}</span>
+                    <span>{specialty}</span>
                   </div>
                 </div>
               </div>
 
               <div className={`${profileStyles.statusBadge} ${profileStyles.glass}`}>
                 <span className={profileStyles.statusDot}></span>
-                {doctor.status}
+                {status}
               </div>
             </div>
 
             {/* Two Columns */}
             <div className={profileStyles.columnsRow}>
               {/* Today's Overview */}
+              {/* 
+                Note: The current DoctorOverviewSerializer does NOT return
+                appointment counts or next appointment.
+                These remain placeholders until the backend is extended.
+              */}
               <div className={`${profileStyles.overviewCard} ${profileStyles.glass}`}>
                 <h2 className={profileStyles.cardTitle}>Today's Overview</h2>
 
                 <div className={profileStyles.overviewList}>
                   <div className={profileStyles.overviewRow}>
                     <span>Appointments</span>
-                    <span className={profileStyles.numBadge}>
-                      {doctor.overview.appointments}
-                    </span>
+                    <span className={profileStyles.numBadge}>—</span>
                   </div>
-
                   <div className={profileStyles.overviewRow}>
                     <span>Completed</span>
-                    <span className={profileStyles.numBadge}>
-                      {doctor.overview.completed}
-                    </span>
+                    <span className={profileStyles.numBadge}>—</span>
                   </div>
-
                   <div className={profileStyles.overviewRow}>
                     <span>Upcoming</span>
-                    <span className={profileStyles.numBadge}>
-                      {doctor.overview.upcoming}
-                    </span>
+                    <span className={profileStyles.numBadge}>—</span>
                   </div>
-
                   <div className={profileStyles.overviewRow}>
                     <span>Cancelled</span>
-                    <span className={profileStyles.numBadge}>
-                      {doctor.overview.cancelled}
-                    </span>
+                    <span className={profileStyles.numBadge}>—</span>
                   </div>
                 </div>
 
                 <div className={profileStyles.nextAppointment}>
                   <h3 className={profileStyles.nextTitle}>Next Appointment</h3>
-                  <p className={profileStyles.nextInfo}>
-                    {doctor.nextAppointment.time} - {doctor.nextAppointment.patient}
-                  </p>
+                  <p className={profileStyles.nextInfo}>—</p>
                 </div>
 
-                <button 
-                    onClick={() => navigate("/admin/manage&doctors/doctor&profile/appointments")}
-                    className={`${profileStyles.viewBtn} ${profileStyles.glass}`}>
+                <button
+                  onClick={() =>
+                    navigate(
+                      "/admin/manage&doctors/doctor&profile/appointments",
+                      { state: { doctorId: publicId } }
+                    )
+                  }
+                  className={`${profileStyles.viewBtn} ${profileStyles.glass}`}
+                >
                   View Appointments →
                 </button>
               </div>
@@ -189,22 +284,27 @@ function DoctorProfile() {
                 <div className={`${profileStyles.infoInner} ${profileStyles.glass}`}>
                   <div className={profileStyles.infoBlock}>
                     <p className={profileStyles.infoLabel}>Full Name:</p>
-                    <p className={profileStyles.infoValue}>{doctor.fullName}</p>
+                    <p className={profileStyles.infoValue}>{name}</p>
                   </div>
 
                   <div className={profileStyles.infoBlock}>
                     <p className={profileStyles.infoLabel}>Specialty:</p>
-                    <p className={profileStyles.infoValue}>{doctor.specialty}</p>
+                    <p className={profileStyles.infoValue}>{specialty}</p>
                   </div>
 
                   <div className={profileStyles.infoBlock}>
                     <p className={profileStyles.infoLabel}>Phone:</p>
-                    <p className={profileStyles.infoValue}>{doctor.phone}</p>
+                    <p className={profileStyles.infoValue}>{phone}</p>
                   </div>
 
                   <div className={profileStyles.infoBlock}>
                     <p className={profileStyles.infoLabel}>Email:</p>
-                    <p className={profileStyles.infoValue}>{doctor.email}</p>
+                    <p className={profileStyles.infoValue}>{email}</p>
+                  </div>
+
+                  <div className={profileStyles.infoBlock}>
+                    <p className={profileStyles.infoLabel}>Working Hours:</p>
+                    <p className={profileStyles.infoValue}>{scheduleText}</p>
                   </div>
                 </div>
               </div>

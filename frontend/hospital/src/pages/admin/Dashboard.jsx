@@ -1,16 +1,10 @@
 import styles from "./Dashboard.module.css";
-import { useRef, useState ,useMemo } from "react"
-import RevenueOverview from './RevenueOverview/RevenueOverview';
-import Sidebar from './Sidebar';
-
+import { useState, useEffect } from "react";
+import RevenueOverview from "./RevenueOverview/RevenueOverview";
+import Sidebar from "./Sidebar";
 
 function Dashboard() {
   // ---------- Date helpers ----------
-  function getCurrentDate() {
-    const date = new Date();
-    return `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
-  }
-
   function getFormattedDate() {
     const date = new Date();
 
@@ -45,7 +39,6 @@ function Dashboard() {
 
     function getSuffix(day) {
       if (day > 3 && day < 21) return "th";
-
       switch (day % 10) {
         case 1:
           return "st";
@@ -66,163 +59,142 @@ function Dashboard() {
     };
   }
 
-  function handleDateChange(e) {
-    const value = e.target.value;
-
-    if (!value) {
-      setCurrentDate("");
-      return;
-    }
-
-    const [year, month, day] = value.split("-");
-    setCurrentDate(`${day} / ${month} / ${year}`);
-  }
-
-  // ---------- Time helpers ----------
-  const START = 8;
-  const END = 18;
-
-  function timeToPercent(time) {
-    const [hour, minute] = time.split(":").map(Number);
-    const total = hour + minute / 60;
-
-    return ((total - START) / (END - START)) * 100;
-  }
-
-  function getClockIcon(time) {
-    const hour = Number(time.split(":")[0]);
-    return `/assest/doctor/cards/clock/${hour.toString().padStart(2, "0")}.svg`;
-  }
-
-  function formatTime(time) {
-    let [hour, minute] = time.split(":").map(Number);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-
-    return `${hour}:${String(minute).padStart(2, "0")} ${period}`;
-  }
-
   // ---------- State ----------
-  const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [showMenu, setShowMenu] = useState(false);
   const [activeNav, setActiveNav] = useState("dashboard");
-  const dateInput = useRef();
 
-  // ---------- Data ----------
-  try {
-    const hostname = window.location.hostname;
-    const response = await fetch(`http://${hostname}:8000/manager/dashboard/`, {
-      method = "GET",
-      credentials = "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const [dashboardData, setDashboardData] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const data = await response.json();
-    if (!response.ok){
-      throw new Error(data.message || "Failed to fetch");
-      
+  // ---------- Fetch helpers ----------
+  const getDashboard = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const hostname = window.location.hostname;
+      const response = await fetch(
+        `http://${hostname}:8000/manager/dashboard/`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch dashboard");
+      }
+
+      setDashboardData(data);
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
   };
 
+  const getPersonalInfo = async () => {
+    try {
+      const hostname = window.location.hostname;
+      const response = await fetch(
+        `http://${hostname}:8000/accounts/personal-informations/`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch personal info");
+      }
+
+      // Handle both single object and array responses
+      const info = Array.isArray(data) ? data[0] : data;
+      setUserInfo(info);
+    } catch (err) {
+      console.error("Personal info fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    getDashboard();
+    getPersonalInfo();
+  }, []);
+
+  // ---------- Helpers ----------
+  function formatActivityTime(isoString) {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return isoString;
+    return date.toLocaleString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
+  function getDisplayName() {
+    if (!userInfo) return "Manager";
+
+    const first = userInfo.first_name?.trim() || "";
+    const last = userInfo.last_name?.trim() || "";
+
+    if (first || last) {
+      return `${first} ${last}`.trim();
+    }
+
+    return userInfo.username || "Manager";
+  }
+
+  // ---------- Derived data (exact API shape) ----------
   const today = getFormattedDate();
 
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const appointmentsCount = dashboardData?.today?.appointments_count ?? 0;
+  const lastThree = dashboardData?.today?.last_three ?? [];
+  const todayPatients = dashboardData?.today?.patients ?? [];
+  const patientsCount = dashboardData?.today?.patients_count ?? 0;
+  const activeDoctorsCount = dashboardData?.doctors?.active_count ?? 0;
+  const recentActivity = dashboardData?.recent_activity ?? [];
 
-  const appointments = [
-    {
-      id: 1,
-      day: "Mon",
-      patient: "MIA",
-      type: "Surgery",
-      start: "15:00",
-      end: "18:00",
-    },
-    {
-      id: 2,
-      day: "Tue",
-      patient: "John",
-      type: "Checkup",
-      start: "11:00",
-      end: "12:00",
-    },
-    {
-      id: 3,
-      day: "Thu",
-      patient: "Sara",
-      type: "Consultation",
-      start: "14:00",
-      end: "16:00",
-    },
-    {
-      id: 4,
-      day: "Fri",
-      patient: "GAZI",
-      type: "Surgery",
-      start: "12:00",
-      end: "18:00",
-    },
-  ];
+  const status = dashboardData?.appointments_by_status ?? {};
+  const confirmedCount = status.confirmed_appointments ?? 0;
+  const pendingCount = status.pending_appointments ?? 0;
+  const cancelledCount = status.cancelled_appointments ?? 0;
 
-  const currentAppointment = appointments[0];
-
-  const timeSlots = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
+  // Fake revenue data
+  const mockData = [
+    { day: "Day 1", value: 4000 },
+    { day: "Day 2", value: 5800 },
+    { day: "Day 3", value: 3500 },
+    { day: "Day 4", value: 8000 },
+    { day: "Day 5", value: 1500 },
+    { day: "Day 6", value: 10500 },
+    { day: "Day 7", value: 5000 },
+    { day: "Day 8", value: 7000 },
+    { day: "Day 9", value: 9500 },
+    { day: "Day 10", value: 8000 },
   ];
 
   // ---------- Render ----------
-
-  const mockData = [
-    { day: 'Day 1', value: 4000 },
-    { day: 'Day 2', value: 5800 },
-    { day: 'Day 3', value: 3500 },
-    { day: 'Day 4', value: 8000 },
-    { day: 'Day 5', value: 1500 },
-    { day: 'Day 6', value: 10500 },
-    { day: 'Day 7', value: 5000 },
-    { day: 'Day 8', value: 7000 },
-    { day: 'Day 9', value: 9500 },
-    { day: 'Day 10',value: 8000 },
-  ];
-
-  //----------- aaa --------------
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  const [pickedDate, setPickedDate] = useState("");
-
-  function handleDateChange(e) {
-    const value = e.target.value; // "YYYY-MM-DD"
-    if (!value) {
-      setPickedDate("");
-      return;
-    }
-    const [year, month, day] = value.split("-");
-    setPickedDate(`${day} / ${month} / ${year}`);
-    if (onDateChange) onDateChange(value);
-  }
-
-
-
   return (
     <div className={styles.DoctorDashboard}>
       <div className={styles.back}></div>
 
-      {/* Sidebar */}
       <Sidebar activeId={activeNav} onSelect={setActiveNav} />
 
-      {/* Right Side */}
       <section className={styles.dashboardContent}>
         {/* Navbar */}
         <nav className={styles.nav}>
@@ -237,10 +209,13 @@ function Dashboard() {
             <img src="/assest/doctor/cards/LIne3.svg" alt="" />
 
             <div className={styles.profileSec}>
-              <div className={styles.profilePic}>M</div>
+              <div className={styles.profilePic}>
+                {userInfo?.first_name?.[0]?.toUpperCase() ||
+                  userInfo?.username?.[0]?.toUpperCase() ||
+                  "M"}
+              </div>
 
               <button
-              
                 className={styles.profBut}
                 onClick={() => setShowMenu(!showMenu)}
               >
@@ -265,10 +240,16 @@ function Dashboard() {
 
         {/* Main Content */}
         <main className={styles.cards}>
+          {loading && (
+            <div className={styles.loadingBanner}>Loading dashboard…</div>
+          )}
+          {error && <div className={styles.errorBanner}>{error}</div>}
+
+          {/* Hero */}
           <div className={styles.heroSec}>
             <div className={styles.fullNameBox}>
               <div className={styles.heroNameP}>
-                <p className={styles.heroName}>Hello, MVMOD </p>
+                <p className={styles.heroName}>Hello, {getDisplayName()}</p>
                 <p>👋</p>
               </div>
               <p className={styles.heroPar}>
@@ -279,104 +260,106 @@ function Dashboard() {
             <div className={styles.dateRealDay}>
               <img src="/assest/doctor/cards/Vector (1).svg" alt="" />
               <p>
-                <span>{today.dayName}</span> , <span>{today.dayNumber}</span>
-                th <span>{today.month}</span>
+                <span>{today.dayName}</span> ,{" "}
+                <span>{today.dayNumber}</span>
+                {today.suffix} <span>{today.month}</span>
               </p>
             </div>
           </div>
 
           <div className={styles.containerCards}>
-            {/* BOX ONE */}
+            {/* BOX 1 – Appointments This Day */}
             <div className={styles.box1}>
               <div className={styles.boxJustiUper}>
                 <div>
-                  <img src="/assest/admin/calnder.svg" alt="iiw" />
+                  <img src="/assest/admin/calnder.svg" alt="" />
                 </div>
-                  <div>Appointments This Day</div>
-                </div>
+                <div>Appointments This Day</div>
+              </div>
 
-                <div className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxOne}`}>
-                  <div className={styles.mainNumBoxOne}>54</div>
-                  {/* Appointments START */}
+              <div
+                className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxOne}`}
+              >
+                <div className={styles.mainNumBoxOne}>{appointmentsCount}</div>
 
-                  <div className={styles.appBoxOne}>
-                    <div className={styles.tableNamesBoxOne}>
-                      <div className={styles.tableElement}>Dr.Hadi</div>
-                      <div className={styles.tableElement}>Dr.Jessica</div>
-                      <div className={styles.tableElement}>Dr.Hadi</div>
-                    </div>
-                    <div className={styles.tablePaNamesBoxOne}>
-                      <div className={styles.tableElement}>Mia</div>
-                      <div className={styles.tableElement}>Robert</div>
-                      <div className={styles.tableElement}>Joe</div>
-                    </div>
-                    <div className={styles.tablePaCostBoxOne}>
-                      <div className={styles.tableElement}>$120</div>
-                      <div className={styles.tableElement}>$290</div>
-                      <div className={styles.tableElement}>$350</div>
-                    </div> 
+                <div className={styles.appBoxOne}>
+                  <div className={styles.tableNamesBoxOne}>
+                    {lastThree.map((appt) => (
+                      <div
+                        key={appt.public_id}
+                        className={styles.tableElement}
+                      >
+                        {appt.doctor_name || "—"}
+                      </div>
+                    ))}
                   </div>
+                  <div className={styles.tablePaNamesBoxOne}>
+                    {lastThree.map((appt) => (
+                      <div
+                        key={appt.public_id}
+                        className={styles.tableElement}
+                      >
+                        {appt.patient_name || "—"}
+                      </div>
+                    ))}
+                  </div>
+                  <div className={styles.tablePaCostBoxOne}>
+                    {lastThree.map((appt) => (
+                      <div
+                        key={appt.public_id}
+                        className={styles.tableElement}
+                      >
+                        {formatActivityTime(appt.completed_at)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                {/* Appointments END */}
-
-
-                <div className={styles.arrowBoxOne}> 
-                  <img alt="jj" src="/assest/doctor/cards/go-svgrepo-com 1.svg"></img>
+                <div className={styles.arrowBoxOne}>
+                  <img
+                    alt=""
+                    src="/assest/doctor/cards/go-svgrepo-com 1.svg"
+                  />
                 </div>
               </div>
             </div>
 
-            {/* BOX TWO */}
+            {/* BOX 2 – Today Patients */}
             <div className={styles.box2}>
               <div className={styles.boxJustiUper}>
                 <div>
                   <img
                     src="/assest/admin/update-svgrepo-com 1.svg"
-                    alt="a"
+                    alt=""
                   />
                 </div>
                 <div>Today Patient</div>
               </div>
 
+              <div
+                className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxTwo}`}
+              >
+                <div className={styles.mainNumBoxTwo}>{patientsCount}</div>
 
-              <div className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxTwo}`}>
-                  <div className={styles.mainNumBoxTwo}>35</div>
-                  {/* Appointments START */}
-
-                  <div className={styles.appBoxTwo}>
-                    <div className={styles.tableNamesBoxTwo}>
-                      <div className={styles.tableElementTwo}>Noah</div>
-                      <div className={styles.tableElementTwo}>Herry</div>
-                      <div className={styles.tableElementTwo}>Alex</div>
-                    </div>
-                    <img 
-                      height="90%"
-                      src="/assest/admin/Line 7.svg"
-                      alt="" />
-                    <div className={styles.tablePaNamesBoxTwo}>
-                      <div className={styles.tableElementTwo}>Mia</div>
-                      <div className={styles.tableElementTwo}>Robert</div>
-                      <div className={styles.tableElementTwo}>Joe</div>
-                    </div>
-                    <img 
-                      height="90%"
-                      src="/assest/admin/Line 7.svg"
-                      alt="" />
-                    <div className={styles.tablePaCostBoxTwo}>
-                      <div className={styles.tableElementTwo}>Steve</div>
-                      <div className={styles.tableElementTwo}>Micheal</div>
-                      <div className={styles.tableElementTwo}>Mariah</div>
-                    </div> 
-                    <div className={styles.arrowBoxOne}> 
-                     <img alt="jj" src="/assest/doctor/cards/go-svgrepo-com 1.svg"></img>
-                    </div>
+                <div className={styles.appBoxTwo}>
+                  <div className={styles.tableNamesBoxTwo}>
+                    {todayPatients.slice(0, 3).map((name, i) => (
+                      <div key={i} className={styles.tableElementTwo}>
+                        {name || "—"}
+                      </div>
+                    ))}
                   </div>
-
-                {/* Appointments END */}
+                  <div className={styles.arrowBoxOne}>
+                    <img
+                      alt=""
+                      src="/assest/doctor/cards/go-svgrepo-com 1.svg"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* BOX THREE */}
+            {/* BOX 3 – Active Doctors */}
             <div className={styles.box3}>
               <div className={styles.boxJustiUper}>
                 <div>
@@ -388,49 +371,25 @@ function Dashboard() {
                 <div>Active Doctors</div>
               </div>
 
-              <div className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxTwo}`}>
-                  <div className={styles.mainNumBoxTwo}>24</div>
-                  {/* Appointments START */}
-
-                  <div className={styles.appBoxTwo}>
-                    <div className={styles.tableNamesBoxTwo}>
-                      <div className={styles.tableElementTwo}>Dr.Noah</div>
-                      <div className={styles.tableElementTwo}>Dr.Herry</div>
-                      <div className={styles.tableElementTwo}>Dr.Alex</div>
-                    </div>
-                    <img 
-                      height="90%"
-                      src="/assest/admin/Line 7.svg"
-                      alt="" />
-                    <div className={styles.tablePaNamesBoxTwo}>
-                      <div className={styles.tableElementTwo}>Dr.Mia</div>
-                      <div className={styles.tableElementTwo}>Dr.Robert</div>
-                      <div className={styles.tableElementTwo}>Dr.Joe</div>
-                    </div>
-                    <img 
-                      height="90%"
-                      src="/assest/admin/Line 7.svg"
-                      alt="" />
-                    <div className={styles.tablePaCostBoxTwo}>
-                      <div className={styles.tableElementTwo}>Dr.Steve</div>
-                      <div className={styles.tableElementTwo}>Dr.Micheal</div>
-                      <div className={styles.tableElementTwo}>Dr.Mariah</div>
-                    </div> 
-                    <div className={styles.arrowBoxOne}> 
-                     <img alt="jj" src="/assest/doctor/cards/go-svgrepo-com 1.svg"></img>
-                    </div>
-                  </div>
-
-                {/* Appointments END */}
+              <div
+                className={`${styles.boxJustiDown} ${styles.boxJustiDownBoxTwo}`}
+              >
+                <div className={styles.mainNumBoxTwo}>{activeDoctorsCount}</div>
+                <div className={styles.arrowBoxOne}>
+                  <img
+                    alt=""
+                    src="/assest/doctor/cards/go-svgrepo-com 1.svg"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* BOX FOUR */}
-            <div style={{ width: '100%' }} className={styles.box4}>
-              <RevenueOverview   onDateChange={setSelectedDate} data={mockData} />
+            {/* BOX 4 – Revenue (fake data) */}
+            <div style={{ width: "100%" }} className={styles.box4}>
+              <RevenueOverview data={mockData} />
             </div>
 
-            {/* BOX FIVE */}
+            {/* BOX 5 – Recent Activity */}
             <div className={styles.box5}>
               <div>
                 <div className={styles.boxJustiUper}>
@@ -445,42 +404,34 @@ function Dashboard() {
               </div>
 
               <div className={styles.noti}>
-                <div className={styles.notiCard}>
-                  <div className={styles.notiTime}><p>2 min ago</p></div>
-                  <div className={styles.notiDisc}>New Patient Registered
-                      <p>By: Mia Morgan</p>
+                {recentActivity.length === 0 && !loading && (
+                  <div className={styles.notiCard}>
+                    <div className={styles.notiDisc}>No recent activity</div>
                   </div>
-                </div>
+                )}
 
-                <div className={styles.notiCard}>
-                  <div className={styles.notiTime}><p>Today , 2:32  PM</p></div>
-                  <div className={styles.notiDisc}>Appointment Booked
-                      <p>By: Dr.Hadi</p>
+                {recentActivity.map((log, i) => (
+                  <div key={i} className={styles.notiCard}>
+                    <div className={styles.notiTime}>
+                      <p>{formatActivityTime(log.created_at)}</p>
+                    </div>
+                    <div className={styles.notiDisc}>
+                      {log.action}
+                      <p>By: {log.user || "System"}</p>
+                    </div>
                   </div>
-                </div>
+                ))}
 
-                <div className={styles.notiCard}>
-                  <div className={styles.notiTime}><p>Today , 12:02  AM</p></div>
-                  <div className={styles.notiDisc}>Appointment Cancelled
-                      <p>By: Dr.MVMOD</p>
-                  </div>
+                <div className={styles.arrowBoxSix}>
+                  <img
+                    src="/assest/doctor/cards/go-svgrepo-com 1.svg"
+                    alt=""
+                  />
                 </div>
-
-                <div className={styles.notiCard}>
-                  <div className={styles.notiTime}><p>Today , 8:12  AM</p></div>
-                  <div className={styles.notiDisc}>Appointment Completed
-                      <p>By: Jeren Gazi</p>
-                  </div>
-                </div>
-                <div class={styles.arrowBoxSix}>
-                  <img src="/assest/doctor/cards/go-svgrepo-com 1.svg" alt="" />
-                </div>
-
               </div>
-              
             </div>
 
-            {/* BOX SIX */}
+            {/* BOX 6 – Appointments Status */}
             <div className={styles.box6}>
               <div className={styles.boxJustiUper}>
                 <div>
@@ -493,22 +444,36 @@ function Dashboard() {
               </div>
 
               <div className={styles.boxJustiDownForSix}>
+                {/* Confirmed */}
                 <div className={styles.staPi}>
-                  <img src="/assest/admin/approved-aproved-confirm-2-svgrepo-com 1.svg" alt="" />
+                  <img
+                    src="/assest/admin/approved-aproved-confirm-2-svgrepo-com 1.svg"
+                    alt=""
+                  />
                   <div className={styles.staPiIn}>
-                    <span>55</span>
+                    <span>{confirmedCount}</span>
                   </div>
                 </div>
+
+                {/* Pending */}
                 <div className={styles.staPi}>
-                  <img src="/assest/admin/minus-circle-svgrepo-com (1) 1.svg" alt="" />
+                  <img
+                    src="/assest/admin/minus-circle-svgrepo-com (1) 1.svg"
+                    alt=""
+                  />
                   <div className={styles.staPiIn}>
-                    <span>6</span>
+                    <span>{pendingCount}</span>
                   </div>
                 </div>
+
+                {/* Cancelled */}
                 <div className={styles.staPi}>
-                  <img src="/assest/admin/cancle-circle-svgrepo-com 1.svg" alt="" />
+                  <img
+                    src="/assest/admin/cancle-circle-svgrepo-com 1.svg"
+                    alt=""
+                  />
                   <div className={styles.staPiIn}>
-                    <span>23</span>
+                    <span>{cancelledCount}</span>
                   </div>
                 </div>
               </div>

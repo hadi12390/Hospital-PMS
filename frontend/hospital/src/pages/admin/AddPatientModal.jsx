@@ -11,7 +11,7 @@ const initialForm = {
   firstName: "",
   lastName: "",
   email: "",
-  userName: "",
+  user: "",
   phone: "",
   birth_date: "",
   gender: "",
@@ -85,6 +85,8 @@ function AddPatientModal({ onClose, onSave }) {
       gender: form.gender,
       phone_number: form.phone,
       blood_type: form.bloodType,
+      user: form.user,
+
     };
 
     try {
@@ -172,8 +174,8 @@ function AddPatientModal({ onClose, onSave }) {
         <div className={styles.field}>
           <label>User Name (optional):</label>
           <input
-            name="userName"
-            value={form.userName}
+            name="user"
+            value={form.user}
             onChange={handleChange}
             placeholder="@MiaQuien"
           />

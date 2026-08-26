@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import Patient
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # 1. Used by Patients registering themselves
 class PatientSelfRegistrationSerializer(serializers.ModelSerializer):
@@ -19,18 +22,31 @@ class PatientSelfRegistrationSerializer(serializers.ModelSerializer):
 
 # 2. Used by Doctors and Managers registering a patient
 class StaffPatientSerializer(serializers.ModelSerializer):
+    # Staff type the username; we resolve it to the actual User instance
+    user = serializers.CharField(write_only=True)
+
     class Meta:
         model = Patient
-        # Staff explicitly specify which user account this profile belongs to
         fields = [
-            'personal_id', 
-            'first_name', 
-            'last_name', 
+            'user',
+            'personal_id',
+            'first_name',
+            'last_name',
             'birth_date',
             'gender',
             'phone_number',
             'blood_type',
         ]
+
+    def validate_user(self, value):
+        try:
+            return User.objects.get(username=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No user found with that username.")
+
+    def create(self, validated_data):
+        # validated_data['user'] is already a resolved User instance
+        return Patient.objects.create(**validated_data)
 
 class ProfileSerializer(serializers.ModelSerializer):
 

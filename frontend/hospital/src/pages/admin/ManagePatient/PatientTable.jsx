@@ -16,6 +16,7 @@ const ageOptions = [
 ];
 
 function formatDisplayDate(isoDate) {
+  if (!isoDate) return "—";
   const [year, month, day] = isoDate.split("-");
   const date = new Date(Number(year), Number(month) - 1, Number(day));
 
@@ -25,6 +26,19 @@ function formatDisplayDate(isoDate) {
   ];
 
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+// Adapts the raw API item (nested `patient` object, appointment info, etc.)
+// into the flat shape the table actually renders.
+function normalizePatient(apiPatient, index) {
+  return {
+    id: apiPatient.patient?.public_id ?? `patient-${index}`,
+    public_id: apiPatient.patient?.public_id ?? null,
+    name: apiPatient.patient?.name ?? "Unknown",
+    phone: apiPatient.phone ?? "",
+    lastVisit: apiPatient.last_appointment?.appointment_date ?? null,
+    age: apiPatient.age,
+  };
 }
 
 function PatientTable({ patients }) {
@@ -38,10 +52,12 @@ function PatientTable({ patients }) {
   const [selectedDate, setSelectedDate] = useState(""); // "" = بدون فلتر تاريخ
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  function handlePatientClick(patientId) {
-    navigate("/admin/manage&patients/patient&profile", { state: { patientId } });
-  }
+  const [pid, setPid] = useState(true);
 
+
+  function handlePatientClick(patientId) {
+    navigate(`/admin/manage&patients/patient&profile/${patientId}`);
+  }
   function toggleDropdown() {
     setOpenDropdown((prev) => !prev);
   }
@@ -52,7 +68,7 @@ function PatientTable({ patients }) {
   }
 
   function handleDateChange(e) {
-    setSelectedDate(e.target.value); 
+    setSelectedDate(e.target.value);
   }
 
   function handleClearDate() {
@@ -66,7 +82,9 @@ function PatientTable({ patients }) {
     setSelectedDate("");
   }
 
-  const filteredPatients = patients.filter((patient) => {
+  const normalizedPatients = patients.map(normalizePatient);
+
+  const filteredPatients = normalizedPatients.filter((patient) => {
     const search = searchText.toLowerCase();
 
     const matchesSearch =
@@ -170,17 +188,29 @@ function PatientTable({ patients }) {
           {filteredPatients.map((patient) => (
             <button
               key={patient.id}
-              className={`${styles.row} ${styles.glass}`}
-              onClick={() => handlePatientClick(patient.id)}
+              className={`${
+                patient.public_id === "User Is guest."
+                  ? styles.rowDisabled
+                  : styles.row
+              } ${styles.glass}`}
+              onClick={() => {
+                if (patient.public_id !== "User Is guest.") {
+                  handlePatientClick(patient.public_id);
+                }
+              }}
             >
               <div className={styles.colDoctor}>
                 <div className={styles.avatar}>
                   <Person className={styles.personIcon} />
                 </div>
+
                 <span>{patient.name}</span>
               </div>
 
-              <div className={styles.colSpecialty}>{patient.phone}</div>
+              <div className={styles.colSpecialty}>
+                {patient.phone}
+              </div>
+
               <div className={styles.colSchedule}>
                 {formatDisplayDate(patient.lastVisit)}
               </div>

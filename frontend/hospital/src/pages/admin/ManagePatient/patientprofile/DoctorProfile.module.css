@@ -362,7 +362,11 @@
     padding: 10px;
     border-radius:1rem ;
     background-color: #f1efe852;
-}
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 /* ==========================================================================
    PAGE ENTRANCE ANIMATION
    ========================================================================== */
@@ -444,4 +448,9 @@
 .rowoe{
   flex: 1;
   font-size: 1.2rem;
+}
+.picFont{
+  margin: 0;
+  font-size: 7rem;
+  color: white;
 }

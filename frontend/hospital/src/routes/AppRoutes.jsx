@@ -151,7 +151,7 @@ function AppRoutes() {
       />
 
       <Route
-        path="/admin/manage&patients/patient&profile"
+        path="/admin/manage&patients/patient&profile/:patientId"
         element={
           <ProtectedRoute allowedRole="manager">
             <PatientProfile />

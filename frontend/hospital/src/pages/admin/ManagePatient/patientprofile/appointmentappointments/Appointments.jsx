@@ -4,7 +4,7 @@ import appStyles from "./DoctorAppointments.module.css";
 
 import RecentAppointments from "./table/RecentAppointments.jsx";
 
-import { useRef, useState ,useMemo } from "react"
+import { useRef, useState ,useMemo,useEffect } from "react"
 import RevenueOverview from '../../../RevenueOverview/RevenueOverview.jsx';
 import Sidebar from '../../../Sidebar.jsx';
 
@@ -103,6 +103,8 @@ function Appointments() {
     setCurrentDate(`${day} / ${month} / ${year}`);
   }
 
+
+
   function formatTime(time) {
     let [hour, minute] = time.split(":").map(Number);
     const period = hour >= 12 ? "PM" : "AM";
@@ -132,8 +134,6 @@ function Appointments() {
     if (onDateChange) onDateChange(value);
   }
 
-
-
   return (
     <div className={styles.DoctorDashboard}>
       <div className={styles.back}></div>
@@ -147,7 +147,7 @@ function Appointments() {
         <nav className={`${styles.nav} ${layoutStyles.navContent}`}>
           <div className={layoutStyles.pageanme}>
             <Gear/>
-            Manage Doctors
+            See Appointments
           </div>
           <div className={`${styles.navContent}`}>
             

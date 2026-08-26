@@ -440,14 +440,13 @@ class ManagePatients(APIView):
             ),
         elif patient:
             patient_public_id = "User Is guest."
-            patient_name = patient.get_full_name()
-            profile_picture = (
-                self.context['request'].build_absolute_uri(patient.user.profile_picture.url)
-                if patient.user.profile_picture else None
-            ),
+            patient_name = f"{patient.first_name} {patient.last_name}"
+            profile_picture = None
+
         else:
             patient_public_id = None
             patient_name = "Unknown"
+            profile_picture = None
 
         if last_appointment:
             last_appointment_public_id = str(last_appointment.public_id)

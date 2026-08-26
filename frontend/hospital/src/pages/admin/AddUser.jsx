@@ -22,6 +22,8 @@ function IssueForm({
   confirmPassword, onConfirmPasswordChange,
   role, onRoleChange,
   onConfirm,
+  error,
+  loading,
 }) {
   const [openDropdown, setOpenDropdown] = useState(false);
 
@@ -148,9 +150,11 @@ function IssueForm({
         </div>
       </div>
 
+      {error && <p className={formStyles.errorText}>{error}</p>}
+
       <div className={formStyles.formActions}>
-        <button className={formStyles.addBtn} onClick={onConfirm}>
-          + Add
+        <button className={formStyles.addBtn} onClick={onConfirm} disabled={loading}>
+          {loading ? "Adding..." : "+ Add"}
         </button>
       </div>
     </div>
@@ -213,7 +217,16 @@ function AddUser() {
   const [error, setError] = useState("");
 
   const handleConfirm = async () => {
-    if (!username || !email) return;
+    // Basic required-field validation before hitting the API
+    if (!username || !email || !firstName || !lastName || !password || !confirmPassword || !role) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     setError("");
     setLoading(true);
@@ -237,24 +250,26 @@ function AddUser() {
         }),
       });
 
-      const data = await response.json();
-      console.log("403 response body:", data);
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to add user");
+        // DRF validation errors often come back as { field: ["msg"] }
+        // rather than a flat { message }, so fall back to the raw JSON.
+        const message =
+          data.message ||
+          data.detail ||
+          Object.values(data).flat().join(" ") ||
+          "Failed to add user";
+        throw new Error(message);
       }
 
       setStep(2);
-
     } catch (err) {
-      console.error("Add user error:", err);
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
-
-  
 
   const handleBackHome = () => {
     setStep(1);
@@ -265,6 +280,7 @@ function AddUser() {
     setPassword("");
     setConfirmPassword("");
     setRole("");
+    setError("");
     setActiveNav("dashboard");
   };
 
@@ -320,6 +336,8 @@ function AddUser() {
                 confirmPassword={confirmPassword} onConfirmPasswordChange={setConfirmPassword}
                 role={role} onRoleChange={setRole}
                 onConfirm={handleConfirm}
+                error={error}
+                loading={loading}
               />
             ) : (
               <ReportSentConfirmation

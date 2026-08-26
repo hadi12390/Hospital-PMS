@@ -1,9 +1,11 @@
 import styles from "./Login.module.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 
 function Login() {
+    const { getCurrentUser } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -13,61 +15,61 @@ function Login() {
 
 
     const handleLogin = async () => {
-      setError("");
-      setLoading(true);
+    setError("");
+    setLoading(true);
 
-      try {
-        const hostname = window.location.hostname;
-        const response = await fetch(`http://${hostname}:8000/dj-rest-auth/login`, {
+    try {
+      const hostname = window.location.hostname;
+
+      const response = await fetch(
+        `http://${hostname}:8000/dj-rest-auth/login/`,
+        {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Login failed");
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         }
+      );
 
-        console.log("Login successful:", data);
-        const meResponse = await fetch(`http://${hostname}:8000/accounts/me/`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const data = await response.json();
 
-        const meData = await meResponse.json();
-
-        if (!meResponse.ok) {
-          throw new Error(meData.message || "Failed to fetch user info");
-        }
-
-        const role = meData.role;
-        console.log("User role:", role);
-
-        if (role === "manager") {
-          navigate("/admin/dashboard");
-        } else if (role === "doctor") {
-          navigate("/doctor/dashboard");
-        } else if (role === "patient") {
-          navigate("/patient/home");
-        } else {
-          setError("Unknown role, please contact support");
-        }
-
-      } catch (err) {
-        console.error("Login error:", err);
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
       }
-    };
+
+      console.log("Login successful:", data);
+
+      // Update AuthContext AND get the logged-in user
+      const user = await getCurrentUser();
+
+      if (!user) {
+        throw new Error("Could not get user information");
+      }
+
+      console.log("User role:", user.role);
+
+      if (user.role === "manager") {
+        navigate("/admin/dashboard");
+      } else if (user.role === "doctor") {
+        navigate("/doctor/dashboard");
+      } else if (user.role === "patient") {
+        navigate("/patient/home");
+      } else {
+        setError("Unknown role, please contact support");
+      }
+
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={styles.loginpage}>

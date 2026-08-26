@@ -29,15 +29,22 @@ export async function apiFetch(path, options = {}) {
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
 
   const doFetch = () =>
-    fetch(url, {
-      credentials: "include",
-      headers: { "Content-Type": "application/json", ...options.headers },
-      ...options,
-    });
+  fetch(url, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
   let response = await doFetch();
 
-  if (response.status === 401) {
+  if (
+    response.status === 401 &&
+    !path.includes("/token/refresh/") &&
+    !path.includes("/dj-rest-auth/logout/")
+  ) {
     if (isRefreshing) {
       // wait for the in-flight refresh, then retry
       await new Promise((resolve) => subscribeTokenRefresh(resolve));
@@ -53,7 +60,6 @@ export async function apiFetch(path, options = {}) {
     } catch (err) {
       isRefreshing = false;
       refreshSubscribers = [];
-      window.location.href = "/login"; // refresh token dead too — real logout
       throw err;
     }
   }

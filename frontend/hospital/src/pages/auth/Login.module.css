@@ -233,3 +233,56 @@ main{
     align-items: center;
     min-height: 100vh;
 }
+/* Page entrance */
+.mainLog {
+  animation: fadeSlideUp 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Logo */
+.heroLogo {
+  animation: logoPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
+}
+
+@keyframes logoPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Background DNA — unchanged, ambient/slow on purpose */
+.rightDNA,
+.rightTopDNA,
+.leftDNA {
+  animation: float 6s ease-in-out infinite;
+}
+.rightTopDNA { animation-delay: -1.5s; }
+.leftDNA { animation-delay: -3s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+
+/* Eye icon */
+.passVi {
+  transition: transform 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.passViB:active .passVi {
+  transform: scale(0.85);
+}

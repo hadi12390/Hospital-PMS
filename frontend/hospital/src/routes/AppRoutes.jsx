@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
+import GuestRoute from "../context/GuestRoute";
 
 import NotFound from "../pages/auth/NotFound";
 import Login from "../pages/auth/Login";
@@ -54,10 +55,11 @@ function AppRoutes() {
 
       {/* ==================== AUTH ==================== */}
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/resetpassword" element={<RestPassword />} />
-      <Route path="/resetpasswordDone" element={<RestPasswordDone />} />
+      <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+  
+      <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+      <Route path="/resetpassword" element={<GuestRoute><RestPassword /></GuestRoute>} />
+      <Route path="/resetpasswordDone" element={<GuestRoute><RestPasswordDone /></GuestRoute>} />
 
       <Route path="/patient&register" element={<PatientRegister />} />
       <Route path="/patient&register/confirmed" element={<PatientRegisterConfirm />} />

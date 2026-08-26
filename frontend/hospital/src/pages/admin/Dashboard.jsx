@@ -1,9 +1,13 @@
 import styles from "./Dashboard.module.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import RevenueOverview from "./RevenueOverview/RevenueOverview";
 import Sidebar from "./Sidebar";
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   // ---------- Date helpers ----------
   function getFormattedDate() {
     const date = new Date();
@@ -188,6 +192,23 @@ function Dashboard() {
     { day: "Day 10", value: 8000 },
   ];
 
+
+
+  async function handleLogout() {
+    console.log("Logout started");
+
+    try {
+      await logout();
+
+      console.log("Frontend user state cleared");
+
+      navigate("/login", { replace: true });
+
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
   // ---------- Render ----------
   return (
     <div className={styles.DoctorDashboard}>
@@ -224,7 +245,9 @@ function Dashboard() {
 
               {showMenu && (
                 <div className={styles.dropdownMenu}>
-                  <button>
+                  <button
+                    onClick={handleLogout}
+                  >
                     <img
                       width="40%"
                       src="/assest/doctor/cards/log-out.svg"

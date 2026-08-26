@@ -3,7 +3,7 @@ import layoutStyles from "./ManageDoctors.module.css";
 import mvmodStyles from "./ManagePatient.module.css";
 
 
-import { useRef, useState ,useMemo } from "react"
+import { useRef, useState, useMemo, useEffect } from "react";
 import RevenueOverview from './RevenueOverview/RevenueOverview';
 import Sidebar from './Sidebar';
 
@@ -132,11 +132,48 @@ function ManagePatient() {
     if (onDateChange) onDateChange(value);
   }
 
-  function handleSavePatient(patientData) {
-    const newPatient = patientData; 
-    console.log("New patient saved:", newPatient);
-  }
+    function handleSavePatient(patientData) {
+      setPatients(prev => [...prev, patientData]);
+      setShowAddPatient(false);
+    }
+    
+    const [stats, setStats] = useState({
+      total_patients: 0,
+      new_patients_count: 0,
+      total_appointments: 0,
+      completed_appointments: 0,
+      confirmed_appointments: 0,
+      cancelled_appointments: 0,
+    });
 
+    const [patients, setPatients] = useState([]);
+
+    useEffect(() => {
+    async function getData() {
+      try {
+        const hostName = window.location.hostname;
+
+        const response = await fetch(
+          `http://${hostName}:8000/manager/manage-patients/`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        console.log("Manage Patients API:", data);
+
+        setStats(data.stats);
+        setPatients(data.patients);
+
+      } catch (error) {
+        console.error("Failed to fetch patients:", error);
+      }
+    }
+
+    getData();
+  }, []);
 
   return (
     <div className={styles.DoctorDashboard}>
@@ -198,17 +235,17 @@ function ManagePatient() {
           <div className={layoutStyles.statsRow}>
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Total Patient</p>
-              <p className={layoutStyles.statValue}>12</p>
+              <p className={layoutStyles.statValue}>{stats.total_patients}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Today</p>
-              <p className={layoutStyles.statValue}>10</p>
+              <p className={layoutStyles.statValue}>{stats.total_appointments}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>New This Month</p>
-              <p className={layoutStyles.statValue}>4</p>
+              <p className={layoutStyles.statValue}>{stats.new_patients_count}</p>
             </div>
 
             <button 
@@ -219,8 +256,9 @@ function ManagePatient() {
             </button>
           </div>
 
-          <PatientTable/>
-            {showAddPatient && (
+          <PatientTable patients={patients} />
+
+          {showAddPatient && (
             <AddPatientModal
               onClose={() => setShowAddPatient(false)}
               onSave={handleSavePatient}

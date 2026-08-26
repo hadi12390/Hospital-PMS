@@ -15,24 +15,6 @@ const ageOptions = [
   { label: "51+", min: 51, max: 200 },
 ];
 
-const patients = [
-  { id: 1, name: "Mia Quien", phone: "0791200976", lastVisit: "2026-08-10", age: 24 },
-  { id: 2, name: "Adam Smith", phone: "0785551122", lastVisit: "2026-08-11", age: 45 },
-  { id: 3, name: "Lara Johnson", phone: "0783334455", lastVisit: "2026-08-12", age: 12 },
-  { id: 4, name: "Omar Khalil", phone: "0771112233", lastVisit: "2026-08-13", age: 60 },
-  { id: 5, name: "Sara Ahmad", phone: "0792223344", lastVisit: "2026-08-14", age: 29 },
-  { id: 6, name: "Daniel Brown", phone: "0784445566", lastVisit: "2026-08-15", age: 8 },
-  { id: 7, name: "Lina Adel", phone: "0776667788", lastVisit: "2026-08-16", age: 33 },
-  { id: 8, name: "Noah Wilson", phone: "0798889900", lastVisit: "2026-08-17", age: 52 },
-  { id: 9, name: "John Doe", phone: "0781234567", lastVisit: "2026-08-05", age: 40 },
-  { id: 10, name: "Emily Davis", phone: "0772345678", lastVisit: "2026-08-06", age: 19 },
-  { id: 11, name: "Yousef Hassan", phone: "0793456789", lastVisit: "2026-08-07", age: 15 },
-  { id: 12, name: "Sophia Miller", phone: "0784567890", lastVisit: "2026-08-08", age: 55 },
-  { id: 13, name: "Rania Omar", phone: "0775678901", lastVisit: "2026-08-09", age: 27 },
-  { id: 14, name: "Michael Taylor", phone: "0796789012", lastVisit: "2026-08-01", age: 38 },
-  { id: 15, name: "Nour Saleh", phone: "0787890123", lastVisit: "2026-08-02", age: 22 },
-];
-
 function formatDisplayDate(isoDate) {
   const [year, month, day] = isoDate.split("-");
   const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -45,7 +27,7 @@ function formatDisplayDate(isoDate) {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function PatientTable() {
+function PatientTable({ patients }) {
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");

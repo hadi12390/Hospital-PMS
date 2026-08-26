@@ -4,10 +4,8 @@ import styles from "./AddPatientModal.module.css";
 
 import Save from "../../assets/manager/approvedM.svg?react";
 import SaveM from "../../assets/manager/saveM.svg?react";
-
 import Calender from "../../assets/manager/calenderM.svg?react";
 import ArrowDown from "../../assets/manager/arrowdown.svg?react";
-
 
 const initialForm = {
   firstName: "",
@@ -15,18 +13,26 @@ const initialForm = {
   email: "",
   userName: "",
   phone: "",
-  dob: "",
+  birth_date: "",
   gender: "",
   personalId: "",
   bloodType: "",
 };
 
+const hostName = window.location.hostname;
+const API_URL = `http://${hostName}:8000/add-patient/`;
+
 function AddPatientModal({ onClose, onSave }) {
   const [form, setForm] = useState(initialForm);
   const [closing, setClosing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const dobInputRef = useRef();
 
-  // Lock page scroll while the modal is open
+  // Keep the raw ISO date (YYYY-MM-DD) separately for the API,
+  // and only format DD/MM/YYYY for display.
+  const [dobIso, setDobIso] = useState("");
+
   useEffect(() => {
     const original = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -43,11 +49,13 @@ function AddPatientModal({ onClose, onSave }) {
   function handleDobChange(e) {
     const value = e.target.value; // YYYY-MM-DD
     if (!value) {
-      setForm((prev) => ({ ...prev, dob: "" }));
+      setForm((prev) => ({ ...prev, birth_date: "" }));
+      setDobIso("");
       return;
     }
+    setDobIso(value);
     const [year, month, day] = value.split("-");
-    setForm((prev) => ({ ...prev, dob: `${day}/${month}/${year}` }));
+    setForm((prev) => ({ ...prev, birth_date: `${day}/${month}/${year}` }));
   }
 
   function openDatePicker() {
@@ -63,23 +71,47 @@ function AddPatientModal({ onClose, onSave }) {
     setTimeout(() => onClose(), 200);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
+    setSubmitting(true);
 
-    const newPatient = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      userName: form.userName,
-      phone: form.phone,
-      dob: form.dob,
+    // Map camelCase form state -> snake_case fields the API expects
+    const payload = {
+      personal_id: form.personalId,
+      first_name: form.firstName,
+      last_name: form.lastName,
+      birth_date: dobIso, // send YYYY-MM-DD, not DD/MM/YYYY
       gender: form.gender,
-      personalId: form.personalId,
-      bloodType: form.bloodType,
+      phone_number: form.phone,
+      blood_type: form.bloodType,
     };
 
-    onSave(newPatient);
-    handleClose();
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(
+          errData.detail || JSON.stringify(errData) || `Request failed (${res.status})`
+        );
+      }
+
+      const savedPatient = await res.json();
+      onSave(savedPatient); // pass back what the server actually created
+      handleClose();
+    } catch (err) {
+      setError(err.message || "Failed to add patient.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   useEffect(() => {
@@ -101,6 +133,7 @@ function AddPatientModal({ onClose, onSave }) {
         onSubmit={handleSubmit}
       >
         <h2 className={styles.title}>Add Patient</h2>
+
 
         <div className={styles.row}>
           <div className={styles.field}>
@@ -133,7 +166,6 @@ function AddPatientModal({ onClose, onSave }) {
             value={form.email}
             onChange={handleChange}
             placeholder="example@clinic.com"
-            required
           />
         </div>
 
@@ -163,9 +195,9 @@ function AddPatientModal({ onClose, onSave }) {
             <label>Date of Birth:</label>
             <div className={styles.dateWrap} onClick={openDatePicker}>
               <span
-                className={form.dob ? styles.dateValue : styles.datePlaceholder}
+                className={form.birth_date ? styles.dateValue : styles.datePlaceholder}
               >
-                {form.dob || "DD / MM / YYYY"}
+                {form.birth_date || "DD / MM / YYYY"}
               </span>
               <Calender className={styles.calIcon} />
               <input
@@ -181,8 +213,8 @@ function AddPatientModal({ onClose, onSave }) {
             <label>Gender:</label>
             <select name="gender" value={form.gender} onChange={handleChange}>
               <option value="">Select</option>
-              <option value="Female">Female</option>
-              <option value="Male">Male</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
             </select>
           </div>
         </div>
@@ -218,18 +250,22 @@ function AddPatientModal({ onClose, onSave }) {
           </div>
         </div>
 
+        {error && <p className={styles.errorText}>{error}</p>}
+
+
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.cancelBtn}
             onClick={handleClose}
+            disabled={submitting}
           >
             <Save className={styles.btnIcon} />
             Cancel
           </button>
-          <button type="submit" className={styles.saveBtn}>
+          <button type="submit" className={styles.saveBtn} disabled={submitting}>
             <SaveM className={styles.btnIcon} />
-            Save
+            {submitting ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

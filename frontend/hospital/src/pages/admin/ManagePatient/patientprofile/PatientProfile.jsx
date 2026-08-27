@@ -337,29 +337,7 @@ function DoctorProfile() {
             </div>
           </div>
 
-          <div className={profileStyles.recent}>
-            <h1>Recent Appointments</h1>
-            {/*
-              TODO: still placeholder rows — no appointment-history endpoint
-              has been wired up yet. The summary fetch above only gives
-              last/next appointment, not a full history list.
-            */}
-            <div className={`${profileStyles.rowo} ${layoutStyles.glass}`}>
-              <div className={profileStyles.rowoe}>Aug 14</div>
-              <div className={profileStyles.rowoe}>Dr.Jessica</div>
-              <div className={profileStyles.rowoe}>Consultation</div>
-              <div className={profileStyles.rowoe}>Confirmed</div>
-            </div>
-            <div className={`${profileStyles.rowo} ${layoutStyles.glass}`}>
-              <div className={profileStyles.rowoe}>Aug 14</div>
-              <div className={profileStyles.rowoe}>Dr.Jessica</div>
-              <div className={profileStyles.rowoe}>Consultation</div>
-              <div className={profileStyles.rowoe}>Confirmed</div>
-            </div>
-            <button
-            onClick={() => navigate("/admin/manage&patients/patient&profile/appointments")}
-            className={layoutStyles.glass}>View All Appointment<ArrowLeft/></button>
-          </div>
+          
 
         </main>
       </section>

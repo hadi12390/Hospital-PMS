@@ -15,30 +15,6 @@ import EditAppointmentModal from "./EditAppointmentModal";
 const statusOptions = ["Completed", "Confirmed", "Pending"];
 const typeOptions = ["Consultation", "Follow Up", "Check Up", "Surgery"];
 
-const initialAppointments = [
-  { id: 1, date: "2026-08-05", time: "9:00AM", patient: "Mia Quien", patientPhone: "+962 79 120 0976", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-  { id: 2, date: "2026-08-06", time: "10:00AM", patient: "Adam Smith", patientPhone: "+962 79 555 1122", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Completed", note: "" },
-  { id: 3, date: "2026-08-07", time: "11:30AM", patient: "Lara Johnson", patientPhone: "+962 78 333 4455", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Completed", note: "" },
-  { id: 4, date: "2026-08-08", time: "2:00PM", patient: "Omar Khalil", patientPhone: "+962 77 111 2233", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-  { id: 5, date: "2026-08-09", time: "9:30AM", patient: "Sara Ahmad", patientPhone: "+962 79 222 3344", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Completed", note: "" },
-  { id: 6, date: "2026-08-10", time: "10:30AM", patient: "Daniel Brown", patientPhone: "+962 78 444 5566", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Completed", note: "" },
-  { id: 7, date: "2026-08-11", time: "1:00PM", patient: "Lina Adel", patientPhone: "+962 77 666 7788", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-  { id: 8, date: "2026-08-12", time: "3:00PM", patient: "Noah Wilson", patientPhone: "+962 79 888 9900", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Completed", note: "" },
-  { id: 9, date: "2026-08-13", time: "9:00AM", patient: "John Doe", patientPhone: "+962 78 123 4567", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Completed", note: "" },
-  { id: 10, date: "2026-08-14", time: "10:00AM", patient: "Emily Davis", patientPhone: "+962 77 234 5678", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-  { id: 11, date: "2026-08-15", time: "11:30AM", patient: "Yousef Hassan", patientPhone: "+962 79 345 6789", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Completed", note: "" },
-  { id: 12, date: "2026-08-16", time: "2:00PM", patient: "Sophia Miller", patientPhone: "+962 78 456 7890", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Completed", note: "" },
-  { id: 13, date: "2026-08-17", time: "9:30AM", patient: "Rania Omar", patientPhone: "+962 77 567 8901", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-
-  { id: 14, date: "2026-08-18", time: "9:00AM", patient: "Michael Taylor", patientPhone: "+962 79 678 9012", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Completed", note: "" },
-  { id: 15, date: "2026-08-18", time: "10:00AM", patient: "Nour Saleh", patientPhone: "+962 78 789 0123", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Confirmed", note: "" },
-  { id: 16, date: "2026-08-18", time: "11:00AM", patient: "James Anderson", patientPhone: "+962 77 890 1234", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Pending", note: "" },
-
-  { id: 17, date: "2026-08-19", time: "9:00AM", patient: "Hala Mahmoud", patientPhone: "+962 79 901 2345", doctor: "Dr.Jessica Smeeth", type: "Consultation", status: "Confirmed", note: "" },
-  { id: 18, date: "2026-08-19", time: "11:30AM", patient: "William Thomas", patientPhone: "+962 78 012 3456", doctor: "Dr.Jessica Smeeth", type: "Surgery", status: "Pending", note: "" },
-  { id: 19, date: "2026-08-20", time: "9:00AM", patient: "Omar Ali", patientPhone: "+962 77 123 4567", doctor: "Dr.Jessica Smeeth", type: "Follow Up", status: "Confirmed", note: "" },
-  { id: 20, date: "2026-08-20", time: "2:00PM", patient: "Maya Ibrahim", patientPhone: "+962 79 234 5678", doctor: "Dr.Jessica Smeeth", type: "Check Up", status: "Pending", note: "" },
-];
 
 function statusIcon(status) {
   if (status === "Completed") return <Approved className={styles.dotIcon} />;
@@ -46,13 +22,12 @@ function statusIcon(status) {
   return <Dot className={styles.dotIcon} />;
 }
 
-function AppointmentsTable() {
+function AppointmentsTable({ appointments = []  }) {
   const [selectedButton, setSelectedButton] = useState("Today");
 
   // Appointments now live in state so edits made in EditAppointmentModal
   // actually persist in the table. Swap this for a real fetch/save to your
   // backend whenever that's wired up.
-  const [appointmentsData, setAppointmentsData] = useState(initialAppointments);
 
   const [searchText, setSearchText] = useState("");
 
@@ -75,8 +50,13 @@ function AppointmentsTable() {
 
   // Derived from live data so new patients/doctors show up in the
   // filters and the edit form automatically.
-  const doctorOptions = Array.from(new Set(appointmentsData.map((a) => a.doctor)));
-  const patientOptions = Array.from(new Set(appointmentsData.map((a) => a.patient)));
+  const doctorOptions = Array.from(
+    new Set(appointments.map((a) => a.doctor))
+  );
+
+  const patientOptions = Array.from(
+    new Set(appointments.map((a) => a.patient))
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -175,7 +155,7 @@ function AppointmentsTable() {
     setEditingAppointment(null);
   }
 
-  const filteredAppointments = appointmentsData.filter((appt) => {
+  const filteredAppointments = appointments.filter((appt) => {
     const matchesSearch = appt.patient
       .toLowerCase()
       .includes(searchText.toLowerCase());

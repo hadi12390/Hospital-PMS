@@ -143,7 +143,6 @@ function AddAppointmentModal({ patients, doctors, types, onClose, onAdd }) {
               value={formData.date}
               onChange={(e) => updateField("date", e.target.value)}
             />
-            <Calendar className={styles.dateIcon} />
           </div>
         </div>
 

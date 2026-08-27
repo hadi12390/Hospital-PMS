@@ -3,7 +3,7 @@ import layoutStyles from "./ManageDoctors.module.css";
 import mvmodStyles from "./ManagePatient.module.css";
 
 
-import { useRef, useState ,useMemo } from "react"
+import { useRef, useState ,useMemo,useEffect } from "react"
 import RevenueOverview from './RevenueOverview/RevenueOverview';
 import Sidebar from './Sidebar';
 
@@ -26,10 +26,6 @@ import Calender from "../../assets/manager/calenderM.svg?react";
 
 import PatientTable from "./ManageAppointments/AppointmentsTable.jsx";
 
-// TODO: these should come from the same source of truth as
-// AppointmentsTable's appointment data (a shared context, a store, or a
-// fetch) so the Add-Appointment form always reflects real patients/doctors.
-// Hardcoded here for now so the modal has something to show.
 const patientOptions = [
   "Mia Quien", "Adam Smith", "Lara Johnson", "Omar Khalil", "Sara Ahmad",
   "Daniel Brown", "Lina Adel", "Noah Wilson", "John Doe", "Emily Davis",
@@ -157,6 +153,38 @@ function ManageAppointment() {
     console.log("New appointment added:", appointmentData);
   }
 
+  const [apiData , setApiData] = useState([]);
+  
+  useEffect(() =>{
+    async function getData() {
+
+    try {
+      // Send request to API
+      const hostName = window.location.hostname;
+      const response = await fetch(`http://${hostName}:8000/manager/manage-appointments/`,
+        {
+          method: "GET",
+          credentials: "include",
+        });
+
+        // Convert response to JSON
+        const data = await response.json();
+
+        // Display data
+        console.log(data);
+        setApiData(data);
+
+
+      } catch (error) {
+
+        // Display error if request fails
+        console.error(error);
+
+      }
+  }
+  getData(); 
+  },[])
+
 
   return (
     <div className={styles.DoctorDashboard}>
@@ -218,31 +246,31 @@ function ManageAppointment() {
           <div className={layoutStyles.statsRow}>
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Total</p>
-              <p className={layoutStyles.statValue}>94</p>
+              <p className={layoutStyles.statValue}>{apiData.total_appointments}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Cancelled </p>
-              <p className={layoutStyles.statValue}>10</p>
+              <p className={layoutStyles.statValue}>{apiData.cancelled_appointments}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Pending </p>
-              <p className={layoutStyles.statValue}>4</p>
+              <p className={layoutStyles.statValue}>{apiData.pending_appointments}</p>
             </div>
 
             <div className={layoutStyles.statCard}>
               <p className={layoutStyles.statLabel}>Confarimed </p>
-              <p className={layoutStyles.statValue}>4</p>
+              <p className={layoutStyles.statValue}>{apiData.confirmed_appointments}</p>
             </div>
             
             <div className={layoutStyles.statCard}>
-              <p className={layoutStyles.statLabel}>Appointments</p>
-              <p className={layoutStyles.statValue}>12</p>
+              <p className={layoutStyles.statLabel}>Completed</p>
+              <p className={layoutStyles.statValue}>{apiData.completed_appointments}</p>
             </div>
           </div>
 
-          <PatientTable/>
+          <PatientTable appointments={apiData.appointments} />
             {showAddPatient && (
             <AddPatientModal
               onClose={() => setShowAddPatient(false)}

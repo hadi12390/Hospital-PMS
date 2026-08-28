@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.utils.dateparse import parse_date
 from django.db import transaction
 from django.utils import timezone
-from datetime import date, datetime
+from datetime import datetime, timedelta, time
 from django.db.models import Q
 from rest_framework.generics import( 
     ListCreateAPIView, 
@@ -321,7 +321,25 @@ class AvailableTimesView(APIView):
         # 3) Find the doctor's working hours for that day
         if doctor.start_time and doctor.end_time:
             day_start = timezone.make_aware(datetime.combine(selected_date, doctor.start_time))
-            day_end = timezone.make_aware(datetime.combine(selected_date, doctor.end_time))
+
+            if doctor.end_time == time.min:  # 00:00:00 means "end of day", not "start of day"
+                day_end = timezone.make_aware(
+                    datetime.combine(selected_date + timedelta(days=1), time.min)
+                )
+            else:
+                day_end = timezone.make_aware(datetime.combine(selected_date, doctor.end_time))
+
+            if day_end <= day_start:
+                return Response(
+                    {"detail": "Doctor's end time must be after start time."},
+                    status=409,
+                )
+
+            if (day_end - day_start) < timedelta(minutes=duration):
+                return Response(
+                    {"detail": "Doctor's working hours are shorter than the appointment duration."},
+                    status=409,
+                )
         else:
             return Response({"detail": "The doctor hasn't set the available hours yet."}, status=409)
         
@@ -356,9 +374,9 @@ class AvailableTimesView(APIView):
         
         # 7) Remove past times
         future_times = []
-        for time in available_times:
-            if time >= timezone.now():
-                future_times.append(time)
+        for slot in available_times:
+            if slot >= timezone.now():
+                future_times.append(slot)
         available_times = future_times
 
         # 8) Mark the times that will conflict with the patient appointments

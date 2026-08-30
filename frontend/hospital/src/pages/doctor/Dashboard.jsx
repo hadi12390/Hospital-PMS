@@ -1,22 +1,87 @@
 import styles from "./Dashboard.module.css";
-import { useRef, useState } from "react"
+import { useRef, useState ,useEffect } from "react"
 import Sidebar from "./sidebarD";
 
 
 function DoctorDashboard() {
+  const [apiData, setApiData] = useState({}); // object, not array — matches usage below
+  const [loading, setLoading] = useState(true);
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  // ---- helpers must be defined BEFORE they're called ----
+  const DAY_ABBREV = {
+    Sunday: "Sun",
+    Monday: "Mon",
+    Tuesday: "Tue",
+    Wednesday: "Wed",
+    Thursday: "Thu",
+    Friday: "Fri",
+    Saturday: "Sat",
+  };
+
+  const APPT_TYPE_LABEL = {
+    follow_up: "Follow Up",
+    check_up: "Check Up",
+    consultation: "Consultation",
+    surgery: "Surgery",
+  };
+
+  function toHHMM(isoString) {
+    const d = new Date(isoString);
+    return `${String(d.getHours()).padStart(2, "0")}:${String(
+      d.getMinutes()
+    ).padStart(2, "0")}`;
+  }
+
+  function mapWeekAppointments(rawList = []) {
+    return rawList.map((appt, index) => ({
+      id: index,
+      day: DAY_ABBREV[appt.day] || appt.day,
+      patient: (appt.patient?.name ?? "Unknown").replace(/^Guest:\s*/, ""),
+      type: APPT_TYPE_LABEL[appt.appointment_type] || appt.appointment_type,
+      start: toHHMM(appt.scheduled_time),
+      end: toHHMM(appt.end_time),
+    }));
+  }
+
+  // ---- now safe to call ----
+  const appointments = mapWeekAppointments(apiData.week_appointments);
+  const currentAppointment = appointments[0] ?? null;
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const hostName = window.location.hostname;
+        const response = await fetch(`http://${hostName}:8000/doctor/dashboard/`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await response.json();
+        console.log(data);
+        setApiData(data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getData();
+  }, []);
+
+
   const [activeNav, setActiveNav] = useState("appointment");
 
-  
+
   function handleSelect(id) {
     console.log("Sidebar clicked:", id); 
     setActiveNav(id);
   }
 
-  // ---------- Date helpers ----------
-  function getCurrentDate() {
-    const date = new Date();
-    return `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
-  }
+    // ---------- Date helpers ----------
+    function getCurrentDate() {
+      const date = new Date();
+      return `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
+    }
 
   function getFormattedDate() {
     const date = new Date();
@@ -86,75 +151,38 @@ function DoctorDashboard() {
   }
 
   // ---------- Time helpers ----------
-  const START = 8;
-  const END = 18;
+    const START = 8;
+    const END = 16;
 
-  function timeToPercent(time) {
-    const [hour, minute] = time.split(":").map(Number);
-    const total = hour + minute / 60;
+    function timeToPercent(time) {
+      const [hour, minute] = time.split(":").map(Number);
+      const total = hour + minute / 60;
 
-    return ((total - START) / (END - START)) * 100;
-  }
+      return ((total - START) / (END - START)) * 100;
+    }
 
-  function getClockIcon(time) {
-    const hour = Number(time.split(":")[0]);
-    return `/assest/doctor/cards/clock/${hour.toString().padStart(2, "0")}.svg`;
-  }
+    function getClockIcon(time) {
+      const hour = Number(time.split(":")[0]);
+      return `/assest/doctor/cards/clock/${hour.toString().padStart(2, "0")}.svg`;
+    }
 
-  function formatTime(time) {
-    let [hour, minute] = time.split(":").map(Number);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
+    function formatTime(time) {
+      let [hour, minute] = time.split(":").map(Number);
+      const period = hour >= 12 ? "PM" : "AM";
+      hour = hour % 12 || 12;
 
-    return `${hour}:${String(minute).padStart(2, "0")} ${period}`;
-  }
+      return `${hour}:${String(minute).padStart(2, "0")} ${period}`;
+    }
 
-  // ---------- State ----------
-  const [currentDate, setCurrentDate] = useState(getCurrentDate());
-  const [showMenu, setShowMenu] = useState(false);
-  const dateInput = useRef();
+    // ---------- State ----------
+    const [currentDate, setCurrentDate] = useState(getCurrentDate());
+    const [showMenu, setShowMenu] = useState(false);
+    const dateInput = useRef();
 
-  // ---------- Data ----------
-  const today = getFormattedDate();
+    // ---------- Data ----------
+    const today = getFormattedDate();
 
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-  const appointments = [
-    {
-      id: 1,
-      day: "Mon",
-      patient: "MIA",
-      type: "Surgery",
-      start: "15:00",
-      end: "18:00",
-    },
-    {
-      id: 2,
-      day: "Tue",
-      patient: "John",
-      type: "Checkup",
-      start: "11:00",
-      end: "12:00",
-    },
-    {
-      id: 3,
-      day: "Thu",
-      patient: "Sara",
-      type: "Consultation",
-      start: "14:00",
-      end: "16:00",
-    },
-    {
-      id: 4,
-      day: "Fri",
-      patient: "GAZI",
-      type: "Surgery",
-      start: "12:00",
-      end: "18:00",
-    },
-  ];
-
-  const currentAppointment = appointments[0];
+    
 
   const timeSlots = [
     "08:00",
@@ -166,13 +194,37 @@ function DoctorDashboard() {
     "14:00",
     "15:00",
     "16:00",
-    "17:00",
-    "18:00",
   ];
 
+  function formatAppointmentDate(dateStr) {
+  if (!dateStr) return "";
+
+    const date = new Date(dateStr);
+
+    const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+    const month = date.toLocaleDateString("en-US", { month: "long" });
+    const day = date.getDate();
+
+    const ordinal = (n) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+
+    return `${weekday} ${ordinal(day)} ${month}`;
+  }
+
   const [stopped, setStopped] = useState(false);
+  function clampToEnd(time) {
+  const [hour, minute] = time.split(":").map(Number);
+  const total = hour + minute / 60;
+  return total > END ? `${END}:00` : time;
+}
 
   // ---------- Render ----------
+  if (loading) 
+  return <div>Loading...</div>
+  else
   return (
     <div className={styles.DoctorDashboard}>
       <div className={styles.back}></div>
@@ -272,8 +324,10 @@ function DoctorDashboard() {
               </div>
 
               <div className={styles.boxJustiDown}>
-                <h1>514</h1>
-                <div>since 12/4/2019</div>
+                <h1>{apiData.total_appointments}</h1>
+                <div>
+                    since {apiData.since?.split(" ")[0].replaceAll("-", "/") || "unknown"}
+                </div>
               </div>
             </div>
 
@@ -290,7 +344,7 @@ function DoctorDashboard() {
               </div>
 
               <div className={`${styles.boxJustiDown}`}>
-                <h1>12</h1>
+                <h1>{apiData.week_appointments_count}</h1>
                 {/* {styles.precentRed} */}
                 <div>
                   <span className={styles.precentGreen}>20%</span> from last
@@ -312,7 +366,7 @@ function DoctorDashboard() {
               </div>
 
               <div className={styles.boxJustiDown}>
-                <h1>Mia Quian</h1>
+                <h1>{apiData.last_patient || "No patient"}</h1>
                 <div>Type: surgery</div>
               </div>
             </div>
@@ -359,8 +413,7 @@ function DoctorDashboard() {
                               style={{
                                 left: `${timeToPercent(app.start)}%`,
                                 width: `${
-                                  timeToPercent(app.end) -
-                                  timeToPercent(app.start)
+                                  timeToPercent(clampToEnd(app.end)) - timeToPercent(app.start)
                                 }%`,
                               }}
                             >
@@ -397,7 +450,7 @@ function DoctorDashboard() {
                 </div>
 
                 <div className={styles.boxJustiDown}>
-                  <h1>Sara Morgan</h1>
+                  <h1>{apiData.current_appointment || "No Appointment"}</h1>
                 </div>
               </div>
 
@@ -412,18 +465,23 @@ function DoctorDashboard() {
                             alt=""
                           />
                         </div>
-                        confirmed
+                        
                       </div>
                     </div>
                   </div>
 
                   <div className={styles.mainClock}>
-                    <img
-                      src={getClockIcon(currentAppointment.start)}
-                      alt={currentAppointment.start}
-                    />
-
-                    <div>{formatTime(currentAppointment.start)}</div>
+                    {currentAppointment ? (
+                      <>
+                        <img
+                          src={getClockIcon(currentAppointment.start)}
+                          alt={currentAppointment.start}
+                        />
+                        <div>{formatTime(currentAppointment.start)}</div>
+                      </>
+                    ) : (
+                      <div>No appointment</div>
+                    )}
                   </div>
                 </div>
 
@@ -451,10 +509,16 @@ function DoctorDashboard() {
               </div>
 
               <div className={styles.boxJustiDownForSix}>
-                <h1>Jeirn gazi</h1>
+                <h1>{apiData.next_appointment?.patient?.name ?? "No Next"}</h1>
                 <div>
-                  <p>Dentist</p>
-                  <p>Wednesday 16th July </p>
+                  <p>
+                    {apiData.next_appointment?.appointment_type === "follow_up"
+                      ? "Follow Up"
+                      : apiData.next_appointment?.appointment_type === "check_up"
+                      ? "Check Up"
+                      : "Consultation"}
+                  </p>
+                  <p>{formatAppointmentDate(apiData.next_appointment?.date)}</p>
                 </div>
               </div>
             </div>

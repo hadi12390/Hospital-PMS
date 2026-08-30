@@ -64,6 +64,24 @@
   object-fit: cover;
 
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.patientNameA{
+  flex-shrink: 0;
+
+  width: 4.5em;
+  height: 4.5em;
+
+  object-fit: cover;
+
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .patientInfo {
@@ -185,4 +203,9 @@
     background-color: white;
     padding: 3px;
     border-radius: 50%;
+}
+.letter{
+    color: white;
+    font-size: 4rem;
+    padding: 0 .3em;
 }

@@ -1,6 +1,6 @@
 import styles from "./Dashboard.module.css";
 import patientStyles from "./Patients.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./sidebarD";
 import PatientProfileModal from "./PatientProfileModal";
 
@@ -8,12 +8,30 @@ import Calendar from "../../assets/doctor/patients/calendar.svg?react";
 import Phone from "../../assets/doctor/patients/phone.svg?react";
 import PersonCircle from "../../assets/doctor/patients/person.svg?react";
 
-import patient1 from "../../assets/doctor/patients/patient1.png";
-import patient2 from "../../assets/doctor/patients/patient2.png";
-import patient3 from "../../assets/doctor/patients/patient3.png";
-import patient4 from "../../assets/doctor/patients/patient4.png";
-import patient5 from "../../assets/doctor/patients/patient5.png";
-import patient6 from "../../assets/doctor/patients/patient6.png";
+import defaultAvatar from "../../assets/doctor/patients/patient1.png";
+
+
+const API_BASE = `http://${window.location.hostname}:8000`;
+
+function formatDob(isoDate) {
+  if (!isoDate) return "—";
+  const [year, month, day] = isoDate.split("-");
+  return `${day} / ${month} / ${year}`;
+}
+
+function formatPhone(raw) {
+  if (!raw) return "—";
+  const cc = raw.slice(0, 4);   // "+962"
+  const rest = raw.slice(4);    // "791215103"
+  return `${cc} ${rest.slice(0, 2)} ${rest.slice(2, 5)} ${rest.slice(5)}`;
+}
+
+function splitName(fullName) {
+  const parts = (fullName || "").trim().split(" ");
+  const firstName = parts[0] || "";
+  const lastName = parts.slice(1).join(" ") || "";
+  return { firstName, lastName };
+}
 
 function DoctorManagePatient() {
   const [activeNav, setActiveNav] = useState("appointment");
@@ -21,14 +39,54 @@ function DoctorManagePatient() {
   const [stopped, setStopped] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const patients = [
-    { id: 1, firstName: "Patient", lastName: "One", dob: "2 / 05 / 2002", phone: "+962 79 120 0976", bloodType: "A+", gender: "Female", photo: patient1 },
-    { id: 2, firstName: "Patient", lastName: "Two", dob: "2 / 05 / 1991", phone: "+962 79 120 0976", bloodType: "O+", gender: "Male", photo: patient2 },
-    { id: 3, firstName: "Patient", lastName: "Three", dob: "22 / 09 / 2006", phone: "+962 79 120 0976", bloodType: "B+", gender: "Female", photo: patient3 },
-    { id: 4, firstName: "Patient", lastName: "Four", dob: "2 / 05 / 2002", phone: "+962 79 120 0976", bloodType: "AB+", gender: "Male", photo: patient4 },
-    { id: 5, firstName: "Patient", lastName: "Five", dob: "2 / 05 / 2002", phone: "+962 79 120 0976", bloodType: "A-", gender: "Female", photo: patient5 },
-    { id: 6, firstName: "Patient", lastName: "Six", dob: "2 / 04 / 1988", phone: "+962 79 120 0976", bloodType: "O-", gender: "Male", photo: patient6 },
-  ];
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchPatients() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/doctor/patients/`, {
+         method: "GET",
+         credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log(data)
+
+        const mapped = data.map((p, i) => {
+          const { firstName, lastName } = splitName(p.name);
+          return {
+            id: p.public_id && p.public_id !== "User is guest." ? p.public_id : i,
+            firstName,
+            lastName,
+            dob: formatDob(p.birth_date),
+            phone: formatPhone(p.phone_number),
+            photo: p.profile_picture ,
+          };
+        });
+
+        setPatients(mapped);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message || "Failed to load patients.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPatients();
+    return () => controller.abort();
+  }, []);
 
   function handleSeeProfile(patient) {
     setSelectedPatient(patient);
@@ -100,47 +158,70 @@ function DoctorManagePatient() {
               <h1>My Patients</h1>
             </div>
 
-            <div className={patientStyles.patientGrid}>
-              {patients.map((patient, i) => (
-                <div
-                  key={patient.id}
-                  className={`${patientStyles.patientCard} ${patientStyles.fadeUp}`}
-                  style={{ "--d": `${80 + i * 60}ms` }}
-                >
-                  <div className={`${patientStyles.imgdev} ${styles.glass}`}>
-                    <img
-                      className={patientStyles.patientPhoto}
-                      src={patient.photo}
-                      alt={`${patient.firstName} ${patient.lastName}`}
-                    />
-                  </div>
+            {loading && (
+              <p className={patientStyles.patientMeta}>Loading patients…</p>
+            )}
 
-                  <div className={patientStyles.patientInfo}>
-                    <h3 className={patientStyles.patientName}>
-                      {patient.firstName} {patient.lastName}
-                    </h3>
+            {error && !loading && (
+              <p className={patientStyles.patientMeta}>
+                Couldn't load patients: {error}
+              </p>
+            )}
 
-                    <p className={patientStyles.patientMeta}>
-                      <Calendar className={patientStyles.metaIcon} />
-                      {patient.dob}
-                    </p>
-                    <p className={patientStyles.patientMeta}>
-                      <Phone className={patientStyles.metaIcon} />
-                      {patient.phone}
-                    </p>
-                  </div>
+            {!loading && !error && patients.length === 0 && (
+              <p className={patientStyles.patientMeta}>No patients found.</p>
+            )}
 
-                  <button
-                    type="button"
-                    className={`${styles.glass} ${patientStyles.seeProfileBtn}`}
-                    onClick={() => handleSeeProfile(patient)}
+            {!loading && !error && patients.length > 0 && (
+              <div className={patientStyles.patientGrid}>
+                {patients.map((patient, i) => (
+                  <div
+                    key={patient.id}
+                    className={`${patientStyles.patientCard} ${patientStyles.fadeUp}`}
+                    style={{ "--d": `${80 + i * 60}ms` }}
                   >
-                    <div className={patientStyles.contbtn}><PersonCircle className={patientStyles.seeProfileIcon} /></div>
-                    See Profile
-                  </button>
-                </div>
-              ))}
-            </div>
+                    <div className={`${patientStyles.imgdev} ${styles.glass}`}>
+                      {patient.photo ? (
+                        <img
+                          className={patientStyles.patientPhoto}
+                          src={patient.photo}
+                          alt={`${patient.firstName} ${patient.lastName}`}
+                        />
+                      ) : (
+                        <h1 className={`${patientStyles.letter} ${patientStyles.patientPhotoA}`}>
+                          {patient.firstName?.charAt(0).toUpperCase()}
+                        </h1>
+                      )}
+                      
+                    </div>
+
+                    <div className={patientStyles.patientInfo}>
+                      <h3 className={patientStyles.patientName}>
+                        {patient.firstName} {patient.lastName}
+                      </h3>
+
+                      <p className={patientStyles.patientMeta}>
+                        <Calendar className={patientStyles.metaIcon} />
+                        {patient.dob}
+                      </p>
+                      <p className={patientStyles.patientMeta}>
+                        <Phone className={patientStyles.metaIcon} />
+                        {patient.phone}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={`${styles.glass} ${patientStyles.seeProfileBtn}`}
+                      onClick={() => handleSeeProfile(patient)}
+                    >
+                      <div className={patientStyles.contbtn}><PersonCircle className={patientStyles.seeProfileIcon} /></div>
+                      See Profile
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
           </div>
         </main>

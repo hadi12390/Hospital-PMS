@@ -1738,3 +1738,94 @@ body {
     transition: none !important;
   }
 }
+.dayRow {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.day {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.timeline {
+  position: relative;
+  flex: 1;
+  height: 32px;
+  margin: 4px 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.03);
+}
+
+.appointment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 6px;
+}
+.timeHeader {
+    display: grid;
+    grid-template-columns: 70px repeat(9, 1fr);  /* was 60px repeat(11, 1fr) — now matches .dayRow's 70px and your 9 timeSlots */
+    align-items: center;
+    color: #777;
+    font-size: .9rem;
+}
+
+.timeHeader span {
+    text-align: center;
+}
+
+.dayRow {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    align-items: center;
+
+    min-height: 50px;
+
+    border-bottom: 1px solid #ECECEC;
+}
+
+.dayRow:last-child {
+    border-bottom: none;
+}
+
+.day {
+    color: #666;
+    font-size: 1rem;
+}
+
+.timeline {
+    position: relative;
+    height: 22px;
+    overflow: hidden;      /* keep bars from spilling out, matches your 16:00 clamp discussion */
+}
+
+.appointment {
+    position: absolute;
+    top: 0;
+    height: 22px;
+    border-radius: 6px;
+    background: #2F73B9;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: .75rem;
+    padding: 0 10px;
+    box-sizing: border-box;   /* padding no longer distorts the %-width */
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

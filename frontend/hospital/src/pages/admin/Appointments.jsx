@@ -31,7 +31,10 @@ const patientOptions = [
   "Daniel Brown", "Lina Adel", "Noah Wilson", "John Doe", "Emily Davis",
 ];
 const doctorOptions = ["Dr.Jessica Smeeth"];
-const typeOptions = ["Consultation", "Follow Up", "Check Up", "Surgery"];
+const typeOptions = [
+  { id: "consultation", label: "Consultation" },
+  { id: "checkup", label: "Check Up" },
+];
 
 
 
@@ -282,7 +285,10 @@ function ManageAppointment() {
             <AddAppointmentModal
               patients={patientOptions}
               doctors={doctorOptions}
-              types={typeOptions}
+              types={[
+                { id: "consultation", label: "Consultation" },
+                { id: "checkup", label: "Check Up" },
+              ]}
               onClose={() => setShowAddAppointment(false)}
               onAdd={handleAddAppointment}
             />

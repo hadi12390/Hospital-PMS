@@ -249,3 +249,15 @@
   width: 55%;
   height: 55%;
 }
+.devThree {
+  cursor: pointer;
+}
+
+.devThree input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

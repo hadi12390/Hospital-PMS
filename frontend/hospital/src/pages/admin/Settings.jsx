@@ -1,7 +1,7 @@
 import styles from "./Dashboard.module.css";
 import setting from "./Settings.module.css";
 
-import { useRef, useState } from "react"
+import {useEffect, useRef, useState } from "react"
 import Sidebar from './Sidebar';
 
 import Edit from "./../../assets/manager/edit.svg?react";
@@ -10,15 +10,106 @@ import Eye from "./../../assets/manager/eye-open.svg?react";
 import EyeOff from "./../../assets/manager/eye-close.svg?react";
 
 function Settings() {
+  const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState("idle"); // "idle" | "saving" | "saved"
+  async function handleSave() {
+  try {
+    setSaveStatus("saving");
+
+    const hostName = window.location.hostname;
+
+    const formData = new FormData();
+    formData.append("username", profile.username);
+    formData.append("first_name", profile.firstName);
+    formData.append("last_name", profile.lastName);
+    formData.append("email", profile.email);
+
+    if (profileImage) {
+      formData.append("profile_picture", profileImage);
+    }
+
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 800)); // adjust ms as you like
+
+    const fetchPromise = fetch(
+      `http://${hostName}:8000/accounts/personal-informations/`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        body: formData,
+      }
+    );
+
+    const [response] = await Promise.all([fetchPromise, minDelay]);
+
+    if (!response.ok) throw new Error(`PATCH failed: ${response.status}`);
+
+    const data = await response.json();
+    console.log("Updated profile:", data);
+
+    setSaveStatus("saved");
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    setSaveStatus("idle");
+  }
+}
+
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  function handleImageChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  }
+  
   const [showMenu, setShowMenu] = useState(false);
   const [activeNav, setActiveNav] = useState("settings");
 
   // ---------- Profile fields ----------
   const [profile, setProfile] = useState({
-    username: "MVMOD",
-    firstName: "MVMOD",
-    email: "MVMOD@gmail.com",
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
   });
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const hostName = window.location.hostname;
+        const response = await fetch(
+          `http://${hostName}:8000/accounts/personal-informations/`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) throw new Error(`GET failed: ${response.status}`);
+
+        const data = await response.json();
+
+        setProfile({
+          username: data.username ?? "",
+          firstName: data.first_name ?? "",
+          lastName: data.last_name ?? "",
+          email: data.email ?? "",
+        });
+
+        if (data.profile_picture) {
+          setPreviewUrl(data.profile_picture);
+        }
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, []);
 
   const [editingField, setEditingField] = useState(null); // "username" | "firstName" | "email" | null
   const [draft, setDraft] = useState("");
@@ -40,10 +131,7 @@ function Settings() {
     if (e.key === "Escape") setEditingField(null);
   }
 
-  function handleSave() {
-    console.log("Saving profile:", profile);
-  }
-
+  
   // ---------- Password fields ----------
   const [passwords, setPasswords] = useState({
     current: "",
@@ -142,11 +230,23 @@ function Settings() {
             <div className={`${setting.SetSecOne} ${setting.fadeUp}`} style={{ "--d": "80ms" }}>
               <div className={setting.avatarWrap}>
                 <div className={`${styles.glass} ${setting.devOne}`}>
-                  <div className={setting.devTwo}>
-                    {profile.firstName.charAt(0)}
-                  </div>
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="Profile preview"
+                      className={setting.devTwo}
+                      style={{ objectFit: "cover", width: "100%", height: "100%", borderRadius: "50%" }}
+                    />
+                  ) : (
+                    <div className={setting.devTwo}>{profile.firstName?.charAt(0) || "?"}</div>
+                  )}
                 </div>
                 <button className={setting.devThree} aria-label="Change photo">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
                   <Edit />
                 </button>
               </div>
@@ -205,6 +305,39 @@ function Settings() {
                     <Edit />
                   </button>
                 </div>
+                <div className={`${setting.fieldRow} ${setting.fadeUp}`} style={{ "--d": "180ms" }}>
+                  <span className={setting.fieldLabel}>Last Name:</span>
+
+                {editingField === "lastName" ? (
+                <input
+                ref={(el) => (inputRefs.current.lastName = el)}
+                className={setting.fieldInput}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={() => commitEdit("lastName")}
+                onKeyDown={(e) => handleFieldKeyDown(e, "lastName")}
+                />
+                ) : ( <span className={setting.fieldValue}>
+                {profile.lastName} </span>
+                )}
+
+                <button
+                type="button"
+                className={setting.fieldEditBtn}
+                onClick={() =>
+                editingField === "lastName"
+                ? commitEdit("lastName")
+                : startEdit("lastName")
+                }
+                aria-label="Edit last name"
+
+                >
+
+                   <Edit />
+
+                  </button>
+                </div>
+
 
                 <div className={`${setting.fieldRow} ${setting.fadeUp}`} style={{ "--d": "220ms" }}>
                   <span className={setting.fieldLabel}>Email:</span>
@@ -240,8 +373,9 @@ function Settings() {
                 className={`${setting.saveButton} ${setting.fadeUp}`}
                 style={{ "--d": "260ms" }}
                 onClick={handleSave}
+                disabled={saveStatus === "saving"}
               >
-                Save Changes
+                {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save Changes"}
                 <Save className={setting.saveIcon} />
               </button>
 

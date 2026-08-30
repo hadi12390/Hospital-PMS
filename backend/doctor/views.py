@@ -258,7 +258,7 @@ class DoctorPatients(APIView):
     permission_classes = [IsDoctor]
 
     def patient_summary(self, patient):
-        patient_user = patient.user if patient else None
+        patient_user = patient.user if patient.user else None
 
         if patient_user:
             public_id = str(patient_user.public_id)
@@ -269,7 +269,7 @@ class DoctorPatients(APIView):
             )
         elif patient:
             public_id = "User is guest."
-            name = patient.get_full_name()
+            name = f"{patient.first_name} {patient.last_name}"
             profile_picture = None
         else:
             public_id = None
@@ -311,7 +311,7 @@ class DoctorAppointments(APIView):
 
     def appointment_summary(self, appointment):
         patient_obj = appointment.patient
-        patient_user = patient_obj.user if patient_obj else None
+        patient_user = patient_obj.user if patient_obj.user else None
 
         if patient_user:
             patient_public_id = str(patient_user.public_id)
@@ -323,15 +323,18 @@ class DoctorAppointments(APIView):
 
         elif patient_obj:
             patient_public_id = "User Is guest."
-            patient_name = patient_obj.get_full_name()
+            patient_name = f"{patient_obj.first_name} {patient_obj.last_name}"
+            profile_picture = None
         else:
             patient_public_id = None
             patient_name = "Unknown"
+            profile_picture = None
         return {
             "appointment_public_id": str(appointment.public_id),
             "patient": {
                 "public_id": patient_public_id,
                 "name": patient_name,
+
                 "profile_picture": profile_picture
             },
             "appointment_type": appointment.appointment_type,

@@ -101,7 +101,7 @@ class Patient(models.Model):
         return final_score
 
     def __str__(self):
-        return f"{self.reliability}"
+        return f"{self.first_name}"
     
     def save(self, *args, **kwargs):
         # If linked to a User, sync names from User if not manually specified

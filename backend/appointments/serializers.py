@@ -132,7 +132,14 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
 
         return getattr(person, "name", None)
 
-
+    def get_profile_picture(self, person):
+        try:
+            if person.user.profile_picture:
+                return self.context['request'].build_absolute_uri(person.user.profile_picture.url)
+        except Exception:
+            pass
+        return None
+    
     def get_person_repr(self, person):
         if person is None:
             return None
@@ -144,10 +151,7 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 else None
             ),
             "name": self.get_full_name(person),
-            'profile_picture': (
-                self.context['request'].build_absolute_uri(person.user.profile_picture.url)
-                if person.user.profile_picture else None
-            ),
+            'profile_picture': self.get_profile_picture(person)
         }
     
     patient = serializers.UUIDField(write_only=True)

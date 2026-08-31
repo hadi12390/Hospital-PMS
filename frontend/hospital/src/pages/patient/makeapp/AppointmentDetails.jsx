@@ -6,7 +6,7 @@ import Per from "./icons/per.svg?react";
 import Next from "./icons/next.svg?react";
 
 
-function TimeChoice({
+function AppointmentDetails({
     doctor,
     date,
     onNext,
@@ -15,9 +15,13 @@ function TimeChoice({
     const [appointmentType, setAppointmentType] = useState(null);
     const [reason, setReason] = useState("");
     const [note, setNote] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
+    const [isNoteFocused, setIsNoteFocused] = useState(false);
+
+    const canContinue = appointmentType && reason.trim();
 
     const handleNext = () => {
-        if (!appointmentType || !reason.trim()) {
+        if (!canContinue) {
             return;
         }
 
@@ -27,11 +31,6 @@ function TimeChoice({
             note
         });
     };
-
-    const canContinue =
-        appointmentType && reason.trim();
-    const [isFocused, setIsFocused] = useState(false);
-    const [isNoteFocused, setIsNoteFocused] = useState(false);
 
     return (
         <div className={styles.timeChoice}>
@@ -184,4 +183,4 @@ function TimeChoice({
     );
 }
 
-export default TimeChoice;
+export default AppointmentDetails;

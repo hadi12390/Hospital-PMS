@@ -134,7 +134,7 @@ function DetailRow({ label, value, options, onCommit }) {
   }
 
   return (
-    <p className={styles.detailLine}>
+    <div className={styles.detailLine}>
       {label}: {value}
       <button
         type="button"
@@ -144,7 +144,7 @@ function DetailRow({ label, value, options, onCommit }) {
       >
         <EditC className={styles.pencilIcon} />
       </button>
-    </p>
+    </div>
   );
 }
 
@@ -191,20 +191,62 @@ function DateRow({ value, onCommit }) {
 /* ==========================================================================
    EditAppointmentModal
    ========================================================================== */
-
 function EditAppointmentModal({ appointment, onClose, onSave }) {
+
+  function toIsoWithOffset(dateStr, timeStr) {
+  // dateStr: "2026-08-30", timeStr: "12:00" (24hr)
+  const local = new Date(`${dateStr}T${timeStr}:00`);
+
+  const offsetMinutes = -local.getTimezoneOffset(); 
+  const sign = offsetMinutes >= 0 ? "+" : "-";
+  const abs = Math.abs(offsetMinutes);
+  const hours = String(Math.floor(abs / 60)).padStart(2, "0");
+  const minutes = String(abs % 60).padStart(2, "0");
+
+  return `${dateStr}T${timeStr}:00${sign}${hours}:${minutes}`;
+}
+
+
+  function durationToMinutes(str) {
+    if (!str) return null;
+
+    const s = str.trim().toLowerCase();
+
+    if (s === "default") return null; 
+
+    const match = s.match(/(\d+)\s*(minute|hour)/);
+    if (!match) return null;
+
+    const [, num, unit] = match;
+    const value = parseInt(num, 10);
+
+    return unit === "hour" ? value * 60 : value;
+  }
+
+  function toApiValue(str) {
+    if (!str) return str;
+    return str.trim().toLowerCase().replace(/\s+/g, "_");
+  }
+
+  function getCookie(name) {
+    const match = document.cookie.match(
+      new RegExp("(^| )" + name + "=([^;]+)")
+    );
+    return match ? decodeURIComponent(match[2]) : null;
+  }
   const [formData, setFormData] = useState({
     type: appointment.type,
     reason: appointment.reason,
-    duration: appointment.duration || "Default",
+    duration: appointment.duration,
     date: appointment.dateTime.split("T")[0],
     time: formatTime12(appointment.dateTime),
     status: appointment.status,
-    note: appointment.note || "",
+    note: appointment.note,
   });
-
   const [isClosing, setIsClosing] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setIsEntering(false));
@@ -232,21 +274,90 @@ function EditAppointmentModal({ appointment, onClose, onSave }) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSave() {
-    const updated = {
-      ...appointment,
-      type: formData.type,
-      reason: formData.reason,
-      duration: formData.duration,
-      status: formData.status,
-      note: formData.note,
-      dateTime: `${formData.date}T${parseTime12To24(formData.time)}:00`,
+  async function handleSave() {
+    console.log("APPOINTMENT OBJECT:", appointment);
+
+    setSaveError(null);
+
+    // Only appointment-level fields are sent — patient data is never
+    // read from formData because it was never put there in the first place.
+    const payload = {
+      appointment_type: toApiValue(formData.type),
+      reason_for_visit: formData.reason,
+      duration_minutes: durationToMinutes(formData.duration),
+      status: toApiValue(formData.status),
+      notes: formData.note,   
+      scheduled_time: toIsoWithOffset(formData.date, parseTime12To24(formData.time)),
     };
-    closeWithAnimation(() => onSave(updated));
+
+    setIsSaving(true);
+      console.log("PAYLOAD BEING SENT:", JSON.stringify(payload, null, 2));
+
+    
+    try {
+
+      const hostName = window.location.hostname;
+      const res = await fetch(
+        `http://${hostName}:8000/appointment/doctor/${appointment.id}/`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        let message = `Save failed (${res.status})`;
+
+        try {
+          const errorJson = JSON.parse(text);
+          const conflictMsg = errorJson?.non_field_errors?.find((m) =>
+            m.toLowerCase().includes("time slot conflicts")
+          );
+
+          if (conflictMsg) {
+            message = "The selected time does not match your schedule.";
+          } else {
+            const firstFieldError = Object.values(errorJson || {})[0];
+            message = Array.isArray(firstFieldError) ? firstFieldError[0] : text;
+          }
+        } catch {
+          message = text || message;
+        }
+
+        throw new Error(message);
+      }
+
+      const updatedFromServer = await res.json().catch(() => null);
+
+      const updated = {
+        ...appointment,
+        type: formData.type,
+        reason: formData.reason,
+        duration: formData.duration,
+        status: formData.status,
+        note: formData.note,
+        dateTime: payload.date_time,
+        ...(updatedFromServer || {}), // let server response win if it returns the full object
+      };
+
+      closeWithAnimation(() => onSave(updated));
+      
+    } catch (err) {
+      console.error(err);
+      setSaveError(err.message || "Something went wrong while saving.");
+      setIsSaving(false);
+    }
   }
 
   const overlayState = isClosing ? styles.overlayClosing : isEntering ? styles.overlayEntering : styles.overlayOpen;
   const modalState = isClosing ? styles.modalClosing : isEntering ? styles.modalEntering : styles.modalOpen;
+
 
   return createPortal(
     <div className={`${styles.overlay} ${overlayState}`} onClick={handleOverlayClick}>
@@ -256,11 +367,18 @@ function EditAppointmentModal({ appointment, onClose, onSave }) {
         {/* ---- Patient photo + info (read-only) ---- */}
         <div className={styles.topRow}>
           <div className={`${styles.photoBox} ${styles.glass}`}>
-            <img
-              className={styles.photo}
-              src={photoMap[patient.photo]}
-              alt={`${patient.firstName} ${patient.lastName}`}
-            />
+            {patient.photo ? (
+              <img
+                className={styles.photo}
+                src={patient.photo}
+                alt={`${patient.firstName} ${patient.lastName}`}
+              />
+            ) : (
+              <div className={styles.photoFallback}>
+                {patient.firstName?.[0]}
+                {patient.lastName?.[0]}
+              </div>
+            )}
           </div>
 
           <div className={`${styles.infoCard} ${styles.glass}`}>
@@ -302,10 +420,7 @@ function EditAppointmentModal({ appointment, onClose, onSave }) {
               options={timeOptions}
               onCommit={(v) => updateField("time", v)}
             />
-            <DateRow
-              value={formData.date}
-              onCommit={(v) => updateField("date", v)}
-            />
+            
             <DetailRow
               label="Duration"
               value={formData.duration}
@@ -313,25 +428,30 @@ function EditAppointmentModal({ appointment, onClose, onSave }) {
               onCommit={(v) => updateField("duration", v)}
             />
             <DetailRow
-              label="Reason for visit"
-              value={formData.reason}
-              onCommit={(v) => updateField("reason", v)}
-            />
-            <DetailRow
               label="Type"
               value={formData.type}
               options={["Consultation", "Follow Up", "Check Up", "Surgery"]}
               onCommit={(v) => updateField("type", v)}
             />
-            <p className={styles.detailLine}>
-              Created at: {formatDisplayDate(appointment.createdAt.split("T")[0])}
-            </p>
             <DetailRow
               label="Status"
               value={formData.status}
               options={statusOptions}
               onCommit={(v) => updateField("status", v)}
             />
+            <DetailRow
+              label="Reason for visit"
+              value={formData.reason}
+              onCommit={(v) => updateField("reason", v)}
+            />
+            <DateRow
+              value={formData.date}
+              onCommit={(v) => updateField("date", v)}
+            />
+            <p className={styles.detailLine}>
+              Created at: {formatDisplayDate(appointment.createdAt.split("T")[0])}
+            </p>
+            
           </div>
 
           <div className={styles.notesCol}>
@@ -344,16 +464,22 @@ function EditAppointmentModal({ appointment, onClose, onSave }) {
             />
           </div>
         </div>
+        
+        {saveError && (
+          <div className={`${styles.cancelBtnA} ${styles.glass}`}>
+            {saveError}
+          </div>
+        )}
 
         <div className={styles.actionsRow}>
-          <button className={`${styles.cancelBtn} ${styles.glass}`} onClick={handleCancel}>
+          <button className={`${styles.cancelBtn} ${styles.glass}`} onClick={handleCancel} disabled={isSaving}>
             <CancleM className={styles.icon} />
             Cancel
           </button>
 
-          <button className={`${styles.saveBtn} ${styles.glass}`} onClick={handleSave}>
+          <button className={`${styles.saveBtn} ${styles.glass}`} onClick={handleSave} disabled={isSaving}>
             <Approved className={styles.icon} />
-            Save
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

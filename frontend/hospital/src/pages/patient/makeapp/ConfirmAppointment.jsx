@@ -1,7 +1,6 @@
 import styles from "../MakeAppointment.module.css";
 
 import Pill from "./icons/pill.svg?react";
-import Star from "./icons/star.svg?react";
 import Locwhite from "./icons/location.svg?react";
 import TimePast from "./icons/time-past.svg?react";
 import Cam from "./icons/cam.svg?react";
@@ -9,10 +8,23 @@ import Per from "./icons/per.svg?react";
 import Next from "./icons/next.svg?react";
 
 
-function ConfirmAppointment({ appointment, onBack, onConfirm }) {
+const formatWorkTime = (timeStr) => {
+    if (!timeStr) return "";
+
+    const [hours, minutes] = timeStr.split(":");
+    const date = new Date();
+    date.setHours(Number(hours), Number(minutes), 0);
+
+    return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+    });
+};
+
+
+function ConfirmAppointment({ appointment, onBack, onConfirm, submitting, submitError }) {
 
     const { doctor, date, appointmentType, reason, note, timeSlot } = appointment;
-
 
     const handleConfirm = () => {
         if (onConfirm) {
@@ -37,14 +49,17 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
 
                     <div className={styles.secOneBox}>
                         <div className={`${styles.photoCont} ${styles.glass}`}>
-                            <img src={doctor?.image} alt={doctor?.name} />
+                            <img
+                                src={doctor?.profile_picture || "/assest/patient/hadi.png"}
+                                alt={`${doctor?.first_name} ${doctor?.last_name}`}
+                            />
                         </div>
                     </div>
 
                     <div className={styles.infoDEV}>
 
                         <h1 className={styles.heroCardInfo}>
-                            {doctor?.name}
+                            Dr. {doctor?.first_name} {doctor?.last_name}
                         </h1>
 
                         <div className={styles.infoshehe}>
@@ -55,18 +70,13 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
                             </div>
 
                             <div className={styles.thingsCards}>
-                                <Star />
-                                {doctor?.rating} ({doctor?.reviews} Reviews)
-                            </div>
-
-                            <div className={styles.thingsCards}>
                                 <Locwhite />
-                                {doctor?.location}
+                                {doctor?.phone_number}
                             </div>
 
                             <div className={`${styles.timeICON} ${styles.thingsCards}`}>
                                 <TimePast />
-                                {doctor?.availability}
+                                {formatWorkTime(doctor?.start_time)} - {formatWorkTime(doctor?.end_time)}
                             </div>
 
                         </div>
@@ -94,7 +104,7 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
                     <h3>{date?.day}</h3>
                     <p className={styles.confirmDateSub}>{date?.date}</p>
                     {timeSlot && (
-                        <p className={styles.confirmDateSub}>{timeSlot.time}</p>
+                        <p className={styles.confirmDateSub}>{timeSlot.display}</p>
                     )}
                 </div>
 
@@ -115,6 +125,13 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
             </div>
 
 
+            {submitError && (
+                <p className={styles.confirmDateSub}>
+                    Failed to confirm appointment: {submitError}
+                </p>
+            )}
+
+
             {/* NAVIGATION */}
             <div className={styles.navigationButtons}>
 
@@ -122,6 +139,7 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
                     type="button"
                     onClick={onBack}
                     className={styles.backStep}
+                    disabled={submitting}
                 >
                     Back
                     <div className={`${styles.innerNB} ${styles.innerNBE}`}><Next/></div>
@@ -131,8 +149,9 @@ function ConfirmAppointment({ appointment, onBack, onConfirm }) {
                     type="button"
                     onClick={handleConfirm}
                     className={styles.nextStep}
+                    disabled={submitting}
                 >
-                    Confirm Appointment
+                    {submitting ? "Confirming..." : "Confirm Appointment"}
                     <div className={styles.innerNB}><Next/></div>
                 </button>
 

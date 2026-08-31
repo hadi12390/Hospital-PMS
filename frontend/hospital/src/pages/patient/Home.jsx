@@ -18,12 +18,88 @@ import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 
 import { NavLink } from "react-router-dom";
-import { useRef, useState } from 'react';
+import { useRef, useState ,useEffect} from 'react';
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 
 function PatientHome(){
+  const [apiData , setApiData] = useState([]);
+  const [apiPatientData , setPatientApiData] = useState([]);
+
+  function getCurrentDateTime() {
+    const now = new Date();
+
+    const day = now.getDate();
+    const month = now.toLocaleString("en-US", { month: "short" });
+
+    const time = now.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return `${day} ${month} ${time}`;
+  }
+
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const hostName = window.location.hostname;
+
+        const response = await fetch(
+          `http://${hostName}:8000/patient/dashboard/`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log(data);
+
+        setApiData(data);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    }
+
+    async function getPatientData() {
+      try {
+        const hostName = window.location.hostname;
+
+        const response = await fetch(
+          `http://${hostName}:8000/patient/profile/`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log(data);
+
+        setPatientApiData(data);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    }
+    getData();
+    getPatientData();
+  }, []);
+
+
    const navigate = useNavigate();
 
    // ---------- Date helpers ----------
@@ -213,6 +289,57 @@ function PatientHome(){
       const [year, month, day] = value.split("-");
       setPickedDate(`${day} / ${month} / ${year}`);
       if (onDateChange) onDateChange(value);
+    }
+
+    function calculateAge(birthDate) {
+      if (!birthDate) return null;
+
+      const birth = new Date(birthDate);
+      const today = new Date();
+
+      let age = today.getFullYear() - birth.getFullYear();
+
+      const monthDifference = today.getMonth() - birth.getMonth();
+      const dayDifference = today.getDate() - birth.getDate();
+
+      // Birthday hasn't happened yet this year
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && dayDifference < 0)
+      ) {
+        age--;
+      }
+
+      return age;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "Unknown";
+
+      const [year, month, day] = dateString.split("T")[0].split("-");
+
+      return `${day} / ${month} / ${year}`;
+    }
+
+    function daysUntil(dateString) {
+      if (!dateString) return "Unknown";
+
+      const targetDate = new Date(dateString);
+      const today = new Date();
+
+      // Remove the time so we compare only dates
+      today.setHours(0, 0, 0, 0);
+      targetDate.setHours(0, 0, 0, 0);
+
+      const difference = targetDate - today;
+
+      const days = Math.ceil(difference / (1000 * 60 * 60 * 24));
+
+      if (days === 0) return "Today";
+      if (days === 1) return "1 day";
+      if (days > 1) return `${days}`;
+
+      return "Passed";
     }
 
   return (
@@ -419,11 +546,11 @@ function PatientHome(){
                 <div className={styles.bOrowOne}>
                   <div className={`${styles.bOmainprof} ${styles.glass}`}><img src="/assest/patient/pp.png" alt="" /></div>
                   <div className={`${styles.bOinfo} ${styles.glass}`}>
-                    <h1>Mia Quian</h1>
+                    <h1>{apiPatientData.first_name || "Unknown"}</h1>
                     <div className={`${styles.bOinfoin} ${styles.glass}`}>
-                      <p>Age: 19</p>
-                      <p>Gender: Female</p>
-                      <p>Patient ID: 202819376</p>
+                      <p>Age: {calculateAge(apiPatientData.birth_date) || "Unknown"}</p>
+                      <p>Gender: {apiPatientData.gender || "Unknown"}</p>
+                      <p>Patient ID: {apiPatientData.personal_id || "Unknown"}</p>
                     </div>
                   </div>
                 </div>
@@ -432,7 +559,7 @@ function PatientHome(){
                   <div className={styles.bOmedinfoONE}>
                     <div className={styles.medinfos}>
                       <Blood/>
-                      <p>Blood Type: A+</p>
+                      <p>Blood Type: {apiPatientData.blood_type}</p>
                     </div>
 
                     <div className={styles.medinfos}>
@@ -442,20 +569,18 @@ function PatientHome(){
 
                     <div className={styles.medinfos}>
                       <TimePast/>
-                      <p>Primary Doctor: <br /> Dr.Jessica</p>
+                      <p>Last Doctor: <br /> {apiData.last_doctor || "No Doctor"}</p>
                     </div>
 
                   </div>
                   <div>
 
-                    <div className={styles.medinfos}><TimePast/>Last Visit: 13 Jul 2026</div>
+                    <div className={styles.medinfos}><TimePast/>Last Visit:</div>
                       <div className={`${styles.lastseco} ${styles.glass}`}>
                         <div className={styles.infosin}>Visits
-                          <div className={`${styles.bOnums} ${styles.glass}`}>12</div>
+                          <div className={`${styles.bOnums} ${styles.glass}`}>{apiData.visitse}</div>
                         </div>
-                        <div className={styles.infosin}>Reports
-                          <div className={`${styles.bOnums} ${styles.glass}`}>32</div>
-                        </div>
+                        
                       </div> 
                     </div>
                 </div>
@@ -481,8 +606,8 @@ function PatientHome(){
             {/* BOX TWO */}
             <div className={styles.bOXTWO}>
               <h1>Days Until Appointment</h1>
-              <div className={`${styles.circays} ${styles.glass}`}><div className={styles.innieDiv}>4 Days</div></div>
-              <p className={styles.dateofcir}>Last Update: 14 Jul 7:32</p>
+              <div className={`${styles.circays} ${styles.glass}`}><div className={styles.innieDiv}>{daysUntil(apiData.next_appointment?.scheduled_time)}</div></div>
+              <p className={styles.dateofcir}>Last Update: {getCurrentDateTime()}</p>
             </div>
                     </div>
                     
@@ -538,27 +663,41 @@ function PatientHome(){
 
             {/* BOX FOUR */}
             <div className={styles.bOXFOUR}>
-              <h1 className={styles.heronoti}>Notifications</h1>
-              <div className={`${styles.notification} ${styles.glass}`}>
-                <div className={styles.notiname}>
-                  <h1>Appointment Confirmed</h1>
+  <h1 className={styles.heronoti}>Notifications</h1>
+
+            {apiData.latest_unread_notifications?.length > 0 ? (
+              apiData.latest_unread_notifications.map((notification, index) => (
+                <div
+                  key={index}
+                  className={`${styles.notification} ${styles.glass}`}
+                >
+                  <div className={styles.notiname}>
+                    <h1>{notification.title}</h1>
+                  </div>
+
+                  <p className={styles.discnoti}>
+                    {notification.message}
+                  </p>
+
+                  <p className={styles.dataNoti}>
+                    {formatDate(notification.created_at)}
+                  </p>
                 </div>
-                  <p className={styles.discnoti}>Your appointment with 
-                    Dr.Ahmad hasbeen confirmed</p>
-                  <p className={styles.dataNoti}>10 min ago</p>
-              </div>
-              <div className={`${styles.notification} ${styles.glass}`}>
-                <div className={styles.notiname}>
-                  <h1>Appointment Confirmed</h1>
-                </div>
-                  <p className={styles.discnoti}>Your appointment with 
-                    Dr.Ahmad hasbeen confirmed</p>
-                  <p className={styles.dataNoti}>10 min ago</p>
-              </div>
-              <Link className={styles.linkbuttnotif} to="/patient/notifications">
-                <button className={`${styles.buttnotif} ${styles.glass}`}>View All Notifications <Arrow className={styles.Arrownoti}/></button>
-              </Link>
-            </div>
+              ))
+            ) : (
+              <p className={styles.discnoti}>No new notifications</p>
+            )}
+
+            <Link
+              className={styles.linkbuttnotif}
+              to="/patient/notifications"
+            >
+              <button className={`${styles.buttnotif} ${styles.glass}`}>
+                View All Notifications
+                <Arrow className={styles.Arrownoti} />
+              </button>
+            </Link>
+          </div>
         </div>
     
       

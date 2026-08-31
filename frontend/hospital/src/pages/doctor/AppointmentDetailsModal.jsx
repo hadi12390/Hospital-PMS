@@ -1,6 +1,7 @@
 import styles from "./AppointmentDetailsModal.module.css";
 import { formatDisplayDate } from "./DateHelper/dateUtils";
 import { createPortal } from "react-dom";
+import { adaptAppointment } from "./appointmentAdapter";
 import patient1 from "./photos/patient1.png";
 import patient2 from "./photos/patient2.png";
 import patient3 from "./photos/patient3.png";
@@ -41,6 +42,7 @@ function AppointmentDetailsModal({ appointment, onClose, onEdit, onCancel }) {
   if (!appointment) return null;
 
   const { patient } = appointment;
+  console.log(appointment)
 
   function handleOverlayClick(e) {
     if (e.target === e.currentTarget) onClose();
@@ -54,11 +56,13 @@ function AppointmentDetailsModal({ appointment, onClose, onEdit, onCancel }) {
         {/* ---- Patient photo + info ---- */}
         <div className={styles.topRow}>
           <div className={`${styles.photoBox} ${styles.glass}`}>
-            <img
-              className={styles.photo}
-              src={photoMap[patient.photo] ?? patient1}
-              alt={`${patient.firstName} ${patient.lastName}`}
-            />
+            {patient.photo ? (
+              <img className={styles.photo} src={patient.photo} alt={`${patient.firstName} ${patient.lastName}`} />
+            ) : (
+              <div className={styles.photoFallback}>
+                {patient.firstName?.[0]}{patient.lastName?.[0]}
+              </div>
+            )}
           </div>
 
           <div className={`${styles.infoCard} ${styles.glass}`}>
@@ -111,9 +115,13 @@ function AppointmentDetailsModal({ appointment, onClose, onEdit, onCancel }) {
             <p className={styles.detailLine}>
               Type: {appointment.type}
             </p>
-            <p className={styles.detailLine}>
-              Created at: {formatDisplayDate(appointment.createdAt.split("T")[0])}
-            </p>
+            <div className={styles.detailLine}>
+             {appointment.createdAt && (
+                <p className={styles.detailLine}>
+                  Created at: {formatDisplayDate(appointment.createdAt.split("T")[0])}
+                </p>
+              )}
+            </div>
             <p className={styles.detailLine}>
               Status: {appointment.status}
             </p>

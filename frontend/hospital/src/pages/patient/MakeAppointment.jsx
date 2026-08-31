@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MakeAppointment.module.css";
 
@@ -23,6 +23,15 @@ import ConfirmAppointment from "./makeapp/ConfirmAppointment";
 import AppointmentSent from "./makeapp/AppointmentSent";
 import NotificationLogo from "../../assets/patient/notification.svg?react";
 
+
+// ================================
+// API CONFIG
+// ================================
+
+const API_BASE = `http://${window.location.hostname}:8000`;
+
+const mapAppointmentType = (type) =>
+    type === "routinecheckup" ? "checkup" : "consultation";
 
 
 function MakeAppointment() {
@@ -59,65 +68,43 @@ function MakeAppointment() {
 
 
     // ================================
-    // TEMPORARY DOCTOR DATA
+    // DOCTORS (fetched)
     // ================================
 
-    const doctors = [
-        {
-            id: 1,
-            name: "Dr. Hadi Al-Issa",
-            image: "/assest/patient/hadi.png",
-            specialty: "Cardiologist",
-            rating: 4.9,
-            reviews: 234,
-            location: "Amman Medical Center",
-            availability: "Available Today",
-        },
+    const [doctors, setDoctors] = useState([]);
+    const [doctorsLoading, setDoctorsLoading] = useState(true);
+    const [doctorsError, setDoctorsError] = useState(null);
 
-        {
-            id: 2,
-            name: "Dr. Sarah Ahmad",
-            image: "/assest/patient/hadi.png",
-            specialty: "Dermatologist",
-            rating: 4.8,
-            reviews: 189,
-            location: "Amman Medical Center",
-            availability: "Available Today",
-        },
+    useEffect(() => {
+        const controller = new AbortController();
 
-        {
-            id: 3,
-            name: "Dr. Ahmad Khaled",
-            image: "/assest/patient/hadi.png",
-            specialty: "Neurologist",
-            rating: 4.7,
-            reviews: 156,
-            location: "Amman Medical Center",
-            availability: "Available Tomorrow",
-        },
+        setDoctorsLoading(true);
+        setDoctorsError(null);
 
-        {
-            id: 4,
-            name: "Dr. Lina Omar",
-            image: "/assest/patient/hadi.png",
-            specialty: "Pediatrician",
-            rating: 4.9,
-            reviews: 312,
-            location: "Amman Medical Center",
-            availability: "Available Today",
-        },
+        fetch(`${API_BASE}/doctor/`, {
+            credentials: "include",
+            signal: controller.signal,
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to load doctors");
+                return res.json();
+            })
+            .then((data) => setDoctors(data))
+            .catch((err) => {
+                if (err.name !== "AbortError") setDoctorsError(err.message);
+            })
+            .finally(() => setDoctorsLoading(false));
 
-        {
-            id: 5,
-            name: "Dr. James Wilson",
-            image: "/assest/patient/hadi.png",
-            specialty: "Orthopedic",
-            rating: 4.8,
-            reviews: 201,
-            location: "Amman Medical Center",
-            availability: "Available Tomorrow",
-        },
-    ];
+        return () => controller.abort();
+    }, []);
+
+
+    // ================================
+    // SUBMISSION STATE
+    // ================================
+
+    const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
 
 
     // ================================
@@ -192,6 +179,84 @@ function MakeAppointment() {
 
         nextStep();
     };
+
+    // ================================
+    // CSRF HELPER
+    // ================================
+
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+
+        if (parts.length === 2) {
+            return parts.pop().split(";").shift();
+        }
+
+        return null;
+    };
+
+
+    // ================================
+    // STEP 5 - CONFIRM (submit to API)
+    // ================================
+
+    const handleConfirm = async () => {
+        setSubmitting(true);
+        setSubmitError(null);
+
+        try {
+            const res = await fetch(`${API_BASE}/appointment/`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify({
+                    doctor: appointment.doctor?.public_id ?? null,
+                    scheduled_time: appointment.timeSlot?.time ?? null,
+                    reason_for_visit: appointment.reason,
+                    notes: appointment.note,
+                    appointment_type: mapAppointmentType(
+                        appointment.appointmentType
+                    ),
+                }),
+            });
+
+            // Get the response body first
+            const data = await res.json();
+
+            // Log everything from the backend
+            console.log("Response status:", res.status);
+            console.log("Response data:", data);
+
+            console.log("doctor being sent:", appointment.doctor);
+
+
+            if (!res.ok) {
+                console.log("Full error response:", data);
+
+                throw new Error(
+                    data.detail ||
+                    data.message ||
+                    JSON.stringify(data)
+                );
+
+            }
+
+            // Success
+            nextStep();
+
+        } catch (err) {
+            console.error("Appointment error:", err);
+            console.error("Error message:", err.message);
+
+            setSubmitError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
 
 
     return (
@@ -555,10 +620,16 @@ function MakeAppointment() {
                             <div key={step} className={styles.stepAnimate}>
 
                                 {step === 1 && (
-                                    <DoctorChoice
-                                        doctors={doctors}
-                                        onNext={handleDoctorNext}
-                                    />
+                                    doctorsLoading ? (
+                                        <p>Loading doctors...</p>
+                                    ) : doctorsError ? (
+                                        <p>Failed to load doctors: {doctorsError}</p>
+                                    ) : (
+                                        <DoctorChoice
+                                            doctors={doctors}
+                                            onNext={handleDoctorNext}
+                                        />
+                                    )
                                 )}
 
                                 {step === 2 && (
@@ -582,6 +653,8 @@ function MakeAppointment() {
                                     <TimeSlotChoice
                                         doctor={appointment.doctor}
                                         date={appointment.date}
+                                        type={mapAppointmentType(appointment.appointmentType)}
+                                        apiBase={API_BASE}
                                         onNext={handleTimeSlotNext}
                                         onBack={previousStep}
                                     />
@@ -591,7 +664,9 @@ function MakeAppointment() {
                                     <ConfirmAppointment
                                         appointment={appointment}
                                         onBack={previousStep}
-                                        onConfirm={nextStep}
+                                        onConfirm={handleConfirm}
+                                        submitting={submitting}
+                                        submitError={submitError}
                                     />
                                 )}
 

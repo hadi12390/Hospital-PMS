@@ -1,20 +1,10 @@
 import styles from "./Dashboard.module.css";
-import { useRef, useState , useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import Sidebar from "./sidebarD";
 
 import patient1 from "./photos/patient1.png";
-import patient2 from "./photos/patient2.png";
-import patient3 from "./photos/patient3.png";
-import patient4 from "./photos/patient4.png";
-import patient5 from "./photos/patient5.png";
-import patient6 from "./photos/patient6.png";
-import patient7 from "./photos/patient1.png"; // reuse or add patient7/8 if you have them
-import patient8 from "./photos/patient2.png";
 
-const photoMap = {
-  patient1, patient2, patient3, patient4,
-  patient5, patient6, patient7, patient8,
-};
+const defaultAvatar = patient1;
 
 import Search from "./svg/search.svg?react";
 import ArrowDown from "./svg/arrowdown.svg?react";
@@ -30,175 +20,59 @@ import EditAppointmentModal from "./EditAppointmentModal";
 const statusOptions = ["Completed", "Confirmed", "Pending"];
 const typeOptions = ["Consultation", "Follow Up", "Check Up", "Surgery"];
 
-const initialAppointments = [
-  {
-    id: 1,
-    patient: {
-      createdAt: "2026-08-05T09:15:00",
-      firstName: "Mia",
-      lastName: "Quien",
-      dateOfBirth: "2001-04-12",
-      phone: "+962 79 120 0976",
-      bloodType: "A+",
-      gender: "Female",
-      photo: "patient1",
-    },
-    doctor: "Dr. Ahmad",
-    reason: "Flu",
-    type: "Consultation",
-    dateTime: "2026-08-23T09:00:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-20T14:25:00",
-    status: "Confirmed",
-  },
+// ---------- API <-> UI mapping helpers ----------
 
-  {
-    id: 2,
-    patient: {
-      createdAt: "2026-08-06T10:20:00",
-      firstName: "Omar",
-      lastName: "Khaled",
-      dateOfBirth: "1998-09-21",
-      phone: "+962 78 345 6210",
-      bloodType: "O+",
-      gender: "Male",
-      photo: "patient2",
-    },
-    doctor: "Dr. Lina",
-    reason: "Headache",
-    type: "Follow Up",
-    dateTime: "2026-08-23T10:30:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-21T09:15:00",
-    status: "Pending",
-  },
+// "consultation" -> "Consultation", "follow_up" -> "Follow Up"
+function formatType(rawType) {
+  if (!rawType) return "Consultation";
+  return rawType
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
 
-  {
-    id: 3,
-    patient: {
-      createdAt: "2026-08-07T11:45:00",
-      firstName: "Lina",
-      lastName: "Ahmad",
-      dateOfBirth: "2003-02-15",
-      phone: "+962 79 456 7832",
-      bloodType: "B+",
-      gender: "Female",
-      photo: "patient3",
-    },
-    doctor: "Dr. Jessica",
-    reason: "Toothache",
-    type: "Check Up",
-    dateTime: "2026-08-23T11:00:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-19T16:40:00",
-    status: "Completed",
-  },
+// "pending" -> "Pending"
+function formatStatus(rawStatus) {
+  if (!rawStatus) return "Pending";
+  return rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+}
 
-  {
-    id: 4,
-    patient: {
-      createdAt: "2026-08-08T13:10:00",
-      firstName: "Yousef",
-      lastName: "Ali",
-      dateOfBirth: "1995-11-03",
-      phone: "+962 77 234 8901",
-      bloodType: "AB+",
-      gender: "Male",
-      photo: "patient4",
-    },
-    doctor: "Dr. Omar",
-    reason: "Back pain",
-    type: "Consultation",
-    dateTime: "2026-08-23T13:00:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-22T10:05:00",
-    status: "Confirmed",
-  },
+function splitName(fullName) {
+  const parts = (fullName || "").trim().split(" ");
+  const firstName = parts[0] || "";
+  const lastName = parts.slice(1).join(" ") || "";
+  return { firstName, lastName };
+}
 
-  {
-    id: 5,
-    patient: {
-      createdAt: "2026-08-09T14:30:00",
-      firstName: "Sara",
-      lastName: "Hassan",
-      dateOfBirth: "2000-06-28",
-      phone: "+962 79 678 1234",
-      bloodType: "A-",
-      gender: "Female",
-      photo: "patient5",
-    },
-    doctor: "Dr. Sara",
-    reason: "Skin rash",
-    type: "Consultation",
-    dateTime: "2026-08-24T09:30:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-22T15:20:00",
-    status: "Pending",
-  },
+// Maps one row of GET /doctor/appointments/ into the shape the table/modals use
+function mapApiAppointment(apt) {
+  const { firstName, lastName } = splitName(apt.patient?.name);
+  const patientId =
+    apt.patient?.public_id && !apt.patient.public_id.toLowerCase().includes("guest")
+      ? apt.patient.public_id
+      : null;
 
-  {
-    id: 6,
+  return {
+    id: apt.appointment_public_id,
     patient: {
-      createdAt: "2026-08-10T09:30:00",
-      firstName: "Adam",
-      lastName: "Nasser",
-      dateOfBirth: "1997-03-18",
-      phone: "+962 78 901 2345",
-      bloodType: "O-",
-      gender: "Male",
-      photo: "patient6",
+      id: patientId,
+      firstName,
+      lastName,
+      dateOfBirth: apt.patient?.birth_date || null,
+      phone: apt.patient?.phone_number || null,
+      bloodType: apt.patient?.blood_type || null,
+      gender: apt.patient?.gender || null,
+      photo: apt.patient?.profile_picture || defaultAvatar,
     },
-    doctor: "Dr. Ahmad",
-    reason: "Cough",
-    type: "Check Up",
-    dateTime: "2026-08-24T11:00:00",
+    doctor: null,
+    reason: apt.resone_for_visit || "—",
+    type: formatType(apt.appointment_type),
+    dateTime: apt.date,
     duration: "30 minutes",
-    createdAt: "2026-08-21T12:10:00",
-    status: "Confirmed",
-  },
-
-  {
-    id: 7,
-    patient: {
-      createdAt: "2026-08-11T10:00:00",
-      firstName: "Noor",
-      lastName: "Sami",
-      dateOfBirth: "2002-12-05",
-      phone: "+962 77 567 8901",
-      bloodType: "B-",
-      gender: "Female",
-      photo: "patient7",
-    },
-    doctor: "Dr. Lina",
-    reason: "Fever",
-    type: "Consultation",
-    dateTime: "2026-08-24T14:00:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-23T08:30:00",
-    status: "Pending",
-  },
-
-  {
-    id: 8,
-    patient: {
-      createdAt: "2026-08-12T12:00:00",
-      firstName: "Zaid",
-      lastName: "Mahmoud",
-      dateOfBirth: "1994-07-22",
-      phone: "+962 79 321 6547",
-      bloodType: "AB-",
-      gender: "Male",
-      photo: "patient8",
-    },
-    doctor: "Dr. Omar",
-    reason: "Stomach pain",
-    type: "Surgery",
-    dateTime: "2026-08-25T10:00:00",
-    duration: "30 minutes",
-    createdAt: "2026-08-22T11:45:00",
-    status: "Confirmed",
-  },
-];
+    createdAt: apt.date,
+    status: formatStatus(apt.status),
+  };
+}
 
 function statusIcon(status) {
   if (status === "Completed") return <Approved className={styles.dotIcon} />;
@@ -209,7 +83,9 @@ function statusIcon(status) {
 function AppointmentsTable() {
   const [selectedButton, setSelectedButton] = useState("Today");
 
-  const [appointmentsData, setAppointmentsData] = useState(initialAppointments);
+  const [appointmentsData, setAppointmentsData] = useState([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [appointmentsError, setAppointmentsError] = useState(null);
 
   const [searchText, setSearchText] = useState("");
 
@@ -233,8 +109,46 @@ function AppointmentsTable() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [editingAppointment, setEditingAppointment] = useState(null);
 
-  const doctorOptions = Array.from(new Set(appointmentsData.map((a) => a.doctor)));
+  const doctorOptions = Array.from(
+    new Set(appointmentsData.map((a) => a.doctor).filter(Boolean))
+  );
   const patientOptions = appointmentsData.map((a) => a.patient);
+
+  // ---------- Fetch appointments from API ----------
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function getData() {
+      setLoadingAppointments(true);
+      setAppointmentsError(null);
+      try {
+        const hostName = window.location.hostname;
+        const response = await fetch(`http://${hostName}:8000/doctor/appointments/`, {
+          method: "GET",
+          credentials: "include",
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        setAppointmentsData(data.map(mapApiAppointment));
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error(error);
+          setAppointmentsError(error.message || "Failed to load appointments.");
+        }
+      } finally {
+        setLoadingAppointments(false);
+      }
+    }
+
+    getData();
+    return () => controller.abort();
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -547,7 +461,19 @@ function AppointmentsTable() {
         </div>
 
         <div className={styles.tableBody}>
-          {filteredAppointments.length === 0 && (
+          {loadingAppointments && (
+            <p className={`${styles.emptyState} ${styles.fadeIn}`}>
+              Loading appointments...
+            </p>
+          )}
+
+          {!loadingAppointments && appointmentsError && (
+            <p className={`${styles.emptyState} ${styles.fadeIn}`}>
+              Couldn't load appointments: {appointmentsError}
+            </p>
+          )}
+
+          {!loadingAppointments && !appointmentsError && filteredAppointments.length === 0 && (
             <p className={`${styles.emptyState} ${styles.fadeIn}`}>
               {selectedDate
                 ? `No appointments on ${formatDisplayDate(selectedDate)}`
@@ -555,7 +481,7 @@ function AppointmentsTable() {
             </p>
           )}
 
-          {filteredAppointments.map((appt, i) => (
+          {!loadingAppointments && !appointmentsError && filteredAppointments.map((appt, i) => (
             <button
               key={appt.id}
               style={{ "--i": i }}

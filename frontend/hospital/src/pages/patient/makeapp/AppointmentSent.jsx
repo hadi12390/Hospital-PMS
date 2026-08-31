@@ -24,7 +24,7 @@ function AppointmentSent({ appointment, onBackHome }) {
                 <div className={styles.sentDetails}>
 
                     <p className={styles.sentBold}>
-                        {doctor?.name}
+                        Dr. {doctor?.first_name} {doctor?.last_name}
                     </p>
 
                     <p className={styles.sentBold}>
@@ -37,7 +37,7 @@ function AppointmentSent({ appointment, onBackHome }) {
                         </p>
                         {timeSlot && (
                             <p className={styles.sentBold}>
-                                {timeSlot.time}
+                                {timeSlot.display}
                             </p>
                         )}
                     </div>

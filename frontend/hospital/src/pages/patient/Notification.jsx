@@ -26,52 +26,78 @@ import Plusvec from "../../assets/patient/plusvec.svg?react";
 import Deletel from "../../assets/patient/deleteL.svg?react";
 import NotificationLogo from "../../assets/patient/notification.svg?react";
 
-
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import AppointmentButton from "./AppointmentButton";
 
-const initialNotifications = [
-  { id: 1, time: "10:00 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Ahmad has been confirmed" },
-  { id: 2, time: "9:45 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Sarah has been confirmed" },
-  { id: 3, time: "9:30 AM", title: "Prescription Ready", message: "Your prescription is ready for pickup at the pharmacy" },
-  { id: 4, time: "9:10 AM", title: "Appointment Reminder", message: "You have an appointment with Dr.Khaled tomorrow at 11:00 AM" },
-  { id: 5, time: "8:50 AM", title: "Lab Results Ready", message: "Your recent lab results have been uploaded to your profile" },
-  { id: 6, time: "8:30 AM", title: "Appointment Rescheduled", message: "Your appointment with Dr.Ahmad was moved to 2:00 PM" },
-  { id: 7, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
-  { id: 8, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
-  { id: 9, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
-  { id: 11, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
-  { id: 12, time: "10:00 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Ahmad has been confirmed" },
-  { id: 13, time: "9:45 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Sarah has been confirmed" },
-  { id: 14, time: "9:30 AM", title: "Prescription Ready", message: "Your prescription is ready for pickup at the pharmacy" },
-  { id: 15, time: "9:10 AM", title: "Appointment Reminder", message: "You have an appointment with Dr.Khaled tomorrow at 11:00 AM" },
-  { id: 16, time: "8:50 AM", title: "Lab Results Ready", message: "Your recent lab results have been uploaded to your profile" },
-  { id: 17, time: "8:30 AM", title: "Appointment Rescheduled", message: "Your appointment with Dr.Ahmad was moved to 2:00 PM" },
-  { id: 18, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
-  { id: 19, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
-  { id: 20, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
-  { id: 21, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
-  { id: 22, time: "10:00 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Ahmad has been confirmed" },
-  { id: 23, time: "9:45 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Sarah has been confirmed" },
-  { id: 24, time: "9:30 AM", title: "Prescription Ready", message: "Your prescription is ready for pickup at the pharmacy" },
-  { id: 25, time: "9:10 AM", title: "Appointment Reminder", message: "You have an appointment with Dr.Khaled tomorrow at 11:00 AM" },
-  { id: 26, time: "8:50 AM", title: "Lab Results Ready", message: "Your recent lab results have been uploaded to your profile" },
-  { id: 27, time: "8:30 AM", title: "Appointment Rescheduled", message: "Your appointment with Dr.Ahmad was moved to 2:00 PM" },
-  { id: 28, time: "8:15 AM", title: "Payment Received", message: "Your payment for the last visit has been received" },
-  { id: 29, time: "7:55 AM", title: "Appointment Confirmed", message: "Your appointment with Dr.Layla has been confirmed" },
-  { id: 30, time: "7:40 AM", title: "New Message", message: "Dr.Omar sent you a message regarding your treatment plan" },
-  { id: 31, time: "7:20 AM", title: "Appointment Cancelled", message: "Your appointment with Dr.Nour has been cancelled" },
-  
-];
+/* ---------------------------------------------------------
+   Helpers
+--------------------------------------------------------- */
+
+function formatTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getApiBase() {
+  const hostName = window.location.hostname;
+  return `http://${hostName}:8000`;
+}
+
+/**
+ * Reads a cookie value by name (used for Django's csrftoken cookie).
+ */
+function getCookie(name) {
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.split("=")[1]) : null;
+}
+
+/**
+ * PATCH a notification's is_read flag to true.
+ * Adjust the URL/method here if your backend uses a different route.
+ *
+ * A 403 here (while GET requests succeed) almost always means Django's
+ * CSRF protection is rejecting the request because it's missing the
+ * X-CSRFToken header. Django reads the token from the `csrftoken` cookie
+ * (set automatically once you've made a GET request / logged in), so we
+ * pull it from document.cookie and attach it below. If your backend uses
+ * a different cookie/header name, adjust CSRF_COOKIE_NAME accordingly.
+ */
+async function markNotificationRead(publicId) {
+  const csrfToken = getCookie("csrftoken");
+
+  const res = await fetch(`${getApiBase()}/notifications/${publicId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
+    },
+    body: JSON.stringify({ is_read: true }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to mark notification as read: ${res.status}`);
+  }
+
+  return res.json().catch(() => null);
+}
+
+/* ---------------------------------------------------------
+   NotificationCard — purely presentational, no fetching
+--------------------------------------------------------- */
 
 function NotificationCard({ notification, stage, index, onClear, onOverlayEnd, onCollapseEnd }) {
   const wrapperRef = useRef(null);
   const [height, setHeight] = useState(null);
-
 
   // When collapsing starts: measure the real pixel height first, then on the
   // next frame animate it down to 0. Avoids the grid 1fr->0fr snap issue.
@@ -95,6 +121,21 @@ function NotificationCard({ notification, stage, index, onClear, onOverlayEnd, o
         }
       : { animationDelay: `${index * 80}ms` };
 
+  function formatTime(iso) {
+    const d = new Date(iso);
+    let hours = d.getHours();
+    const minutes = d.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    const minutesStr = String(minutes).padStart(2, "0");
+    return `${hours}:${minutesStr}${ampm}`;
+  }
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return `${d.getFullYear()} / ${d.getMonth() + 1} / ${d.getDate()}`;
+  }
+
   return (
     <div
       ref={wrapperRef}
@@ -106,7 +147,7 @@ function NotificationCard({ notification, stage, index, onClear, onOverlayEnd, o
         <div className={`${styles.notificationCardHeaderA} ${stage !== "idle" ? styles.fadeContent : ""}`}>
           <div className={styles.notificationCardHeader}>
             {notification.title}
-            <div>{notification.time}</div>
+            <div>{formatTime(notification.created_at)}</div>
           </div>
           <div className={styles.notificationCardBody}>
             {notification.message}
@@ -129,292 +170,329 @@ function NotificationCard({ notification, stage, index, onClear, onOverlayEnd, o
   );
 }
 
-function notification(){
-  const [searchValue, setSearchValue] = useState('');
+/* ---------------------------------------------------------
+   Main component
+--------------------------------------------------------- */
+
+function Notification() {
+  const [searchValue, setSearchValue] = useState("");
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef(null);
   const navigate = useNavigate();
 
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [notifications, setNotifications] = useState(initialNotifications);
-  // stages keyed by notification id: "idle" | "clearing" | "collapsing"
+  // stages keyed by notification public_id: "idle" | "clearing" | "collapsing"
   const [stages, setStages] = useState({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function getData() {
+      try {
+        setLoading(true);
+        const res = await fetch(`${getApiBase()}/notifications/`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Request failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!cancelled) {
+          setNotifications(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+        console.error("Failed to fetch notifications:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    getData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const getStage = (id) => stages[id] || "idle";
 
-  const handleClear = (id) => {
-    setStages((prev) => ({ ...prev, [id]: "clearing" }));
-  };
+  const handleClear = (publicId) => async () => {
+    setStages((prev) => ({ ...prev, [publicId]: "clearing" }));
 
-  const handleOverlayEnd = (id) => (e) => {
-    if (e.target !== e.currentTarget) return;
-    if (getStage(id) === "clearing") {
-      setStages((prev) => ({ ...prev, [id]: "collapsing" }));
+    try {
+      await markNotificationRead(publicId);
+    } catch (err) {
+      console.error(err);
+      // Roll back the animation if the API call failed, so the user
+      // can see the notification is still there / unread.
+      setStages((prev) => ({ ...prev, [publicId]: "idle" }));
+      return;
     }
   };
 
-  const handleCollapseEnd = (id) => (e) => {
+  const handleOverlayEnd = (publicId) => (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (getStage(publicId) === "clearing") {
+      setStages((prev) => ({ ...prev, [publicId]: "collapsing" }));
+    }
+  };
+
+  const handleCollapseEnd = (publicId) => (e) => {
     if (e.target !== e.currentTarget) return;
     if (e.propertyName !== "height") return;
-    if (getStage(id) === "collapsing") {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    if (getStage(publicId) === "collapsing") {
+      setNotifications((prev) => prev.filter((n) => n.public_id !== publicId));
       setStages((prev) => {
         const next = { ...prev };
-        delete next[id];
+        delete next[publicId];
         return next;
       });
     }
   };
 
   const toggleCard = () => {
-  const next = !expanded;
-  setExpanded(next);
+    const next = !expanded;
+    setExpanded(next);
 
-  if (next) {
+    if (next) {
       setTimeout(() => {
         cardRef.current?.scrollIntoView({
           behavior: "smooth",
-          block: "start", // or "center"
+          block: "start",
         });
       }, 350);
     }
   };
+
+  const filteredNotifications = searchValue.trim()
+    ? notifications.filter((n) =>
+        [n.title, n.message]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(searchValue.toLowerCase())
+      )
+    : notifications;
+
   return (
     <div className={`${styles.PatientDashboard}`}>
-
       <aside className={styles.sideBar}>
-      
-              {/* Logo */}
-              <div className={styles.sidebarLogo}>
-                  <img
-                      src="/assest/patient/logo.svg"
-                      alt="Logo"
-                  />
-              </div>
-      
-      
-              <div className={styles.contSide}>
-      
-                  {/* ================= MAIN MENU ================= */}
-                  <div className={styles.optionsContainer}>
-      
-                      {/* Home */}
-                      <NavLink
-                          to="/patient/home"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.homeLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <HomeLogo className={styles.homelogoicon} />
-                      </NavLink>
-      
-      
-                      {/* Appointments */}
-                      <NavLink
-                          to="/patient/appointment"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.appLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <AppLogo className={styles.applogoicon} />
-                      </NavLink>
-      
-      
-                      {/* Doctors */}
-                      <NavLink
-                          to="/patient/doctor"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.docLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <DocLogo className={styles.doclogoicon} />
-                      </NavLink>
-      
-      
-                      {/* Reports */}
-                      <NavLink
-                          to="/patient/reports"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.pillLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <PillLogo className={styles.pilllogoicon} />
-                      </NavLink>
-      
-      
-                      {/* Payments */}
-                      <NavLink
-                          to="/patient/payment"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.docuLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <DocuLogo className={styles.doculogoicon} />
-                      </NavLink>
-      
-                  </div>
-      
-      
-                  {/* ================= SECOND MENU ================= */}
-                  <div
-                      className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}
-                  >
-      
-                      {/* Help */}
-                      <NavLink
-                          to="/patient/flag"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.helpLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <HelpLogo className={styles.helplogoicon} />
-                      </NavLink>
-      
-      
-                      {/* Settings */}
-                      <NavLink
-                          to="/patient/settings"
-                          className={({ isActive }) =>
-                              `${styles.options} ${styles.settLogoButton} ${
-                                  isActive ? styles.active : ""
-                              }`
-                          }
-                      >
-                          <SettLogo className={styles.settlogoicon} />
-                      </NavLink>
-      
-                  </div>
-      
-      
-                  {/* ================= LOGOUT SECTION ================= */}
-                  <div className={styles.logoutsec}>
-      
-                      <div className={`${styles.optionsContainer} ${styles.optionsContainerLL}`}>
-      
-                          {/* Logout */}
-                          <button
-                              type="button"
-                              className={`${styles.options} ${styles.logoutLogoButton}`}
-                          >
-                              <LogOutLogo
-                                  className={styles.logoutlogoicon}
-                              />
-                          </button>
-      
-      
-                          {/* Notifications */}
-                          <NavLink
-                              to="/patient/notifications"
-                              className={({ isActive }) =>
-                                  `${styles.options} ${styles.notificationLogoButton} ${
-                                      isActive ? styles.active : ""
-                                  }`
-                              }
-                          >
-                              <NotificationLogo
-                                  className={styles.notificationlogoicon}
-                              />
-                          </NavLink>
-      
-                      </div>
-      
-      
-                      {/* Profile picture */}
-                      <div className={styles.profPicLogOut}>
-                          <img
-                              src="/assest/patient/pp.png"
-                              alt="Profile"
-                          />
-                      </div>
-      
-                  </div>
-      
-              </div>
-      
-          </aside>
+        {/* Logo */}
+        <div className={styles.sidebarLogo}>
+          <img src="/assest/patient/logo.svg" alt="Logo" />
+        </div>
 
+        <div className={styles.contSide}>
+          {/* ================= MAIN MENU ================= */}
+          <div className={styles.optionsContainer}>
+            {/* Home */}
+            <NavLink
+              to="/patient/home"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.homeLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <HomeLogo className={styles.homelogoicon} />
+            </NavLink>
+
+            {/* Appointments */}
+            <NavLink
+              to="/patient/appointment"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.appLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <AppLogo className={styles.applogoicon} />
+            </NavLink>
+
+            {/* Doctors */}
+            <NavLink
+              to="/patient/doctor"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.docLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <DocLogo className={styles.doclogoicon} />
+            </NavLink>
+
+            {/* Reports */}
+            <NavLink
+              to="/patient/reports"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.pillLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <PillLogo className={styles.pilllogoicon} />
+            </NavLink>
+
+            {/* Payments */}
+            <NavLink
+              to="/patient/payment"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.docuLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <DocuLogo className={styles.doculogoicon} />
+            </NavLink>
+          </div>
+
+          {/* ================= SECOND MENU ================= */}
+          <div
+            className={`${styles.optionsContainer} ${styles.optionsContainerNN}`}
+          >
+            {/* Help */}
+            <NavLink
+              to="/patient/flag"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.helpLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <HelpLogo className={styles.helplogoicon} />
+            </NavLink>
+
+            {/* Settings */}
+            <NavLink
+              to="/patient/settings"
+              className={({ isActive }) =>
+                `${styles.options} ${styles.settLogoButton} ${
+                  isActive ? styles.active : ""
+                }`
+              }
+            >
+              <SettLogo className={styles.settlogoicon} />
+            </NavLink>
+          </div>
+
+          {/* ================= LOGOUT SECTION ================= */}
+          <div className={styles.logoutsec}>
+            <div
+              className={`${styles.optionsContainer} ${styles.optionsContainerLL}`}
+            >
+              {/* Logout */}
+              <button
+                type="button"
+                className={`${styles.options} ${styles.logoutLogoButton}`}
+              >
+                <LogOutLogo className={styles.logoutlogoicon} />
+              </button>
+
+              {/* Notifications */}
+              <NavLink
+                to="/patient/notifications"
+                className={({ isActive }) =>
+                  `${styles.options} ${styles.notificationLogoButton} ${
+                    isActive ? styles.active : ""
+                  }`
+                }
+              >
+                <NotificationLogo className={styles.notificationlogoicon} />
+              </NavLink>
+            </div>
+
+            {/* Profile picture */}
+            <div className={styles.profPicLogOut}>
+              <img src="/assest/patient/pp.png" alt="Profile" />
+            </div>
+          </div>
+        </div>
+      </aside>
 
       <section className={styles.dashboardContent}>
-      {/* Navbar */}
-      <nav className={styles.nav}>
-        <div className={`${styles.navContentSearch} ${styles.glass}`}>
-          <div className={styles.searchIcon}>
-            <Search size={18} />
-          </div>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Search for Doctor"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </div>
-        <div className={`${styles.navContent} ${styles.glass}`}>
-        <div className={styles.buttonAddAppoi}>
-          <button
-            className={styles.mappbut}
-            onClick={() => navigate("/patient/make&appointment")}
-          >
-            <div className={styles.addDivApp}>+</div>
-            Make an New Appointment
-          </button>
-        </div>
-  
-          <div className={styles.profileSec}>
-            <div className={styles.profilePic}>
-            <img className={styles.navPP} src="/assest/patient/pp.png" alt="Profile" />
-
+        {/* Navbar */}
+        <nav className={styles.nav}>
+          <div className={`${styles.navContentSearch} ${styles.glass}`}>
+            <div className={styles.searchIcon}>
+              <Search size={18} />
             </div>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search for Doctor"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
+          <div className={`${styles.navContent} ${styles.glass}`}>
+            <div className={styles.buttonAddAppoi}>
+              <button
+                className={styles.mappbut}
+                onClick={() => navigate("/patient/make&appointment")}
+              >
+                <div className={styles.addDivApp}>+</div>
+                Make an New Appointment
+              </button>
+            </div>
+
+            <div className={styles.profileSec}>
+              <div className={styles.profilePic}>
+                <img
+                  className={styles.navPP}
+                  src="/assest/patient/pp.png"
+                  alt="Profile"
+                />
+              </div>
               <div className={styles.nameNav}>
                 <p>Mia Quian</p>
               </div>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Main Content */}
-      <main className={styles.cards}>
-            <h2>Notifications</h2>
-        <div className={styles.cardsContent}>
-          <div className={styles.cardsContentHeader}>
-          </div>
-          <div>
-
-            <div className={styles.cardsContentBody}>
+        {/* Main Content */}
+        <main className={styles.cards}>
+          <h2>Notifications</h2>
+          <div className={styles.cardsContent}>
+            <div className={styles.cardsContentHeader}></div>
+            <div>
+              <div className={styles.cardsContentBody}>
                 <div className={styles.cardsContentBodyA}>
-                    {notifications.map((n, index) => (
-                        <NotificationCard
-                            key={n.id}
-                            notification={n}
-                            stage={getStage(n.id)}
-                            index={index}
-                            onClear={() => handleClear(n.id)}
-                            onOverlayEnd={handleOverlayEnd(n.id)}
-                            onCollapseEnd={handleCollapseEnd(n.id)}
-                        />
+                  {loading && <p>Loading notifications...</p>}
+                  {error && <p style={{ color: "red" }}>{error}</p>}
+
+                  {!loading && !error && filteredNotifications.length === 0 && (
+                    <p>No notifications.</p>
+                  )}
+
+                  {!loading &&
+                    !error &&
+                    filteredNotifications.map((n, index) => (
+                      <NotificationCard
+                        key={n.public_id}
+                        notification={n}
+                        stage={getStage(n.public_id)}
+                        index={index}
+                        onClear={handleClear(n.public_id)}
+                        onOverlayEnd={handleOverlayEnd(n.public_id)}
+                        onCollapseEnd={handleCollapseEnd(n.public_id)}
+                      />
                     ))}
                 </div>
+              </div>
             </div>
-          </div>         
-
-        </div>
-      </main>
-    </section>
+          </div>
+        </main>
+      </section>
     </div>
   );
-
 }
 
-export default notification;
+export default Notification;

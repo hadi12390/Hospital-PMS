@@ -22,6 +22,8 @@ export function toISODate(date) {
 }
 
 export function formatDisplayDate(isoDate) {
+  if (!isoDate) return "—";
+
   const [year, month, day] = isoDate.split("-");
   const date = new Date(Number(year), Number(month) - 1, Number(day));
 

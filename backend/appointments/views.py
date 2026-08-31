@@ -97,7 +97,7 @@ class DoctorListCreateAppointment(ListCreateAPIView):
                 user=appointment.patient.user,
                 notification_type=Notification.Type.APPOINTMENT,
                 title="Appointment created",
-                message=f"Dr. {self.request.user.get_full_name()} booked an appointment with you at {appointment.scheduled_time}",
+                message=f"Dr. {self.request.user.get_full_name()} booked an appointment with you",
                 appointment=appointment,
             )
         else:

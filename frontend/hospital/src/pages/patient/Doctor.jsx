@@ -26,12 +26,46 @@ import Plusvec from "../../assets/patient/plusvec.svg?react";
 import NotificationLogo from "../../assets/patient/notification.svg?react";
 
 
-import { useRef, useState } from 'react';
+import { useRef, useState ,useEffect} from 'react';
 import { NavLink } from "react-router-dom";
 
 import AppointmentButton from "./AppointmentButton";
 
 function PatientDoctor(){
+const [apiData,setApiData] = useState([]);
+
+useEffect(() => {
+  async function getData() {
+    try {
+      const hostName = window.location.hostname;
+
+      const response = await fetch(
+        `http://${hostName}:8000/doctor/`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log(data);
+
+      setApiData(data);
+
+    } catch (error) {
+      console.error("Failed to fetch doctor data:", error);
+    }
+  }
+
+  getData();
+}, []);
+
+
   const [searchValue, setSearchValue] = useState('');
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef(null);
@@ -213,7 +247,7 @@ function PatientDoctor(){
       
               </div>
       
-          </aside>
+      </aside>
 
 
       <section className={styles.dashboardContent}>
@@ -248,132 +282,71 @@ function PatientDoctor(){
       {/* Main Content */}
       <main className={styles.cards}>
         <div className={`${styles.cardsDCont} staggerList`}>
-            <div className={styles.Dcards}>
+        {apiData.map((doctor) => (
+            <div className={styles.Dcards} key={doctor.public_id}>
+
                 <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
+                <div className={`${styles.photoCont} ${styles.glass}`}>
+                    {doctor.profile_picture ? (
+                    <img
+                        src={
+                        doctor.profile_picture.startsWith("http")
+                            ? doctor.profile_picture
+                            : `http://${window.location.hostname}:8000${doctor.profile_picture}`
+                        }
+                        alt={`${doctor.first_name} ${doctor.last_name}`}
+                    />
+                    ) : (
+                    <div>
+                        {doctor.first_name?.charAt(0).toUpperCase()}
                     </div>
+                    )}
                 </div>
+                </div>
+
                 <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
+
+                <div className={styles.infoDEV}>
+
+                    <h1 className={styles.heroCardInfo}>
+                    Dr.{" "}
+                    {doctor.first_name?.charAt(0).toUpperCase()}
+                    {doctor.first_name?.slice(1)}{" "}
+                    {doctor.last_name}
+                    </h1>
+
+                    <div className={styles.infoshehe}>
+
+                    <div className={styles.thingsCards}>
+                        <Pill />
+                        {doctor.specialty}
                     </div>
-                    <div className={styles.buttAddDiv}>
-                        <AppointmentButton/>
+
+                    <div className={styles.thingsCards}>
+                        <Star />
+                        4.9 (234 Reviews)
+                    </div>
+
+                    <div className={styles.thingsCards}>
+                        <Locwhite />
+                        Amman Medical Center
+                    </div>
+
+                    <div className={`${styles.timeICON} ${styles.thingsCards}`}>
+                        <TimePast />
+                        Available Today
+                    </div>
+
+                    </div>
                 </div>
+
+                <div className={styles.buttAddDiv}>
+                    <AppointmentButton doctor={doctor} />
+                </div>
+
                 </div>
             </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div>
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.Dcards}>
-                <div className={styles.secOneBox}>
-                    <div className={`${styles.photoCont} ${styles.glass}`}>
-                        <img src="/assest/patient/hadi.png" alt="" />
-                    </div> 
-                </div>
-                <div className={styles.infoANDb}>
-                    <div className={styles.infoDEV}>
-                        <h1 className={styles.heroCardInfo}>Dr. Hadi Al-Issa</h1>
-                        <div className={styles.infoshehe}>
-                            <div className={styles.thingsCards}><Pill/> Cardiologist</div>
-                            <div className={styles.thingsCards}><Star/>4.9 (234 Reviews)</div>
-                            <div className={styles.thingsCards}><Locwhite/> Amman Medical Center </div>
-                            <div className={`${styles.timeICON} ${styles.thingsCards}`}><TimePast/>Available Today </div>
-                        </div>
-                    </div>
-                    <div className={styles.buttAddDiv}> 
-                        <AppointmentButton/>
-                    </div>
-                </div>
-            </div>
+            ))}
        </div>
        
       </main>

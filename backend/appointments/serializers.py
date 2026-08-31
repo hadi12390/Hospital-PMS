@@ -9,6 +9,8 @@ from patient.models import Patient
 from configuration.models import ClinicConfiguration, ReliabilityPolicy
 from logs.models import ActivityLog
 from notifications.models import Notification
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework import serializers
 
 class BaseAppointmentSerializer(serializers.ModelSerializer):
 
@@ -132,7 +134,14 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
 
         return getattr(person, "name", None)
 
-
+    def get_profile_picture(self, person):
+        try:
+            if person.user.profile_picture:
+                return self.context['request'].build_absolute_uri(person.user.profile_picture.url)
+        except Exception:
+            pass
+        return None
+    
     def get_person_repr(self, person):
         if person is None:
             return None
@@ -144,10 +153,7 @@ class BaseAppointmentSerializer(serializers.ModelSerializer):
                 else None
             ),
             "name": self.get_full_name(person),
-            'profile_picture': (
-                self.context['request'].build_absolute_uri(person.user.profile_picture.url)
-                if person.user.profile_picture else None
-            ),
+            'profile_picture': self.get_profile_picture(person)
         }
     
     patient = serializers.UUIDField(write_only=True)
@@ -297,12 +303,19 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
 # =========================
 
 
-class PatientAppointmentSerializer(BaseAppointmentSerializer):
+class SafeSlugRelatedField(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        try:
+            return super().to_internal_value(data) 
+        except DjangoValidationError: 
+            self.fail('does_not_exist', slug_name=self.slug_field, value=data)
 
-    doctor = serializers.SlugRelatedField(
+class PatientAppointmentSerializer(BaseAppointmentSerializer):
+    doctor = SafeSlugRelatedField(
         slug_field="user__public_id",
         queryset=Doctor.objects.all(),
         write_only=True,
+        style={"base_template": "input.html"},  # forces plain text input, not a name dropdown, in the browsable API
     )
     appointment_type = serializers.ChoiceField(
         choices=[
@@ -313,7 +326,6 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
 
     class Meta:
         model = Appointment
-
         fields = [
             "public_id",
             "doctor",
@@ -324,35 +336,25 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
             "appointment_type",
             "duration_minutes",
         ]
-
         read_only_fields = [
             "status",
             "duration_minutes",
         ]
 
-
     def to_representation(self, instance):
-
         data = super().to_representation(instance)
-
-        data["doctor"] = self.get_person_reprget_person_repr(
-            instance.doctor
-        )
-
+        data["doctor"] = self.get_person_repr(instance.doctor)
         return data
 
-
     def validate(self, attrs):
-
         patient = self.context["request"].user.patient
-        
-        if self.online_booking_blocked(patient):
 
+        if self.online_booking_blocked(patient):
             raise serializers.ValidationError(
                 "Online appointment booking is currently unavailable for your account. "
                 "Please contact the clinic for assistance."
             )
-        
+
         if self.is_in_the_past(attrs["scheduled_time"]):
             raise serializers.ValidationError(
                 "You cannot create an appointment for a date or time in the past."
@@ -363,27 +365,18 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
             raise serializers.ValidationError(
                 f"You cannot book an appointment more than {config.max_advance_booking_days} days in advance."
             )
-        
+
         if self.has_conflict(
             doctor=attrs["doctor"],
             patient=patient,
             scheduled_time=attrs["scheduled_time"],
-            appointment_type=attrs.get(
-                "appointment_type"
-            ),
-            duration_minutes=attrs.get(
-                "duration_minutes"
-            ),
-            exclude_id=(
-                self.instance.id
-                if self.instance
-                else None
-            ),
+            appointment_type=attrs.get("appointment_type"),
+            duration_minutes=attrs.get("duration_minutes"),
+            exclude_id=self.instance.id if self.instance else None,
         ):
             raise serializers.ValidationError(
                 "This time slot conflicts with another appointment."
             )
-
 
         if not self.suitable_for_dr(
             doctor=attrs["doctor"],
@@ -399,26 +392,11 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         if self.at_pending_limit(patient=patient):
             configuration = ClinicConfiguration.objects.first()
             raise serializers.ValidationError(
-                f"Unfortunately, you have reached the maximum of {configuration.max_pending_appointments} pending appointments. Please complete or cancel an existing appointment before booking another."
+                f"Unfortunately, you have reached the maximum of {configuration.max_pending_appointments} pending appointments. "
+                "Please complete or cancel an existing appointment before booking another."
             )
 
         return attrs
-
-
-    def create(self, validated_data):
-
-        validated_data["patient"] = (
-            self.context["request"]
-            .user
-            .patient
-        )
-        
-        validated_data["status"] = (
-            Appointment.Status.PENDING
-        )
-
-        return super().create(validated_data)
-
 
 
 # =========================

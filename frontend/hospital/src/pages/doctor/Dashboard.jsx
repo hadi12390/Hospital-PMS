@@ -1,5 +1,6 @@
 import styles from "./Dashboard.module.css";
 import { useRef, useState ,useEffect } from "react"
+import { adaptAppointment } from "./appointmentAdapter";
 import Sidebar from "./sidebarD";
 
 
@@ -33,16 +34,21 @@ function DoctorDashboard() {
       d.getMinutes()
     ).padStart(2, "0")}`;
   }
-
   function mapWeekAppointments(rawList = []) {
-    return rawList.map((appt, index) => ({
-      id: index,
-      day: DAY_ABBREV[appt.day] || appt.day,
-      patient: (appt.patient?.name ?? "Unknown").replace(/^Guest:\s*/, ""),
-      type: APPT_TYPE_LABEL[appt.appointment_type] || appt.appointment_type,
-      start: toHHMM(appt.scheduled_time),
-      end: toHHMM(appt.end_time),
-    }));
+    return rawList.map((raw) => {
+      const appt = adaptAppointment(raw);
+      const start = new Date(appt.dateTime);
+      return {
+        id: appt.id,
+        day: DAY_ABBREV[
+          ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][start.getDay()]
+        ],
+        patient: `${appt.patient.firstName} ${appt.patient.lastName}`.trim(),
+        type: appt.type,
+        start: toHHMM(appt.dateTime),
+        end: toHHMM(appt.end_time),
+      };
+    });
   }
 
   // ---- now safe to call ----
@@ -226,7 +232,7 @@ function DoctorDashboard() {
   return <div>Loading...</div>
   else
   return (
-    <div className={styles.DoctorDashboard}>
+    <div className={`${styles.DoctorDashboard} ${styles.pageEnter}`}>
       <div className={styles.back}></div>
 
       {/* Sidebar */}

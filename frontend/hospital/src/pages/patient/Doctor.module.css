@@ -684,7 +684,10 @@ body {
     padding: 5px;
     border-radius: .5rem;
 
-
+    width: 10.125rem;
+    height: 10.125rem;
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.772);
 }
 .secOneBox{
     display: flex;

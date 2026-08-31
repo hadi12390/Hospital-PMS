@@ -1829,3 +1829,26 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.containerCards > div {
+  opacity: 0;
+  animation: cardFadeIn 0.25s ease-out forwards;
+}
+
+.containerCards > div:nth-child(1) { animation-delay: 0.02s; }
+.containerCards > div:nth-child(2) { animation-delay: 0.04s; }
+.containerCards > div:nth-child(3) { animation-delay: 0.06s; }
+.containerCards > div:nth-child(4) { animation-delay: 0.08s; }
+.containerCards > div:nth-child(5) { animation-delay: 0.10s; }
+.containerCards > div:nth-child(6) { animation-delay: 0.12s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

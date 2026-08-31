@@ -1,7 +1,29 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import styles from "../MakeAppointment.module.css";
 import Next from "./icons/next.svg?react";
+
+
+const buildDates = () => {
+
+    const today = new Date();
+
+    return Array.from({ length: 8 }).map((_, i) => {
+
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+
+        const isoDate =
+            `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+        return {
+            id: i,
+            day: d.toLocaleDateString("en-US", { weekday: "long" }),
+            date: d.toLocaleDateString("en-US", { day: "2-digit", month: "long" }),
+            isoDate,
+        };
+    });
+};
 
 
 function DateChoice({
@@ -12,34 +34,7 @@ function DateChoice({
 
     const [selectedDate, setSelectedDate] = useState(null);
 
-
-    const dates = [
-        {
-            id: 1,
-            day: "Monday",
-            date: "17 August",
-        },
-        {
-            id: 2,
-            day: "Tuesday",
-            date: "18 August",
-        },
-        {
-            id: 3,
-            day: "Wednesday",
-            date: "19 August",
-        },
-        {
-            id: 4,
-            day: "Thursday",
-            date: "20 August",
-        },
-        {
-            id: 5,
-            day: "Friday",
-            date: "21 August",
-        },
-    ];
+    const dates = useMemo(() => buildDates(), []);
 
 
     const handleNext = () => {
@@ -63,7 +58,7 @@ function DateChoice({
 
                     <p>
                         Choose a date for your appointment with{" "}
-                        <strong>{doctor?.name}</strong>
+                        <strong>Dr. {doctor?.first_name} {doctor?.last_name}</strong>
                     </p>
                 </div>
 

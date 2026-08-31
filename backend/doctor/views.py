@@ -258,7 +258,7 @@ class DoctorPatients(APIView):
     permission_classes = [IsDoctor]
 
     def patient_summary(self, patient):
-        patient_user = patient.user if patient.user else None
+        patient_user = patient.user if patient else None
 
         if patient_user:
             public_id = str(patient_user.public_id)
@@ -311,7 +311,13 @@ class DoctorAppointments(APIView):
 
     def appointment_summary(self, appointment):
         patient_obj = appointment.patient
-        patient_user = patient_obj.user if patient_obj.user else None
+        try:
+            patient_user = patient_obj.user
+        except:
+            patient_user = None
+
+        gender = phone_number = birth_date = personal_id = blood_type = None
+        profile_picture = None
 
         if patient_user:
             patient_public_id = str(patient_user.public_id)
@@ -320,28 +326,41 @@ class DoctorAppointments(APIView):
                 self.request.build_absolute_uri(patient_user.profile_picture.url)
                 if patient_user.profile_picture else None
             )
+            gender = patient_obj.gender or None
+            phone_number = patient_obj.phone_number or None
+            birth_date = patient_obj.birth_date or None
+            personal_id = patient_obj.personal_id or None
+            blood_type = patient_obj.blood_type or None
 
         elif patient_obj:
             patient_public_id = "User Is guest."
             patient_name = f"{patient_obj.first_name} {patient_obj.last_name}"
-            profile_picture = None
+            gender = patient_obj.gender or None
+            phone_number = patient_obj.phone_number or None
+            birth_date = patient_obj.birth_date or None
+            personal_id = patient_obj.personal_id or None
+            blood_type = patient_obj.blood_type or None
         else:
             patient_public_id = None
             patient_name = "Unknown"
-            profile_picture = None
+
         return {
             "appointment_public_id": str(appointment.public_id),
             "patient": {
                 "public_id": patient_public_id,
                 "name": patient_name,
-
-                "profile_picture": profile_picture
+                "profile_picture": profile_picture,
+                "gender": gender,
+                "phone_number": phone_number,
+                "birth_date": birth_date,
+                "personal_id": personal_id,
+                "blood_type": blood_type,
             },
             "appointment_type": appointment.appointment_type,
             "resone_for_visit": appointment.reason_for_visit,
             "date": appointment.scheduled_time,
             "status": appointment.status,
-        }        
+        }     
 
     def get(self, request):
         doctor_profile = getattr(request.user, "doctor", None)
@@ -366,8 +385,11 @@ class TodaySchedule(APIView):
 
     def appointment_summary(self, appointment):
         patient_obj = appointment.patient
-        patient_user = patient_obj.user if patient_obj else None
-
+        try:
+            patient_user = patient_obj.user
+        except:
+            patient_user = None
+        profile_picture = None
         if patient_user:
             patient_public_id = str(patient_user.public_id)
             patient_name = patient_user.get_full_name()
@@ -378,7 +400,7 @@ class TodaySchedule(APIView):
 
         elif patient_obj:
             patient_public_id = "User Is guest."
-            patient_name = patient_obj.get_full_name()
+            patient_name = f"{patient_obj.first_name} {patient_obj.last_name}"
         else:
             patient_public_id = None
             patient_name = "Unknown"
@@ -393,6 +415,7 @@ class TodaySchedule(APIView):
             "resone_for_visit": appointment.reason_for_visit,
             "date": appointment.scheduled_time,
             "status": appointment.status,
+            "notes": appointment.notes,
         }  
     def get(self, request):
         doctor_profile = getattr(request.user, "doctor", None)

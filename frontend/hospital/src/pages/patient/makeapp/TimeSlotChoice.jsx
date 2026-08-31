@@ -1,29 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "../MakeAppointment.module.css";
 import Next from "./icons/next.svg?react";
 
 
+const formatSlotTime = (iso) =>
+    new Date(iso).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+    });
+
+
 function TimeSlotChoice({
     doctor,
     date,
+    type,
+    apiBase,
     onNext,
     onBack
 }) {
 
     const [selectedSlot, setSelectedSlot] = useState(null);
+    const [slots, setSlots] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    useEffect(() => {
 
-    const timeSlots = [
-        { id: 1, time: "9:00 AM" },
-        { id: 2, time: "10:00 AM" },
-        { id: 3, time: "11:00 AM" },
-        { id: 4, time: "12:00 PM" },
-        { id: 5, time: "1:00 PM" },
-        { id: 6, time: "2:00 PM" },
-        { id: 7, time: "3:00 PM" },
-        { id: 8, time: "4:00 PM" },
-    ];
+        if (!doctor?.public_id || !date?.isoDate || !type) {
+            return;
+        }
+
+        const controller = new AbortController();
+
+        setLoading(true);
+        setError(null);
+        setSelectedSlot(null);
+
+        const url =
+            `${apiBase}/appointment/available-times/?date=${date.isoDate}&doctor=${doctor.public_id}&type=${type}`;
+
+        fetch(url, {
+            credentials: "include",
+            signal: controller.signal,
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to load available times");
+                return res.json();
+            })
+            .then((data) => setSlots(data))
+            .catch((err) => {
+                if (err.name !== "AbortError") setError(err.message);
+            })
+            .finally(() => setLoading(false));
+
+        return () => controller.abort();
+
+    }, [doctor?.public_id, date?.isoDate, type, apiBase]);
 
 
     const handleNext = () => {
@@ -47,35 +80,52 @@ function TimeSlotChoice({
 
                     <p>
                         Choose a time slot for your appointment with{" "}
-                        <strong>{doctor?.name}</strong> on{" "}
+                        <strong>Dr. {doctor?.first_name} {doctor?.last_name}</strong> on{" "}
                         <strong>{date?.day}, {date?.date}</strong>
                     </p>
                 </div>
 
 
-                <div className={styles.datesContainer}>
+                {loading && <p>Loading available times...</p>}
+                {error && <p>Failed to load available times: {error}</p>}
+                {!loading && !error && slots.length === 0 && (
+                    <p>No available times for this day.</p>
+                )}
 
-                    {timeSlots.map((slot) => (
+                {!loading && !error && slots.length > 0 && (
 
-                        <button
-                            key={slot.id}
-                            className={
-                                selectedSlot?.id === slot.id
-                                    ? styles.dateSelected
-                                    : styles.dateCard
-                            }
-                            onClick={() => setSelectedSlot(slot)}
-                        >
+                    <div className={styles.datesContainer}>
 
-                            <span>
-                                {slot.time}
-                            </span>
+                        {slots.map((slot) => (
 
-                        </button>
+                            <button
+                                key={slot.time}
+                                disabled={slot.conflict_with_patient}
+                                className={
+                                    selectedSlot?.time === slot.time
+                                        ? styles.dateSelected
+                                        : styles.dateCard
+                                }
+                                onClick={() =>
+                                    setSelectedSlot({
+                                        time: slot.time,
+                                        display: formatSlotTime(slot.time),
+                                    })
+                                }
+                            >
 
-                    ))}
+                                <span>
+                                    {formatSlotTime(slot.time)}
+                                    {slot.conflict_with_patient ? " (Booked)" : ""}
+                                </span>
 
-                </div>
+                            </button>
+
+                        ))}
+
+                    </div>
+
+                )}
             </div>
 
 

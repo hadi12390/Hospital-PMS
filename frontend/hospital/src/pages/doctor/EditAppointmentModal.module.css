@@ -570,7 +570,7 @@
   overflow-y: auto;
   border-radius: 12px;
   padding: 4px;
-  z-index: 50; /* raised — must sit above sibling rows below it */
+  z-index: 99999; /* raised — must sit above sibling rows below it */
 
   background: rgba(60, 100, 170, 0.96); /* solid-ish navy-blue, not see-through */
   backdrop-filter: blur(16px) saturate(180%);
@@ -692,4 +692,26 @@
 @media (max-width: 560px) {
   .topRow { flex-direction: column; align-items: center; }
   .detailsCard { grid-template-columns: 1fr; }
+}
+.cancelBtnA{
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 14px 20px;
+  border-radius: 999px;
+
+  border: none;
+  cursor: pointer;
+
+  font-family: "GeologicaBold";
+  font-size: 1.05rem;
+  color: #F1EFE8;
+
+  background-color: rgba(249, 1, 1, 0.425);
+
+  transition: transform 0.3s ease, background 0.3s ease;
 }

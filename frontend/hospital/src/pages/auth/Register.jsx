@@ -1,26 +1,78 @@
 import styles from "./Register.module.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [match, setMatch] = useState(false);
+
+    const navigate = useNavigate();
+
+
     const [passwordOne, setPasswordOne] = useState("");
     const [passwordTwo, setPasswordTwo] = useState("");
 
+    const [userName, setUserName] = useState("");
+    const [email, setEmail] = useState("");
 
+    const hundleSignUp = async () => {
 
-    const checkMatch = ()=>{
-       
-        
-        if(passwordOne !== passwordTwo){
-            setMatch(true);
+      // Check if passwords match
+      if (passwordOne !== passwordTwo) {
+      setMatch(true);
+      return; // Stop the signup request
+      }
+
+      setMatch(false);
+
+      const hostName = window.location.hostname;
+
+      try {
+      const response = await fetch(
+      `http://${hostName}:8000/dj-rest-auth/registration/`,
+      {
+      method: "POST",
+
+          credentials: "include",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            username: userName,
+            email: email,
+            password1: passwordOne,
+            password2: passwordTwo,
+          }),
         }
-        else{
-            setMatch(false);
+      );
+
+      const result = await response.json();
+
+      // Check for API errors
+      if (!response.ok) {
+        console.log("Signup error:", result);
+
+        throw new Error(
+          "Failed to create account."
+        );
+      }
+
+      console.log("Account created successfully:", result);
+      navigate("/register/successful");
+
+
+        } catch (error) {
+        console.error("Signup error:", error.message);
         }
-    };
 
-
+          console.log(userName)
+          console.log(email)
+          console.log(passwordOne)
+          console.log(passwordTwo)
+      };
+    
   return (
     <div className={styles.loginpage}>
         <div className={styles.backgroundImg}>
@@ -38,7 +90,7 @@ function Register() {
             </div>
 
             <div className={styles.inputBoxRegister}>
-                <input type="email" placeholder="Name"/>
+                <input onChange={(e) => setUserName(e.target.value)} type="email" placeholder="Name"/>
                 <span className={styles.icon}><img src="./assest/login/person-svgrepo-com 1.svg" alt="" /></span>
             </div>
 
@@ -47,7 +99,7 @@ function Register() {
             </div>
 
              <div className={styles.inputBoxRegister}>
-                <input type="email" placeholder="example@gmail.com"/>
+                <input onChange={(e) => setEmail(e.target.value)} type="email" placeholder="example@gmail.com"/>
                 <span className={styles.icon}><img src="./assest/login/email-9-svgrepo-com 1.svg" alt="" /></span>
             </div>
 
@@ -82,7 +134,7 @@ function Register() {
             </div>
 
 
-            <button onClick={checkMatch} className={styles.signUpButton}>SIGN UP</button>
+            <button onClick={hundleSignUp} className={styles.signUpButton}>SIGN UP</button>
 
             <p className={styles.errorPasswordRegister}>{match?"The password is not match" : ""}</p>
         </main>
@@ -90,5 +142,6 @@ function Register() {
     </div>
   );
 }
+
 
 export default Register;

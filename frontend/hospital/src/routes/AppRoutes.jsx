@@ -8,6 +8,12 @@ import Register from "../pages/auth/Register";
 import RestPassword from "../pages/auth/RestPassword";
 import RestPasswordDone from "../pages/auth/RestPasswordDone";
 
+import RegisterA from "../pages/auth/RegisterA";
+
+
+
+
+
 // Admin
 import AdminDashboard from "../pages/admin/Dashboard";
 import ManageDoctors from "../pages/admin/ManageDoctors";
@@ -63,6 +69,9 @@ function AppRoutes() {
 
       <Route path="/patient&register" element={<PatientRegister />} />
       <Route path="/patient&register/confirmed" element={<PatientRegisterConfirm />} />
+      
+
+      <Route path="/register/successful" element={<RegisterA />} />
 
       
 

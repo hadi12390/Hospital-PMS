@@ -9,6 +9,8 @@ import RestPassword from "../pages/auth/RestPassword";
 import RestPasswordDone from "../pages/auth/RestPasswordDone";
 
 import RegisterA from "../pages/auth/RegisterA";
+import Emailv from "../pages/auth/EmailvA.jsx";
+
 
 
 
@@ -70,6 +72,9 @@ function AppRoutes() {
       
 
       <Route path="/register/successful" element={<RegisterA />} />
+      <Route path="/verify-email/:key" element={<Emailv />} />
+
+      
 
       
 

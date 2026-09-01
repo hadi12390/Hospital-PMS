@@ -211,7 +211,6 @@ class ManagerAppointmentSerializer(BaseAppointmentSerializer):
 
 class DoctorAppointmentSerializer(BaseAppointmentSerializer):
 
-
     patient_no_show_count = serializers.IntegerField(
         source="patient.no_show_count",
         read_only=True,
@@ -303,20 +302,7 @@ class DoctorAppointmentSerializer(BaseAppointmentSerializer):
 # =========================
 
 
-class SafeSlugRelatedField(serializers.SlugRelatedField):
-    def to_internal_value(self, data):
-        try:
-            return super().to_internal_value(data) 
-        except DjangoValidationError: 
-            self.fail('does_not_exist', slug_name=self.slug_field, value=data)
-
 class PatientAppointmentSerializer(BaseAppointmentSerializer):
-    doctor = SafeSlugRelatedField(
-        slug_field="user__public_id",
-        queryset=Doctor.objects.all(),
-        write_only=True,
-        style={"base_template": "input.html"},  # forces plain text input, not a name dropdown, in the browsable API
-    )
     appointment_type = serializers.ChoiceField(
         choices=[
             (Appointment.AppointmentType.CONSULTATION, Appointment.AppointmentType.CONSULTATION.label),

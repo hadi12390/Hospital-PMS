@@ -67,8 +67,6 @@ function AppRoutes() {
       <Route path="/resetpassword" element={<GuestRoute><RestPassword /></GuestRoute>} />
       <Route path="/resetpasswordDone" element={<GuestRoute><RestPasswordDone /></GuestRoute>} />
 
-      <Route path="/patient&register" element={<PatientRegister />} />
-      <Route path="/patient&register/confirmed" element={<PatientRegisterConfirm />} />
       
 
       <Route path="/register/successful" element={<RegisterA />} />
@@ -255,6 +253,29 @@ function AppRoutes() {
 
       {/* ==================== PATIENT ==================== */}
 
+      <Route
+        path="/patient&register"
+        element={
+          <ProtectedRoute
+            allowedRole="patient"
+            allowIncompletePatient={true}
+          >
+            <PatientRegister />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/patient&register/confirmed" 
+        element={
+          <ProtectedRoute
+            allowedRole="patient"
+            allowIncompletePatient={true}
+          >
+            <PatientRegisterConfirm />
+          </ProtectedRoute>
+        }
+      />
+    
       <Route
         path="/patient/home"
         element={

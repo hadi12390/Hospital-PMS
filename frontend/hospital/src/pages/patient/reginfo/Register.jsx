@@ -1,6 +1,7 @@
 import styles from "./Register.module.css";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 import Logo from "./svg/logo.svg?react";
 import CalendarIcon from "./svg/calendar.svg?react";
@@ -34,7 +35,6 @@ function Dropdown({ options, value, onChange }) {
     };
   }, [open]);
 
-  // decide whether the menu should drop up or down based on available space
   useLayoutEffect(() => {
     if (!open || !rootRef.current) return;
 
@@ -43,7 +43,6 @@ function Dropdown({ options, value, onChange }) {
     const spaceBelow = window.innerHeight - triggerRect.bottom;
     const spaceAbove = triggerRect.top;
 
-    // only flip up if there's not enough room below AND more room above
     setOpenUp(spaceBelow < menuHeight && spaceAbove > spaceBelow);
   }, [open]);
 
@@ -95,13 +94,14 @@ function Dropdown({ options, value, onChange }) {
 
 function Register() {
   const navigate = useNavigate();
+  const { completePatientRegistration } = useAuth();
   const dobRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    email: "",
-    username: "",
+    first_name: "",
+    last_name: "",
     phone_number: "",
-    date_of_birth: "",
+    birth_date: "",
     gender: "Female",
     personal_id: "",
     blood_type: "A+",
@@ -119,42 +119,56 @@ function Register() {
   };
 
   const openDatePicker = () => {
-    // showPicker() is supported in modern Chromium/Firefox; falls back silently otherwise
     dobRef.current?.showPicker?.();
   };
 
-  const handleRegister = async () => {
-    setError("");
-    setLoading(true);
+  // helper: reads a cookie value by name
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
 
-    try {
-      const hostname = window.location.hostname;
-      const response = await fetch(
-        `http://${hostname}:8000/dj-rest-auth/registration/`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+const handleRegister = async () => {
+  setError("");
+  setLoading(true);
 
-      const data = await response.json();
+  try {
+    const hostname = window.location.hostname;
 
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
+    const payload = {
+      ...formData,
+      gender: formData.gender.toLowerCase(),
+    };
 
-      navigate("/login");
-    } catch (err) {
-      console.error("Registration error:", err);
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+    const csrfToken = getCookie("csrftoken");
+
+    const response = await fetch(`http://${hostname}:8000/add-patient/`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Server validation error:", data);
+      throw new Error(data.detail || data.message || JSON.stringify(data));
     }
-  };
+    completePatientRegistration();
+    navigate("/patient&register/confirmed");
+  } catch (err) {
+    console.error("Registration error:", err);
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className={styles.registerPage}>
@@ -168,27 +182,29 @@ function Register() {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <div className={styles.field}>
-          <label className={styles.label}>Email:</label>
-          <div className={`${styles.inputBox} ${styles.glass}`}>
-            <input
-              type="email"
-              placeholder="example@clinic.com"
-              value={formData.email}
-              onChange={handleChange("email")}
-            />
+        <div className={styles.row}>
+          <div className={styles.field}>
+            <label className={styles.label}>First Name:</label>
+            <div className={`${styles.inputBox} ${styles.glass}`}>
+              <input
+                type="text"
+                placeholder="John"
+                value={formData.first_name}
+                onChange={handleChange("first_name")}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className={styles.field}>
-          <label className={styles.label}>User Name (optional):</label>
-          <div className={`${styles.inputBox} ${styles.glass}`}>
-            <input
-              type="text"
-              placeholder="@MiaQuien"
-              value={formData.username}
-              onChange={handleChange("username")}
-            />
+          <div className={styles.field}>
+            <label className={styles.label}>Last Name:</label>
+            <div className={`${styles.inputBox} ${styles.glass}`}>
+              <input
+                type="text"
+                placeholder="Doe"
+                value={formData.last_name}
+                onChange={handleChange("last_name")}
+              />
+            </div>
           </div>
         </div>
 
@@ -212,8 +228,8 @@ function Register() {
                 ref={dobRef}
                 type="date"
                 className={styles.dateInput}
-                value={formData.date_of_birth}
-                onChange={handleChange("date_of_birth")}
+                value={formData.birth_date}
+                onChange={handleChange("birth_date")}
               />
               <button
                 type="button"

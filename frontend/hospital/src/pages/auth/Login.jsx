@@ -5,72 +5,123 @@ import { useAuth } from "../../context/AuthContext";
 
 
 function Login() {
-    const { getCurrentUser } = useAuth();
+  
+    const {
+        getCurrentUser,
+        checkPatientStatus
+      } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isNew, setIsNew] = useState(false);
+    const [apiData , setApiData] =useState([]);
+    const [patientIncomplete, setPatientIncomplete] = useState(false);
+
     const navigate = useNavigate();
 
 
-    const handleLogin = async () => {
-    setError("");
-    setLoading(true);
 
-    try {
-      const hostname = window.location.hostname;
+  const handleLogin = async () => {
+  setError("");
+  setLoading(true);
 
-      const response = await fetch(
-        `http://${hostname}:8000/dj-rest-auth/login/`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
+  try {
+    const hostname = window.location.hostname;
+
+    // =========================
+    // LOGIN
+    // =========================
+
+    const loginResponse = await fetch(
+      `http://${hostname}:8000/dj-rest-auth/login/`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    const loginData = await loginResponse.json();
+
+    if (!loginResponse.ok) {
+      throw new Error(
+        loginData.message ||
+        loginData.detail ||
+        "Login failed"
       );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      console.log("Login successful:", data);
-
-      // Update AuthContext AND get the logged-in user
-      const user = await getCurrentUser();
-
-      if (!user) {
-        throw new Error("Could not get user information");
-      }
-
-      console.log("User role:", user.role);
-
-      if (user.role === "manager") {
-        navigate("/admin/dashboard");
-      } else if (user.role === "doctor") {
-        navigate("/doctor/dashboard");
-      } else if (user.role === "patient") {
-        navigate("/patient/home");
-      } else {
-        setError("Unknown role, please contact support");
-      }
-
-    } catch (err) {
-      console.error("Login error:", err);
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
     }
-  };
 
+    console.log("Login successful:", loginData);
+
+
+    // =========================
+    // GET USER
+    // =========================
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+      throw new Error("Could not get user information");
+    }
+
+    console.log("User role:", user.role);
+
+
+    // =========================
+    // MANAGER
+    // =========================
+
+    if (user.role === "manager") {
+      navigate("/admin/dashboard");
+      return;
+    }
+
+
+    // =========================
+    // DOCTOR
+    // =========================
+
+    if (user.role === "doctor") {
+      navigate("/doctor/dashboard");
+      return;
+    }
+
+
+    // =========================
+    // PATIENT
+    // =========================
+
+    if (user.role === "patient") {
+
+      const incomplete = await checkPatientStatus();
+
+      if (incomplete) {
+        navigate("/patient&register");
+      } else {
+        navigate("/patient/home");
+      }
+
+      return;
+    }
+
+    setError("Unknown role, please contact support");
+
+  } catch (error) {
+    console.error("Login error:", error);
+    setError(error.message || "Something went wrong");
+
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className={styles.loginpage}>
         <div className={styles.backgroundImg}>

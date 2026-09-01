@@ -47,6 +47,8 @@
   height: 100dvh;
   width: 100%;
   padding: clamp(20px, 5vw, 48px) clamp(16px, 6vw, 64px);
+  padding-top:0;
+
   background: #F0EEE6;
   box-sizing: border-box;
 
@@ -431,4 +433,78 @@ body {
   background: rgba(255, 255, 255, 1);
   padding: 5px; 
   border-radius: 5px;
+}
+/* ---- entrance animations (CSS only, no JSX changes) ---- */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- Register.jsx: animate each direct child of mainLog in sequence ---- */
+.mainLog > * {
+  opacity: 0;
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mainLog > *:nth-child(1) { animation: fadeIn 0.6s ease forwards; animation-delay: 0s; }
+.mainLog > *:nth-child(2) { animation-delay: 0.08s; }
+.mainLog > *:nth-child(3) { animation-delay: 0.16s; } /* error, if present, shifts others +1 */
+.mainLog > *:nth-child(4) { animation-delay: 0.22s; }
+.mainLog > *:nth-child(5) { animation-delay: 0.28s; }
+.mainLog > *:nth-child(6) { animation-delay: 0.34s; }
+.mainLog > *:nth-child(7) { animation-delay: 0.42s; }
+
+/* ---- RegisterConfirmed.jsx: animate each direct child of mainLogM in sequence ---- */
+.mainLogM > * {
+  opacity: 0;
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mainLogM > *:nth-child(1) { animation: fadeIn 0.6s ease forwards; animation-delay: 0s; }
+
+/* give the checkmark its own bouncy pop instead of the default rise */
+.mainLogM > .approvedIcon {
+  animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  animation-delay: 0.15s !important;
+}
+
+.mainLogM > *:nth-child(3) { animation-delay: 0.35s; }
+.mainLogM > *:nth-child(4) { animation-delay: 0.42s; }
+.mainLogM > *:nth-child(5) { animation-delay: 0.5s; }
+
+/* respect users who disable motion */
+@media (prefers-reduced-motion: reduce) {
+  .mainLog > *,
+  .mainLogM > *,
+  .mainLogM > .approvedIcon {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

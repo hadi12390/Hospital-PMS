@@ -333,8 +333,10 @@ class PatientAppointmentSerializer(BaseAppointmentSerializer):
         return data
 
     def validate(self, attrs):
+        attrs["patient"] = self.context["request"].user.patient
+        attrs["status"] = Appointment.Status.PENDING
         patient = self.context["request"].user.patient
-
+        
         if self.online_booking_blocked(patient):
             raise serializers.ValidationError(
                 "Online appointment booking is currently unavailable for your account. "
